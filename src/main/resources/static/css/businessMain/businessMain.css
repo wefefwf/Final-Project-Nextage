@@ -1,0 +1,45 @@
+@charset "UTF-8";
+
+.main-content {
+    width: 1200px;
+    margin: 0 auto;
+    padding: 40px 0; /* 좌우 패딩 0으로 고정해서 1200px 정확히 유지 */
+    box-sizing: border-box;
+}
+
+.box-gray {
+    background-color: #e0e0e0;
+    border: 1px solid #bcbcbc;
+    width: 100%;
+}
+
+/* 글자(h3)와 아래 div(box-gray) 사이 간격을 20px로 수정 */
+h3 { margin-bottom: 20px; font-size: 20px; font-family: sans-serif; }
+
+/* 상단 레이아웃 */
+.section-top { display: flex; gap: 40px; margin-bottom: 60px; }
+.calendar-group { width: 60%; }
+.cal-main { height: 450px; }
+.cal-sub { height: 60px; margin-top: 20px; } /* 위 박스와의 간격 20px */
+
+.side-group { width: 40%; display: flex; flex-direction: column; }
+.order-box { height: 240px; }
+.notice-box { height: 140px; }
+
+/* 세로 점 3개 간격 */
+.vertical-dots { 
+    display: flex; flex-direction: column; align-items: center; 
+    justify-content: center; flex-grow: 1; gap: 10px; padding: 10px 0; 
+}
+.vertical-dots span { font-size: 7px; color: #ccc; }
+
+/* 하단 구역들 */
+.section-portfolio { margin-bottom: 60px; }
+.portfolio-full { height: 280px; }
+
+.post-nav { display: flex; gap: 12px; margin-bottom: 20px; } /* 버튼과 아래 박스 간격 20px */
+.btn-mock { width: 130px; height: 45px; }
+.post-full { height: 500px; margin-top: 0; } /* 위 nav에서 margin을 줬으므로 0 */
+
+.link-wrapper { text-align: right; margin-top: 10px; } /* 박스와 링크 사이 10px (전체 20px 느낌 조절) */
+.view-all { color: #333; text-decoration: none; font-size: 12px; }

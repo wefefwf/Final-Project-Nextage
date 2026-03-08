@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/business-layout}">
+<head>
+<meta charset="UTF-8">
+<title>Nextage-Business Main</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+<link rel="stylesheet" th:href="@{/css/businessMain/businessMain.css}" />
+</head>
+<body>
+ <th:block layout:fragment="content">
+	<main class="main-content">
+	  <section class="section-top">
+	    <div class="calendar-group">
+	      <h3>Calendar</h3>
+	      <div class="box-gray cal-main"></div>
+	      <div class="box-gray cal-sub"></div>
+	      <div class="link-wrapper">
+	        <a href="#" class="view-all">전체 보러가기 →</a>
+	      </div>
+	    </div>
+	    
+	    <div class="side-group">
+	      <div class="order-zone">
+	        <h3>New Order</h3>
+	        <div class="box-gray order-box"></div>
+	        <div class="link-wrapper">
+	          <a href="#" class="view-all">전체 보러가기 →</a>
+	        </div>
+	      </div>
+	
+	      <div class="vertical-dots">
+	        <span>●</span>
+	        <span>●</span>
+	        <span>●</span>
+	      </div>
+	
+	      <div class="notice-zone">
+	        <h3>Notice</h3>
+	        <div class="box-gray notice-box"></div>
+	        <div class="link-wrapper">
+	          <a href="#" class="view-all">전체 보러가기 →</a>
+	        </div>
+	      </div>
+	    </div>
+	  </section>
+	
+	  <section class="section-portfolio">
+	    <h3>My PortFolio</h3>
+	    <div class="box-gray portfolio-full"></div>
+	  </section>
+	
+	  <section class="section-post">
+	    <h3>New Post</h3>
+	    <div class="post-nav">
+	      <div class="box-gray btn-mock"></div>
+	      <div class="box-gray btn-mock"></div>
+	      <div class="box-gray btn-mock"></div>
+	      <div class="box-gray btn-mock"></div>
+	    </div>
+	    <div class="link-wrapper">
+	      <a href="#" class="view-all">전체 보러가기 →</a>
+	    </div>
+	    <div class="box-gray post-full"></div>
+	  </section>
+	</main>
+</th:block>
+</body>
+</html>

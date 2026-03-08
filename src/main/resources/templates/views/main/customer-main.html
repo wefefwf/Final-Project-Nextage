@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/customer-layout}">
+<head>
+<meta charset="UTF-8">
+<title>Nextage-Business Main</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+<link rel="stylesheet" th:href="@{/css/customerMain/customerMain.css}" />
+</head>
+<body>
+ <th:block layout:fragment="content">
+	 <main class="content-wrapper">
+	  <section class="top-section">
+	    <div class="calendar-area">
+	      <h3>Calendar</h3>
+	      <div class="block calendar-main"></div>
+	      <div class="block calendar-sub"></div>
+	      <div class="view-more">전체 보러가기 →</div>
+	    </div>
+	
+	    <div class="side-area">
+	      <div class="order-group">
+	        <h3>New Order</h3>
+	        <div class="block order-item"></div>
+	        <div class="block order-item"></div>
+	        <div class="block order-item"></div>
+	        <div class="view-more">전체 보러가기 →</div>
+	      </div>
+	      <div class="notice-group">
+	        <h3>Notice</h3>
+	        <div class="block notice-item"></div>
+	        <div class="block notice-item"></div>
+	        <div class="view-more">전체 보러가기 →</div>
+	      </div>
+	    </div>
+	  </section>
+	
+	  <section class="portfolio-section">
+	    <h3>My PortFolio</h3>
+	    <div class="portfolio-list">
+	      <div class="portfolio-card"><div class="block card-img"></div><div class="card-bar"></div></div>
+	      <div class="portfolio-card"><div class="block card-img"></div><div class="card-bar"></div></div>
+	      <div class="portfolio-card"><div class="block card-img"></div><div class="card-bar"></div></div>
+	      <div class="portfolio-card"><div class="block card-img"></div><div class="card-bar"></div></div>
+	      <div class="portfolio-card"><div class="block card-img"></div><div class="card-bar"></div></div>
+	    </div>
+	  </section>
+	
+	  <section class="post-section">
+	    <h3>New Post</h3>
+	    <div class="category-tabs">
+	      <div class="block tab-item"></div>
+	      <div class="block tab-item"></div>
+	      <div class="block tab-item"></div>
+	      <div class="block tab-item"></div>
+	    </div>
+	    <div class="view-more">전체 보러가기 →</div>
+	
+	    <div class="block post-container">
+	      <div class="post-header-area"></div>
+	      <div class="post-list-row"></div>
+	      <div class="post-list-row"></div>
+	      <div class="post-list-row"></div>
+	      <div class="post-list-row"></div>
+	      <div class="post-list-row"></div>
+	    </div>
+	  </section>
+	</main>
+</th:block>
+</body>
+</html>
