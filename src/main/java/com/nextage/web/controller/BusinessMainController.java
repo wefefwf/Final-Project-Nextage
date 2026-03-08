@@ -7,9 +7,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @RequestMapping("/business")
 public class BusinessMainController {
-	
-	//비즈니스 메인 페이지
-	@GetMapping("/main")
+    
+    // 비즈니스 메인 페이지
+    @GetMapping("/main")
     public String main() {
         return "views/main/business-main";
     }

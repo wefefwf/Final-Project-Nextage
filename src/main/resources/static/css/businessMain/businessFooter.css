@@ -11,7 +11,7 @@
     
     /* 2. 상단 라인만 스티치: 헤더와 대칭되는 포인트 */
     border-top: 3px dashed;
-    border-image: linear-gradient(to right, #fbc2eb, #a6c1ee);
+    border-image: #333;
     border-image-slice: 1;
 }
 
@@ -33,7 +33,7 @@
 /* 상호명이나 주요 정보 강조 */
 .footer-col:nth-child(3) p:first-child {
     font-weight: 700;
-    color: #333;
+    color: rgb(0, 0, 0);
 }
 
 /* 4. 하단 구분선: 카피라이트 구역 나누기 */
