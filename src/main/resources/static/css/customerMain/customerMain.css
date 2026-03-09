@@ -1,6 +1,6 @@
 @charset "UTF-8";
 
-/* [0] 폰트 임포트: Montserrat(슬로건용) & Pretendard(기본용) */
+/* [0] 폰트 임포트 */
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@900&display=swap');
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
 
@@ -8,34 +8,27 @@ body {
     font-family: 'Pretendard', sans-serif;
 }
 
-/* 🚀 슬로건 부분 집중 수정 */
+/* 슬로건 부분 */
 .banner-text-area h1 {
-    font-family: 'Montserrat', sans-serif; /* 슬로건 전용 폰트 */
-    font-size: 50px; /* 폰트 변경 후 크기를 더 키워 시원하게 */
+    font-family: 'Montserrat', sans-serif;
+    font-size: 50px;
     font-weight: 900;
-    
-    /* 텍스트 색상에 살짝 투명도를 주거나 그라데이션을 주면 더 예쁩니다 */
     color: #333;
-    letter-spacing: -3px; /* 폰트 특성상 자간을 더 좁혀야 예쁩니다 */
+    letter-spacing: -3px;
     text-transform: uppercase;
-    
     margin: 0 0 20px 0;
     line-height: 1;
-    
-    /* 은은한 광택 느낌 추가 */
     background: linear-gradient(180deg, #333 60%, #666 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
-/* [1] 전체 레이아웃 */
+/* 상단 배너 */
 .customer-main-wrapper {
     width: 1200px;
     margin: 30px auto;
-    display: block;
 }
 
-/* [2] 상단 배너 섹션 */
 .top-banner-section {
     width: 100%;
     height: 350px;
@@ -53,27 +46,26 @@ body {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
 
-/* 유리 질감 버튼 */
 .request-write-btn {
     padding: 16px 45px;
     font-size: 17px;
     font-weight: 700;
     color: #555;
-    background: rgba(255, 255, 255, 0.25); 
-    backdrop-filter: blur(15px); 
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
-    border: 1.5px solid rgba(255, 255, 255, 0.5); 
+    border: 1.5px solid rgba(255, 255, 255, 0.5);
     border-radius: 50px;
     cursor: pointer;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1), inset 0 0 10px rgba(255, 255, 255, 0.2);
     transition: all 0.4s ease;
 }
 
-/* [3] 하단 좌우 박스 레이아웃 - 높이 맞춤 핵심 */
+/* 하단 좌우 박스 */
 .bottom-list-section {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start; /* 좌우 박스의 시작 지점을 상단으로 통일 */
+    align-items: flex-start;
     gap: 40px;
     width: 100%;
 }
@@ -81,16 +73,15 @@ body {
 .column-item {
     flex: 1;
     display: flex;
-    flex-direction: column; /* 내부 요소들을 세로로 정렬 */
+    flex-direction: column;
 }
 
-/* 타이틀 영역 - 높이 고정으로 아래 박스 라인 맞춤 */
+/* 타이틀 영역 - 전체보러가기와 진행중 의뢰 오른쪽 끝 정렬 */
 .title-row {
     display: flex;
     justify-content: space-between;
-    align-items: flex-end;
+    align-items: center;
     width: 100%;
-    height: 30px;      /* 타이틀 행의 높이를 고정하여 아래 박스 시작점을 맞춤 */
     margin-bottom: 20px;
 }
 
@@ -99,21 +90,36 @@ body {
     font-weight: bold;
     color: #333;
     margin: 0;
-    line-height: 1;    /* 행간 차이 제거 */
-}
-
-.count-info {
-    font-size: 14px;
-    color: #888;
-    margin: 0;
     line-height: 1;
 }
 
-/* [4] 회색 섹션 박스 - 이제 양쪽 높이가 정확히 맞습니다 */
+.count-info,
+.link-wrapper {
+    font-size: 14px;
+    color: #808080;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+}
+
+/* 전체보러가기 버튼 우측 정렬 */
+.link-wrapper {
+    margin-left: auto; /* 왼쪽 여백 자동으로 채워 우측 정렬 */
+}
+
+.link-wrapper a {
+    text-decoration: none;
+    color: #808080;
+    font-weight: 500;
+}
+
+/* 회색 박스 */
 .gray-display-box {
     background-color: #e9e9e9 !important;
     height: 800px;
     border-radius: 15px;
     border: 1px solid #ddd;
     width: 100%;
+    margin-left: auto; /* 오른쪽 기준 정렬 */
+    max-width: 100%;
 }
