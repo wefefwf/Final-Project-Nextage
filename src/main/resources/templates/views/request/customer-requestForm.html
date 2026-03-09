@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/customer-layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>Nextage | 의뢰 작성</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    
+    <style>
+        /* 지수님이 작성하신 쫀득한 애플 스타일 CSS 유지 */
+        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+        
+        .request-page-wrapper {
+            font-family: 'Pretendard', sans-serif;
+            background: #fbfbfd;
+            padding: 80px 20px;
+            min-height: 100vh;
+        }
+
+        .glass-card {
+            max-width: 800px; margin: 0 auto; padding: 60px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.04);
+            border: 1px solid #f2f2f2;
+        }
+
+        .form-header-title { text-align: center; margin-bottom: 60px; }
+        .form-header-title h2 {
+            font-size: 2.8rem; font-weight: 800;
+            background: linear-gradient(90deg, #ffb6c1, #a1c4fd);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            margin-bottom: 10px; letter-spacing: -1.5px;
+        }
+        .form-header-title p { color: #86868b; font-size: 1.1rem; }
+
+        .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px; }
+        .input-col.full { grid-column: span 2; }
+        
+        .label-style { display: block; font-weight: 600; font-size: 0.9rem; color: #1d1d1f; margin-bottom: 12px; margin-left: 5px; }
+        .field-style {
+            width: 100%; padding: 18px 24px; border: none; border-radius: 20px;
+            background: #f5f5f7; font-size: 1rem; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-sizing: border-box;
+        }
+        .field-style:focus {
+            background: #fff; box-shadow: 0 0 0 4px rgba(255, 182, 193, 0.2); outline: none;
+        }
+
+        .upload-dropzone {
+            border: 2px dashed #e5e5e7; border-radius: 25px; padding: 50px;
+            text-align: center; transition: 0.3s; cursor: pointer; background: #fafafa;
+            position: relative;
+        }
+        .upload-dropzone:hover { border-color: #ffb6c1; background: #fffafb; }
+        .upload-dropzone i { font-size: 2.5rem; color: #ffb6c1; margin-bottom: 15px; display: block; }
+        
+        .file-input-hidden { position: absolute; width: 100%; height: 100%; top: 0; left: 0; opacity: 0; cursor: pointer; }
+
+        .submit-button {
+            width: 100%; padding: 22px; background: #1d1d1f; color: #fff;
+            border: none; border-radius: 20px; font-size: 1.2rem; font-weight: 700;
+            cursor: pointer; transition: 0.4s; margin-top: 20px;
+        }
+        .submit-button:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body>
+<th:block layout:fragment="content">
+    <div class="request-page-wrapper">
+        <div class="glass-card">
+            <div class="form-header-title">
+                <h2>Ready to Nextage?</h2>
+                <p>당신의 상상을 현실로 만들어줄 전문가를 만나보세요.</p>
+            </div>
+
+            <form th:action="@{/customer/request/insert}" method="post" enctype="multipart/form-data">
+                <div class="input-row">
+                    <div class="input-col">
+                        <label class="label-style">카테고리</label>
+                        <select name="categoryId" class="field-style" required>
+                            <option value="1">2D Clothes Reform</option>
+                            <option value="2">3D Avatar Gear</option>
+                        </select>
+                    </div>
+                    <div class="input-col">
+                        <label class="label-style">희망 예산</label>
+                        <input type="number" name="hopePrice" class="field-style" placeholder="₩ 금액을 입력하세요" required>
+                    </div>
+                    <div class="input-col full">
+                        <label class="label-style">의뢰 제목</label>
+                        <input type="text" name="title" class="field-style" placeholder="핵심 아이디어를 요약해주세요" required>
+                    </div>
+                    <div class="input-col full">
+                        <label class="label-style">상세 요청사항</label>
+                        <textarea name="description" class="field-style" rows="6" placeholder="전문가가 이해하기 쉽게 구체적인 내용을 적어주세요." style="resize:none;" required></textarea>
+                    </div>
+                    <div class="input-col">
+                        <label class="label-style">완료 희망일</label>
+                        <input type="date" name="requestedDueDate" class="field-style" required>
+                    </div>
+                    <div class="input-col full">
+                        <label class="label-style">참고 사진 (최대 4장)</label>
+                        <div class="upload-dropzone">
+                            <i class="bi bi-cloud-arrow-up"></i>
+                            <p style="font-weight: 500;">클릭하여 이미지 업로드</p>
+                            <input type="file" name="files" multiple accept="image/*" class="file-input-hidden" required>
+                        </div>
+                        <div id="file-preview-names" style="margin-top: 10px; font-size: 0.85rem; color: #86868b; text-align: center;"></div>
+                    </div>
+                </div>
+                <button type="submit" class="submit-button">의뢰 등록 완료하기</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const fileInput = document.querySelector('.file-input-hidden');
+        const previewDiv = document.getElementById('file-preview-names');
+
+        fileInput.addEventListener('change', (e) => {
+            const files = e.target.files;
+            if (files.length > 0) {
+                const names = Array.from(files).map(f => f.name).join(', ');
+                previewDiv.innerText = `선택된 파일: ${names}`;
+            } else {
+                previewDiv.innerText = '';
+            }
+        });
+    </script>
+</th:block>
+</body>
+</html>

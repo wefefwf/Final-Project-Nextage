@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/customer-layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>Nextage | 의뢰 게시판</title>
+    <link rel="stylesheet" th:href="@{/css/customerRequest/customerRequestList.css}" />
+</head>
+<body>
+<th:block layout:fragment="content">
+    <div class="request-board-container">
+        
+        <div class="board-header">
+            <div class="header-left">
+                <div class="category-filters">
+                    <button class="filter-btn active" data-category="all">전체</button>
+                    
+                    <div class="filter-group">
+                        <span class="group-label">Clothes</span>
+                        <button class="filter-btn" data-category="2D Clothes">2D</button>
+                        <button class="filter-btn" data-category="3D Clothes">3D</button>
+                    </div>
+
+                    <div class="filter-group">
+                        <span class="group-label">Accessories</span>
+                        <button class="filter-btn" data-category="3D Object">Object</button>
+                        <button class="filter-btn" data-category="Metal">Metal</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="header-right">
+                <select class="form-select-sm sort-select">
+                    <option>최신순</option>
+                    <option>금액 높은순</option>
+                </select>
+                <a th:href="@{/customer/request/write}" class="write-btn">의뢰하기</a>
+            </div>
+        </div>
+
+        <div class="request-list">
+            <div th:if="${#lists.isEmpty(requestList)}" class="empty-msg">
+                <p>등록된 의뢰가 없습니다. 첫 번째 주인공이 되어보세요!</p>
+            </div>
+
+            <div class="request-item" th:each="request : ${requestList}" 
+                 th:onclick="|location.href='/customer/request/detail/' + ${request.requestId}|">
+                
+                <img th:src="${request.thumbnailPath ?: '/image/no-image.png'}" class="item-thumbnail">
+                
+                <div class="item-info">
+                    <div class="item-top-row">
+                        <div class="item-category" th:text="${request.categoryName}">Category</div>
+                        <span class="status-badge" 
+                              th:classappend="${request.status == 'OPEN' ? 'status-open' : 'status-selected'}"
+                              th:text="${request.status == 'OPEN' ? '의뢰중' : '낙찰완료'}">
+                        </span>
+                    </div>
+                    
+                    <div class="item-title" th:text="${request.title}">의뢰 제목</div>
+                    <div class="item-meta">
+                        <span th:text="${request.customerNickname}">작성자</span> • 
+                        <span th:text="${request.createdAt}">날짜</span>
+                    </div>
+                </div>
+                
+                <div class="item-price">
+                    ₩ <span th:text="${#numbers.formatInteger(request.hopePrice, 0, 'COMMA')}">0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll('.filter-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                // 모든 버튼에서 active 클래스 제거
+                document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+                // 클릭한 버튼만 활성화
+                this.classList.add('active');
+                
+                const category = this.getAttribute('data-category');
+                console.log("선택된 카테고리:", category);
+            });
+        });
+    </script>
+</th:block>
+</body>
+</html>

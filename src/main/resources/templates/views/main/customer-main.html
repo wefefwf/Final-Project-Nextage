@@ -14,31 +14,58 @@
         <div class="top-banner-section">
             <div class="banner-text-area">
                 <h1>Ready to Nextage?</h1>
-                <button class="request-write-btn">의뢰 작성하기 <i class="bi bi-arrow-right-short"></i></button>
+                <a th:href="@{/customer/request/write}" class="request-write-btn" style="text-decoration: none; display: inline-block; line-height: 1;">
+                    의뢰 작성하기 <i class="bi bi-arrow-right-short"></i>
+                </a>
             </div>
-            </div>
+        </div>
 
         <div class="bottom-list-section">
-		    <div class="column-item">
-		        <div class="title-row">
-		            <h3 class="box-title">진행 중인 의뢰 리스트</h3>
-		            <div class="link-wrapper">
-			          <a href="#" class="view-all">전체 보러가기 →</a>
-			        </div>
-		            <span class="count-info">&nbsp;</span> 
-		        </div>
-		        <div class="gray-display-box"></div>
-		    </div>
-		
-		    <div class="column-item">
-		        <div class="title-row">
-		            <h3 class="box-title">업체 제안</h3>
-		            <span class="count-info">의뢰 #건 진행 중</span>
-		        </div>
-		        <div class="gray-display-box"></div>
-		    </div>
-		</div>
-    </div>
+            
+            <div class="column-item">
+                <div class="title-row">
+                    <h3 class="box-title">요즘 핫한 리폼 의뢰</h3>
+                    <div class="link-wrapper">
+                        <a th:href="@{/customer/request/list}" class="view-all">전체 보러가기 →</a>
+                    </div>
+                </div>
+                
+                <div class="gray-display-box">
+                    <a th:each="request, stat : ${trendingRequests}" 
+                       th:href="@{/customer/request/detail/{id}(id=${request.requestId})}" 
+                       class="trending-item-card hot-style">
+                        
+                        <div class="rank-tag" th:text="${stat.count}">1</div>
+
+                        <div class="item-info-group">
+                            <div class="category-row" style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
+                                <span class="hot-label" style="background: #ff79c6; color: #fff; font-size: 10px; font-weight: 900; padding: 2px 6px; border-radius: 4px;">HOT</span>
+                                <span class="item-category" style="font-size: 12px; color: #bbb; font-weight: 700;" th:text="${request.categoryId == 1 ? '2D Reform' : '3D Gear'}">2D Reform</span>
+                            </div>
+                            <div class="item-title" style="font-size: 18px; font-weight: 700; color: #1d1d1f;" th:text="${request.title}">의뢰 제목</div>
+                        </div>
+
+                        <div class="item-price-group" style="margin-left: auto; text-align: right;">
+                            <span class="item-price-label" style="font-size: 11px; color: #aaa; display: block; margin-bottom: 3px;">희망 예산</span>
+                            <span class="item-price-value" style="font-size: 19px; font-weight: 900; color: #ff79c6;" th:text="|₩${#numbers.formatInteger(request.hopePrice, 0, 'COMMA')}|">₩0</span>
+                        </div>
+                    </a>
+
+                    <div th:if="${#lists.isEmpty(trendingRequests)}" class="empty-state-msg" style="text-align: center; padding-top: 150px; color: #bbb;">
+                        <i class="bi bi-fire" style="font-size: 3rem; margin-bottom: 20px; display: block; color: #ff79c6;"></i>
+                        <p style="font-weight: 600;">실시간 트렌드를 분석 중입니다.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="column-item">
+                <div class="title-row">
+                    <h3 class="box-title">업체 제안</h3>
+                    <span class="count-info">의뢰 #건 진행 중</span>
+                </div>
+                <div class="gray-display-box">
+                    </div>
+            </div>
+
+        </div> </div>
 </th:block>
-</body>
-</html>

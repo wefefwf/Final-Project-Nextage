@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nextage.web.mapper.CustomerRequestMapper">
+
+    <insert id="insertRequest" useGeneratedKeys="true" keyProperty="requestId">
+        INSERT INTO request (customer_id, category_id, title, description, hope_price, requested_due_date, status)
+        VALUES (#{customerId}, #{categoryId}, #{title}, #{description}, #{hopePrice}, #{requestedDueDate}, 'OPEN')
+    </insert>
+
+    <insert id="insertAttachment">
+        INSERT INTO attachment (ref_type, ref_id, image_url, origin_name, is_thumbnail)
+        VALUES (#{refType}, #{refId}, #{imageUrl}, #{originName}, #{isThumbnail})
+    </insert>
+
+    <select id="selectAllRequests" resultType="com.nextage.web.domain.RequestDTO">
+        SELECT r.*, 
+               COALESCE(a.image_url, '/image/no-image.png') as thumbnailPath,
+               c.name as categoryName  FROM request r
+        LEFT JOIN (SELECT * FROM attachment WHERE is_thumbnail = 1 AND ref_type = 'REQ') a 
+               ON r.request_id = a.ref_id
+        LEFT JOIN category c ON r.category_id = c.category_id
+        ORDER BY r.created_at DESC
+    </select>
+
+    <select id="selectRequestsByCustomerId" resultType="com.nextage.web.domain.RequestDTO">
+        SELECT r.*, 
+               c.name as categoryName FROM request r
+        LEFT JOIN category c ON r.category_id = c.category_id
+        WHERE r.customer_id = #{customerId}
+        ORDER BY r.created_at DESC
+    </select>
+
+    <update id="updateStatus">
+        UPDATE request SET status = #{status} 
+        WHERE request_id = #{requestId}
+    </update>
+
+    <delete id="deleteAttachmentsByRequestId">
+        DELETE FROM attachment WHERE ref_id = #{requestId} AND ref_type = 'REQ'
+    </delete>
+
+    <delete id="deleteRequest">
+        DELETE FROM request WHERE request_id = #{requestId}
+    </delete>
+
+</mapper>
