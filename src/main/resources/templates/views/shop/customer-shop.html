@@ -21,7 +21,10 @@
 		            총 <span th:text="${kitList.size()}">0</span>개의 상품이 있습니다.
 		        </p>
 		    </div>
-		    <div class="col-auto">
+		    <div class="col-auto d-flex align-items-center gap-2">
+		        <a th:href="@{/customer/shopForm}" class="btn-write">
+		            상품 등록
+		        </a>
 		        <div class="dropdown shop-sort">
 		            <button class="btn dropdown-toggle sort-btn" type="button" data-bs-toggle="dropdown">
 		                <span th:text="${currentSort == 'price_asc' ? '가격 낮은순' : '가격 높은순'}">가격 높은순</span>
@@ -31,8 +34,8 @@
 		                <li><a class="dropdown-item" th:href="@{/customer/shop(page=1, sort='price_asc')}">가격 낮은순</a></li>
 		            </ul>
 		        </div>
-		    </div>
-		</div>
+		    </div>		
+    	</div>
 	    <div class="row row-cols-1 row-cols-md-3 g-4">
 		    <th:block th:each="kit : ${kitList}">
 		        <div class="col">

@@ -198,3 +198,27 @@
     font-size: 18px;
     background-color: #fff;
 }
+/* --- 글쓰기 버튼 스타일 (기존과 동일하되 여백 확인) --- */
+.btn-write {
+    display: inline-block;
+    background-color: rgb(192, 192, 192);
+    color: #fff !important;
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none !important;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    white-space: nowrap; /* 글자 줄바꿈 방지 */
+}
+
+.btn-write:hover {
+    background-color: #000;
+    transform: translateY(-2px);
+}
+
+/* 오른쪽 그룹 내 버튼 사이 간격 */
+.gap-2 {
+    gap: 12px !important;
+}

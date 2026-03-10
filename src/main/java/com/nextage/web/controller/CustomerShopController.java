@@ -23,7 +23,7 @@ public class CustomerShopController {
         this.customerMainController = customerMainController;
     }
 	
-	 // 샵 가기 페이지
+	 //샵 가기-페이지
 	//리스트 뽑아가기
     @GetMapping("/customer/shop")
     public String getList(
@@ -47,11 +47,14 @@ public class CustomerShopController {
         return "views/shop/customer-shop";
     }
     
+    //샵 제품  추가 폼가기
+    @GetMapping("/customer/shopForm")
+    public String goShopInsertForm(){
+    	return "views/shop/customer-shopInsertForm";
+    }
     
     
-    
-    
-    
+    //샵 추가 로직 post
     
     
     
