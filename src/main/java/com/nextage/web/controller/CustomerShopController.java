@@ -26,20 +26,23 @@ public class CustomerShopController {
 	 // 샵 가기 페이지
 	//리스트 뽑아가기
     @GetMapping("/customer/shop")
-    public String getList(@RequestParam(value = "page", defaultValue = "1") int page, Model model) {
-        int size = 9; // 한 페이지에 보여줄 상품 개수 (3줄 x 3열)
+    public String getList(
+        @RequestParam(value = "page", defaultValue = "1") int page, 
+        @RequestParam(value = "sort", defaultValue = "price_desc") String sort, // 정렬 기준 추가
+        Model model) {
         
-        // 1. 해당 페이지에 맞는 리스트만 가져오기 (offset 계산 필요)
+        int size = 9;
         int offset = (page - 1) * size;
-        List<KitDTO> kitList = shopService.getKitListPaged(offset, size);
-        
-        // 2. 전체 상품 개수를 가져와서 총 페이지 수 계산
+
+        // 정렬 기준을 서비스에 넘겨서 쿼리에서 처리하게 합니다.
+        List<KitDTO> kitList = shopService.getKitListPaged(offset, size, sort);
         int totalCount = shopService.getTotalKitCount();
         int totalPages = (int) Math.ceil((double) totalCount / size);
 
         model.addAttribute("kitList", kitList);
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", totalPages);
+        model.addAttribute("currentSort", sort); // 현재 어떤 정렬인지 뷰에 전달
         
         return "views/shop/customer-shop";
     }

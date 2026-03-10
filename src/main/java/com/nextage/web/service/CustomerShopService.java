@@ -15,8 +15,8 @@ public class CustomerShopService {
 	@Autowired
 	public CustomerShopMapper shopMapper;
 	
-	public List<KitDTO> getKitListPaged(int offset, int size) {
-	    return shopMapper.getKitListPaged(offset, size);
+	public List<KitDTO> getKitListPaged(int offset, int size,String sort) {
+	    return shopMapper.getKitListPaged(offset, size,sort);
 	}
 
 	public int getTotalKitCount() {

@@ -1,43 +1,121 @@
 @charset "UTF-8";
 
-/* --- [수정] SHOP 타이틀 디자인 (배경 글자 제거) --- */
-.row:first-of-type {
+/* --- [1] SHOP 타이틀 섹션 --- */
+.custom-shop-container .row:first-of-type {
+    width: 1200px !important;
+    margin: 80px auto 120px !important; 
+    padding: 0 15px !important;
+    box-sizing: border-box !important;
+    text-align: center !important;
+}
+
+.custom-shop-container .row h3 {
+    font-size: 42px !important;
+    font-weight: 900 !important;
+    color: #222 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 6px !important;
+    position: relative !important;
+    display: inline-block !important;
+    margin-bottom: 0 !important;
+}
+
+/* 1-1. SHOP 포인트 바 (Title 아래) */
+.custom-shop-container .row h3::before {
+    content: "" !important;
+    position: absolute !important;
+    top: 60px !important; 
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: 50px !important;
+    height: 5px !important;
+    background: linear-gradient(to right, #fbc2eb, #a6c1ee) !important;
+    border-radius: 10px !important;
+}
+
+/* 1-2. SHOP 서브 문구 (바 아래) */
+.custom-shop-container .row h3::after {
+    content: "나만의 특별한 커스텀 키트를 만나보세요" !important; 
+    position: absolute !important;
+    top: 90px !important; 
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    min-width: 450px !important; 
+    font-size: 15px !important;
+    font-weight: 400 !important;
+    color: #888 !important;
+    letter-spacing: 1px !important;
+    text-transform: none !important; 
+    white-space: nowrap !important;
+    text-align: center !important;
+}
+
+/* --- [2] 정렬 섹션 (개수 왼쪽 끝 & 버튼 오른쪽 끝) --- */
+.row.justify-content-end.mb-3 {
     width: 1200px;
-    margin: 80px auto 40px; 
+    margin: 0 auto 10px;
     padding: 0 15px;
     box-sizing: border-box;
-    text-align: center; /* 중앙 정렬로 임팩트 부여 */
+    display: flex !important;
+    justify-content: space-between !important; /* 양쪽 끝 정렬 */
+    align-items: center;
 }
 
-.row h3 {
-    font-size: 42px; /* 깔끔하게 크기 조절 */
-    font-weight: 900;
-    color: #222;
-    text-transform: uppercase;
-    letter-spacing: 6px; /* 자간을 넓혀 고급스러운 느낌 */
-    position: relative;
-    display: inline-block;
+.total-count-text {
+    font-size: 15px;
+    color: #666;
+    font-weight: 500;
     margin-bottom: 0;
+    white-space: nowrap;
 }
 
-/* 글자 아래 그라데이션 포인트 바 */
-.row h3::after {
-    content: "";
-    position: absolute;
-    bottom: -12px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 50px;
-    height: 5px;
-    background: linear-gradient(to right, #fbc2eb, #a6c1ee); /* 헤더와 통일감 있는 그라데이션 */
-    border-radius: 10px;
+.total-count-text span {
+    color: #ff79c6;
+    font-weight: 700;
 }
 
-/* --- 여기서부터는 기존 카드 코드 (유지) --- */
+.sort-btn {
+    background-color: #fff !important;
+    border: 1px solid #eee !important;
+    border-radius: 20px !important;
+    padding: 8px 20px !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    color: #666 !important;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+}
 
+.sort-btn:hover {
+    border-color: #ff79c6 !important;
+    color: #ff79c6 !important;
+}
+
+.sort-menu {
+    border: none !important;
+    border-radius: 12px !important;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
+    padding: 10px !important;
+    margin-top: 10px !important;
+}
+
+.sort-menu .dropdown-item {
+    font-size: 14px;
+    font-weight: 500;
+    padding: 30px 15px;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+.sort-menu .dropdown-item:hover {
+    background-color: rgba(255, 121, 198, 0.1) !important;
+    color: #ff79c6 !important;
+}
+
+/* --- [3] 상품 카드 레이아웃 (기존 카드 코드 유지) --- */
 .row.row-cols-1.row-cols-md-3.g-4 {
     width: 1200px;
-    margin: 40px auto; 
+    margin: 10px auto; 
     padding: 0 15px;
     box-sizing: border-box;
 }
@@ -76,17 +154,17 @@
 .card-text.fw-bold {
     font-size: 19px; color: #ff79c6 !important; margin-bottom: 0 !important; white-space: nowrap;
 }
-/* --- 페이지네이션 컨테이너 (중앙 정렬) --- */
+
+/* --- [4] 페이지네이션 --- */
 .pagination-container {
     width: 1200px;
-    margin: 60px auto 100px; /* 위로 60px, 아래로 100px 여백 */
+    margin: 60px auto 100px; 
     display: flex;
-    justify-content: center; /* 가로 중앙 정렬 */
+    justify-content: center; 
     align-items: center;
-    gap: 12px; /* 숫자 버튼 사이 간격 */
+    gap: 12px; 
 }
 
-/* --- 개별 버튼 기본 스타일 --- */
 .pagination-item {
     text-decoration: none;
     width: 40px;
@@ -94,7 +172,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 50%; /* 동그란 모양 */
+    border-radius: 50%; 
     background-color: #fff;
     color: #333;
     font-size: 15px;
@@ -103,21 +181,18 @@
     transition: all 0.3s ease;
 }
 
-/* 마우스 올렸을 때 효과 (상세보기와 같은 핑크색) */
 .pagination-item:hover {
     background-color: #ff79c6;
     color: #fff;
-    transform: translateY(-3px); /* 살짝 위로 들림 */
+    transform: translateY(-3px); 
 }
 
-/* --- [중요] 현재 페이지 표시 (그라데이션 적용) --- */
 .pagination-item.active {
-    background: linear-gradient(to right, #fbc2eb, #a6c1ee); /* 헤더 버튼과 통일 */
+    background: linear-gradient(to right, #fbc2eb, #a6c1ee); 
     color: #fff;
     box-shadow: 0 4px 12px rgba(251, 194, 235, 0.3);
 }
 
-/* --- 화살표 버튼 스타일 --- */
 .pagination-arrow {
     color: #ff79c6;
     font-size: 18px;

@@ -7,9 +7,19 @@
 
 	<!-- 페이지에 해당하는 갯수맞게 가져오기 -->
 	<select id="getKitListPaged" resultType="KitDTO">
-    SELECT * FROM kit 
-    ORDER BY created_at DESC 
-    LIMIT #{offset}, #{size}
+	    SELECT * FROM kit 
+	    <choose>
+	        <when test="sort == 'price_desc'">
+	            ORDER BY price DESC
+	        </when>
+	        <when test="sort == 'price_asc'">
+	            ORDER BY price ASC
+	        </when>
+	        <otherwise>
+	            ORDER BY kit_id DESC
+	        </otherwise>
+	    </choose>
+	    LIMIT #{offset}, #{size}
 	</select>
 	
 	<!-- 총갯수 -->
