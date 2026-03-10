@@ -16,4 +16,9 @@ public interface CustomerShopMapper {
 	//총 갯수 가져오기
 	public int getTotalKitCount();
 	
+	//게시글 하나 가져오기
+	public KitDTO getDetail(int id);
+	
+	//게시글 하나 지우기
+	public void deleteShop(int id);
 }

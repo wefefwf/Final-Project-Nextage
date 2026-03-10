@@ -39,7 +39,7 @@
 	    <div class="row row-cols-1 row-cols-md-3 g-4">
 		    <th:block th:each="kit : ${kitList}">
 		        <div class="col">
-		            <div class="card kit-card" style="cursor: pointer;" th:onclick = "|location.href = '@{/customer/shop/detail(id=${kit.kitId})}'|">
+		            <div class="card kit-card" style="cursor: pointer;" th:onclick = "|location.href = '@{/customer/shop/detail(id=${kit.kitId},page=${currentPage})}'|">
 		                <!-- 메인 이미지 -->
 		                <img class="bd-placeholder-img card-img-top" alt="상품 이미지" height="225"
 		                     style="object-fit: cover; width: 100%;"

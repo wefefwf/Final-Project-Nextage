@@ -57,6 +57,19 @@ public class CustomerShopController {
     //샵 추가 로직 post
     
     
+    //샵 상세페이지가기
+    @GetMapping("customer/shop/detail")
+    public String goShopDetail(@RequestParam("id") int id,@RequestParam(value = "page", defaultValue = "1") int page,Model model){
+    	KitDTO kit = shopService.getDetail(id);
+    	model.addAttribute("kit",kit);
+    	model.addAttribute("page", page);
+    	return "views/shop/customer-shopDetail";
+    }
     
-    
+    //제품 삭제
+    @GetMapping("/customer/shop/delete")
+    public String deleteShop(@RequestParam("id") int id){
+    	shopService.deleteShop(id);
+    	return "redirect:/customer/shop";
+    }
 }

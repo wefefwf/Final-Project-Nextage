@@ -3,11 +3,11 @@
 	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.nextage.web.mapper.CustomerShopMapper">
-
-
-	<!-- 페이지에 해당하는 갯수맞게 가져오기 -->
+	
+	<!-- 갯수 맞춰 갖고오기 -->
 	<select id="getKitListPaged" resultType="KitDTO">
 	    SELECT * FROM kit 
+	    WHERE status = 'ACTIVE' 
 	    <choose>
 	        <when test="sort == 'price_desc'">
 	            ORDER BY price DESC
@@ -21,17 +21,22 @@
 	    </choose>
 	    LIMIT #{offset}, #{size}
 	</select>
-	
-	<!-- 총갯수 -->
+	<!--  전체 갯수 -->
 	<select id="getTotalKitCount" resultType="int">
-	    SELECT COUNT(*) FROM kit
+	    SELECT COUNT(*) FROM kit 
+	    WHERE status = 'ACTIVE'
 	</select>
-
-
-
-
-
-
-
+	<!-- 게시물 하나 들고오기 -->
+	<select id="getDetail" parameterType="int" resultType="KitDTO">
+		SELECT * FROM kit 
+		WHERE kit_id = #{id} AND status = 'ACTIVE'
+	</select>
+	
+	<!-- 지우기 근데 결제내역에서 지워지면 안되서 status를 DELETED로 바꿔야함 -->
+	<update id="deleteShop" parameterType="int">
+	    UPDATE kit 
+	    SET status = 'DELETED' 
+	    WHERE kit_id = #{id}
+	</update>
 
 </mapper>
