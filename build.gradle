@@ -38,6 +38,10 @@ dependencies {
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	
 	implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
+
+	// ── 추가 의존성: WebClient + JSON 처리 ───────────────
+	implementation 'org.springframework.boot:spring-boot-starter-webflux' // WebClient 사용
+	implementation 'com.fasterxml.jackson.core:jackson-databind' // JSON 직렬화/역직렬화
 }
 
 tasks.named('test') {
