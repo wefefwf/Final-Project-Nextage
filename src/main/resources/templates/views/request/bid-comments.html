@@ -15,6 +15,7 @@
 	</div>
 
 
+	<script th:src="@{/js/customerRequest/customerRequestDetailBids.js}"></script>
 	<script th:inline="javascript">
 		document.addEventListener('DOMContentLoaded', function() {
 			const requestId = /*[[${request.requestId}]]*/ null;
@@ -24,5 +25,4 @@
 			}
 		});
 	</script>
-	<script th:src="@{/js/customerRequest/customerRequestDetailBids.js}"></script>
 </div>
