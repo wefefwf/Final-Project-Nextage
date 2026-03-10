@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+    <div th:fragment="bidCommentsFragment" class="bid-comments-container">
+        
+        <h3 class="section-title">전문가 제안 현황</h3>
+
+        <div th:if="${not #lists.isEmpty(bidList)}" class="bid-list">
+            <div th:each="bid : ${bidList}" class="bid-item">
+                <div class="bid-pro-info">
+                    <img th:src="${bid.proProfileImg ?: '/image/default-profile.png'}" class="pro-thumb">
+                    <div class="pro-text">
+                        <span class="pro-name" th:text="${bid.proName}">전문가 이름</span>
+                        <span class="bid-date" th:text="${bid.createdAt}">2026-03-10</span>
+                    </div>
+                </div>
+                <div class="bid-content">
+                    <p th:text="${bid.comment}">제안 내용이 여기에 들어갑니다.</p>
+                </div>
+                <div class="bid-price">
+                    <span>제안 가격</span>
+                    <strong th:text="|₩ ${#numbers.formatInteger(bid.bidPrice, 0, 'COMMA')}|">0</strong>
+                </div>
+                <button th:if="${request.status == 'OPEN'}" class="btn-select-bid">선택하기</button>
+            </div>
+        </div>
+
+        <div th:if="${#lists.isEmpty(bidList)}" class="bid-empty">
+            <p>아직 도착한 제안이 없습니다.</p>
+            <span>조금만 기다려주시면 전문가들이 제안을 보낼 거예요!</span>
+        </div>
+
+    </div>
+
+</body>
+</html>

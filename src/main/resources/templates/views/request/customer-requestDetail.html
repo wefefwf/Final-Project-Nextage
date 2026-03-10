@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/customer-layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>Nextage | 의뢰 상세</title>
+    <link rel="stylesheet" th:href="@{/css/customerRequest/customerRequestDetail.css}" />
+</head>
+<body>
+<th:block layout:fragment="content">
+    <div class="detail-wrapper">
+        <div class="request-detail-header">
+            <div class="status-badge" 
+                 th:classappend="${request.status == 'OPEN' ? 'status-open' : 
+                                 (request.status == 'SELECTED' ? 'status-selected' : 
+                                 (request.status == 'PAID' ? 'status-paid' : 'status-completed'))}"
+                 th:text="${request.status == 'OPEN' ? '의뢰중' : 
+                           (request.status == 'SELECTED' ? '낙찰완료' : 
+                           (request.status == 'PAID' ? '결제완료' : '작업완료'))}">상태</div>
+            
+            <h1 th:text="${request.title}">의뢰 제목</h1>
+            <div class="meta-data">
+                <span th:text="${request.categoryName}">카테고리</span> | 
+                <span th:text="${request.createdAt}">작성일</span>
+            </div>
+        </div>
+
+        <div class="request-detail-body">
+            <div class="image-section">
+                <img th:src="${request.thumbnailPath ?: '/image/no-image.png'}" alt="의뢰 이미지" style="max-width: 100%; border-radius: 12px;">
+            </div>
+            
+            <div class="info-section">
+                <h3>의뢰 상세 내용</h3>
+                <p th:text="${request.description}">의뢰 설명이 여기에 출력됩니다.</p>
+                <div class="price-box">
+                    <span>희망 가격</span>
+                    <strong th:text="|₩ ${#numbers.formatInteger(request.hopePrice, 0, 'COMMA')}|">0</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <th:block th:if="${request.status == 'OPEN'}">
+                <button class="btn-edit" th:onclick="|location.href='/customer/request/edit/' + ${request.requestId}|">수정하기</button>
+                <button class="btn-delete">삭제하기</button>
+            </th:block>
+
+            <button th:if="${request.status == 'SELECTED'}" class="btn-pay">결제하기</button>
+
+            <button th:if="${request.status == 'PAID'}" class="btn-info" disabled>작업이 진행 중입니다</button>
+
+            <button th:if="${request.status == 'COMPLETED'}" class="btn-review">리뷰 작성하기</button>
+        </div>
+
+        <hr class="section-divider">
+
+        <div th:replace="~{views/request/bid-comments :: bidCommentsFragment}"></div>
+
+    </div>
+</th:block>
+</body>
+</html>

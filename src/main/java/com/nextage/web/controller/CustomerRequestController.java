@@ -36,4 +36,14 @@ public class CustomerRequestController { // [참고] 오타 Cutomer -> Customer 
         requestService.registerRequest(dto, files);
         return "redirect:/customer/request/list"; // [해결] 절대 경로 리다이렉트
     }
+    
+ // 의뢰 상세 보기
+    @GetMapping("/detail/{requestId}") //승지언니랑 맞춰야할 곳 
+    public String requestDetail(@PathVariable("requestId") Long requestId, Model model) {
+        // DB에서 상세 데이터 가져오기 (서비스에 해당 메서드 구현 필요)
+        RequestDTO request = requestService.getRequestDetail(requestId); 
+        model.addAttribute("request", request);
+        
+        return "views/request/customer-requestDetail"; 
+    }
 }

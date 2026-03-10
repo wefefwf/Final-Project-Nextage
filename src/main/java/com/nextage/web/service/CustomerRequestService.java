@@ -58,6 +58,11 @@ public class CustomerRequestService {
         return requestMapper.selectAllRequests();
     }
 
+    // [추가] 2. 의뢰 상세 조회 (상세 페이지용 - 새로 추가된 부분!)
+    public RequestDTO getRequestDetail(Long requestId) {
+        return requestMapper.selectRequestDetail(requestId);
+    }
+
     // [추가] 4. 내 의뢰 목록 조회 (사용자 본인 글만)
     public List<RequestDTO> getRequestsByCustomerId(Long customerId) {
         return requestMapper.selectRequestsByCustomerId(customerId);

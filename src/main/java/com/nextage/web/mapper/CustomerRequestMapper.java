@@ -17,6 +17,10 @@ public interface CustomerRequestMapper {
     // 3. 전체 목록 조회 (Service에서 호출하는 이름에 맞춤)
     List<RequestDTO> selectAllRequests();
     
+    // [해결] 3-2. 의뢰 상세 조회 (상세 페이지 연동을 위해 반드시 필요!)
+    // image_a4d126.png의 에러를 잡는 핵심 코드입니다.
+    RequestDTO selectRequestDetail(Long requestId);
+    
     // 4. 내 의뢰 목록 조회
     List<RequestDTO> selectRequestsByCustomerId(Long customerId);
     
@@ -24,6 +28,6 @@ public interface CustomerRequestMapper {
     void updateStatus(@Param("requestId") Long requestId, @Param("status") String status);
     
     // 6. 삭제 기능
-    void deleteRequest(Long requestId);
-    void deleteAttachmentsByRequestId(Long requestId);
+    void deleteAttachmentsByRequestId(Long requestId); // 첨부파일 먼저 삭제
+    void deleteRequest(Long requestId); // 의뢰글 삭제
 }
