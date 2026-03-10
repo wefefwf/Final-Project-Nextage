@@ -1,8 +1,19 @@
 package com.nextage.web.mapper;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import com.nextage.web.domain.KitDTO;
 
 @Mapper
 public interface CustomerShopMapper {
 
+	//리스트 갯수대로 가져오기
+	public List<KitDTO> getKitListPaged(@Param("offset")int offset ,@Param("size")int size);
+	
+	//총 갯수 가져오기
+	public int getTotalKitCount();
+	
 }

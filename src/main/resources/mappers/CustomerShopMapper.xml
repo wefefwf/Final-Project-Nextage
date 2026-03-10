@@ -4,4 +4,24 @@
 
 <mapper namespace="com.nextage.web.mapper.CustomerShopMapper">
 
+
+	<!-- 페이지에 해당하는 갯수맞게 가져오기 -->
+	<select id="getKitListPaged" resultType="KitDTO">
+    SELECT * FROM kit 
+    ORDER BY created_at DESC 
+    LIMIT #{offset}, #{size}
+	</select>
+	
+	<!-- 총갯수 -->
+	<select id="getTotalKitCount" resultType="int">
+	    SELECT COUNT(*) FROM kit
+	</select>
+
+
+
+
+
+
+
+
 </mapper>
