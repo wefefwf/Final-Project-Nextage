@@ -5,11 +5,52 @@
 <head>
 <meta charset="UTF-8">
 <title>Nextage Kit Shop</title>
-<link rel="stylesheet" th:href="@{/css/customerKit/customerShop.css}" />
+<link rel="stylesheet" th:href="@{/css/customerShop/customerShop.css}" />
 </head>
 <body>
 <th:block layout:fragment="content">
-    
+	<div class = "row">
+		<div class = "col">
+			<h3>SHOP</h3>
+		</div>
+	</div>
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+	    <th:block th:each="kit : ${kitList}">
+	        <div class="col">
+	            <div class="card kit-card" style="cursor: pointer;">
+	                <!-- 메인 이미지 -->
+	                <img class="bd-placeholder-img card-img-top" alt="상품 이미지" height="225"
+	                     style="object-fit: cover; width: 100%;"
+	                     th:src="@{${kit.mainImage1}}" />
+					<div class="card-body">
+					    <p class="card-text text-muted mb-1" th:text="${kit.manufacturer}">제조사</p>
+					    <h5 class="card-title" th:text="${kit.name}">상품명</h5>
+					    <div class="price-container">
+					        <span class="view-detail-text">상세보기</span>
+					        <p class="card-text fw-bold" 
+					           th:text="|${#numbers.formatInteger(kit.price, 0, 'COMMA')}원|">0원</p>
+					    </div>
+					</div>
+	            </div>
+	        </div>
+	    </th:block>
+	</div>
+	<div class="pagination-container" th:if="${totalPages > 0}">
+	    <a th:href="@{/customer/shop(page=${currentPage - 1})}" 
+	       class="pagination-item pagination-arrow"
+	       th:if="${currentPage > 1}">&lt;</a>
+	
+	    <th:block th:each="i : ${#numbers.sequence(1, totalPages)}">
+	        <a th:href="@{/customer/shop(page=${i})}" 
+	           th:text="${i}" 
+	           class="pagination-item"
+	           th:classappend="${i == currentPage} ? 'active' : ''"></a>
+	    </th:block>
+	
+	    <a th:href="@{/customer/shop(page=${currentPage + 1})}" 
+	       class="pagination-item pagination-arrow"
+	       th:if="${currentPage < totalPages}">&gt;</a>
+	</div>
 </th:block>
 </body>
 </html>
