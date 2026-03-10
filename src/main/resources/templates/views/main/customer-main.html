@@ -37,7 +37,12 @@
             <a th:each="request : ${urgentRequests}" 
                th:href="@{/customer/request/detail/{id}(id=${request.requestId})}" 
                class="trending-item-card">
-                <div class="rank-tag" th:text="'D-' + ${T(java.time.temporal.ChronoUnit).DAYS.between(T(java.time.LocalDate).now(), request.requestedDueDate)}">D-3</div>
+               <div class="rank-tag">
+			    <span th:if="${request.requestedDueDate != null}" 
+			          th:text="'D-' + ${T(java.time.temporal.ChronoUnit).DAYS.between(T(java.time.LocalDate).now(), T(java.time.LocalDate).parse(request.requestedDueDate))}">
+			    </span>
+			    <span th:if="${request.requestedDueDate == null}">HOT</span>
+			</div>
                 <div class="item-info-group">
                     <div class="item-title" th:text="${request.title}">제목</div>
                 </div>

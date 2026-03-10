@@ -169,16 +169,35 @@ body {
     box-shadow: 0 10px 30px rgba(189, 147, 249, 0.1);
 }
 
-/* 랭킹/D-Day 숫자 스타일 */
+/* ========================================== */
+/* [수정] 랭킹/D-Day 및 제목 스타일 (안 구리게!) */
+/* ========================================== */
+
+/* 1. 숫자(D-Day) 스타일: 크기를 줄이고 세련되게 */
 .rank-tag {
     font-family: 'Montserrat', sans-serif;
-    font-size: 26px; 
-    font-weight: 900; 
-    color: #e5e5e7;
-    min-width: 50px; 
-    transition: 0.3s;
+    font-size: 14px;      /* 26px에서 14px로 줄여서 여백 확보 */
+    font-weight: 800; 
+    color: #d2d2d7;      /* 기본은 단정한 연회색 */
+    min-width: 55px;     /* 숫자와 제목 사이 간격 유지 */
+    text-align: left;
+    transition: 0.3s ease;
+    letter-spacing: -0.5px;
 }
-.trending-item-card:hover .rank-tag { color: #bd93f9; }
+
+/* 2. 카드에 마우스 올렸을 때 숫자가 핑크로 슥- 변함 */
+.trending-item-card:hover .rank-tag { 
+    color: #ff79c6;      /* 지수님이 원한 포인트 컬러 */
+}
+
+/* 3. 제목 스타일: 애플 특유의 깔끔한 폰트 느낌 */
+.item-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1d1d1f;      /* 애플 공식 다크 그레이 */
+    margin-left: 5px;
+    flex: 1;             /* 제목이 길어져도 가격이랑 안 겹치게 */
+}
 
 /* 스크롤바 커스텀 (애플 스타일) */
 .column-item:first-child .gray-display-box::-webkit-scrollbar {

@@ -30,4 +30,18 @@ public interface CustomerRequestMapper {
     // 6. 삭제 기능
     void deleteAttachmentsByRequestId(Long requestId); // 첨부파일 먼저 삭제
     void deleteRequest(Long requestId); // 의뢰글 삭제
+    
+ // ===========================================================
+    // [메인 페이지 트렌드 박스용 추가 메서드]
+    // XML의 id값과 반드시 일치해야 데이터가 뜹니다!
+    // ===========================================================
+    
+ // 1. 마감 임박 의뢰 목록 조회 (URGENT)
+    List<RequestDTO> selectUrgentRequests();
+
+    // 2. 최신 의뢰 목록 조회 (NEW ARRIVALS)
+    List<RequestDTO> selectNewRequests();
+
+    // 3. 베스트 후기 목록 조회 (BEST REVIEWS)
+    List<RequestDTO> selectBestReviews();
 }

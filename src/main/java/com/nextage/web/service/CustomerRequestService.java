@@ -80,4 +80,23 @@ public class CustomerRequestService {
         // 의뢰글 삭제
         requestMapper.deleteRequest(requestId);
     }
+    
+ // ===========================================================
+    // [메인 페이지 트렌드 박스용 데이터 연동]
+    // ===========================================================
+
+    // 1. 마감 임박 의뢰 조회 (URGENT)
+    public List<RequestDTO> getUrgentRequests() {
+        return requestMapper.selectUrgentRequests();
+    }
+
+    // 2. 최신 의뢰 조회 (NEW ARRIVALS)
+    public List<RequestDTO> getNewRequests() {
+        return requestMapper.selectNewRequests();
+    }
+
+    // 3. 베스트 후기 조회 (BEST REVIEWS)
+    public List<RequestDTO> getBestReviews() {
+        return requestMapper.selectBestReviews();
+    }
 }

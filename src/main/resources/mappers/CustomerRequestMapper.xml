@@ -54,4 +54,30 @@
         DELETE FROM request WHERE request_id = #{requestId}
     </delete>
 
+<select id="selectUrgentRequests" resultType="com.nextage.web.domain.RequestDTO">
+        SELECT r.*, c.name as categoryName 
+        FROM request r
+        LEFT JOIN category c ON r.category_id = c.category_id
+        WHERE r.status = 'OPEN' AND r.requested_due_date >= CURDATE()
+        ORDER BY r.requested_due_date ASC 
+        LIMIT 5
+    </select>
+
+    <select id="selectNewRequests" resultType="com.nextage.web.domain.RequestDTO">
+        SELECT r.*, c.name as categoryName 
+        FROM request r
+        LEFT JOIN category c ON r.category_id = c.category_id
+        WHERE r.status = 'OPEN'
+        ORDER BY r.created_at DESC 
+        LIMIT 5
+    </select>
+
+    <select id="selectBestReviews" resultType="com.nextage.web.domain.RequestDTO">
+        SELECT r.title as description, r.request_id 
+        FROM request r
+        WHERE r.status = 'COMPLETED'
+        ORDER BY r.created_at DESC
+        LIMIT 3
+    </select>
+
 </mapper>
