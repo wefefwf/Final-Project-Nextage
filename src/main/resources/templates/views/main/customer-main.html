@@ -23,40 +23,59 @@
         <div class="bottom-list-section">
             
             <div class="column-item">
-                <div class="title-row">
-                    <h3 class="box-title">요즘 핫한 리폼 의뢰</h3>
-                    <div class="link-wrapper">
-                        <a th:href="@{/customer/request/list}" class="view-all">전체 보러가기 →</a>
-                    </div>
+    <div class="title-row">
+        <h3 class="box-title">실시간 리폼 트렌드</h3>
+        <div class="link-wrapper">
+            <a th:href="@{/customer/request/list}" class="view-all">전체 보러가기 →</a>
+        </div>
+    </div>
+    
+    <div class="gray-display-box">
+        
+        <div class="content-group">
+            <h4 class="group-label">URGENT</h4>
+            <a th:each="request : ${urgentRequests}" 
+               th:href="@{/customer/request/detail/{id}(id=${request.requestId})}" 
+               class="trending-item-card">
+                <div class="rank-tag" th:text="'D-' + ${T(java.time.temporal.ChronoUnit).DAYS.between(T(java.time.LocalDate).now(), request.requestedDueDate)}">D-3</div>
+                <div class="item-info-group">
+                    <div class="item-title" th:text="${request.title}">제목</div>
                 </div>
-                
-                <div class="gray-display-box">
-                    <a th:each="request, stat : ${trendingRequests}" 
-                       th:href="@{/customer/request/detail/{id}(id=${request.requestId})}" 
-                       class="trending-item-card hot-style">
-                        
-                        <div class="rank-tag" th:text="${stat.count}">1</div>
-
-                        <div class="item-info-group">
-                            <div class="category-row" style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
-                                <span class="hot-label" style="background: #ff79c6; color: #fff; font-size: 10px; font-weight: 900; padding: 2px 6px; border-radius: 4px;">HOT</span>
-                                <span class="item-category" style="font-size: 12px; color: #bbb; font-weight: 700;" th:text="${request.categoryId == 1 ? '2D Reform' : '3D Gear'}">2D Reform</span>
-                            </div>
-                            <div class="item-title" style="font-size: 18px; font-weight: 700; color: #1d1d1f;" th:text="${request.title}">의뢰 제목</div>
-                        </div>
-
-                        <div class="item-price-group" style="margin-left: auto; text-align: right;">
-                            <span class="item-price-label" style="font-size: 11px; color: #aaa; display: block; margin-bottom: 3px;">희망 예산</span>
-                            <span class="item-price-value" style="font-size: 19px; font-weight: 900; color: #ff79c6;" th:text="|₩${#numbers.formatInteger(request.hopePrice, 0, 'COMMA')}|">₩0</span>
-                        </div>
-                    </a>
-
-                    <div th:if="${#lists.isEmpty(trendingRequests)}" class="empty-state-msg" style="text-align: center; padding-top: 150px; color: #bbb;">
-                        <i class="bi bi-fire" style="font-size: 3rem; margin-bottom: 20px; display: block; color: #ff79c6;"></i>
-                        <p style="font-weight: 600;">실시간 트렌드를 분석 중입니다.</p>
-                    </div>
+                <div class="item-price-group" style="margin-left: auto; text-align: right;">
+                    <span class="item-price-value" style="font-size: 19px; font-weight: 900; color: #ff79c6;" 
+                          th:text="|₩${#numbers.formatInteger(request.hopePrice, 0, 'COMMA')}|">₩0</span>
                 </div>
-            </div>
+            </a>
+        </div>
+
+        <div class="content-group">
+            <h4 class="group-label">NEW ARRIVALS</h4>
+            <a th:each="request : ${newRequests}" 
+               th:href="@{/customer/request/detail/{id}(id=${request.requestId})}" 
+               class="trending-item-card">
+                <div class="rank-tag" style="font-size: 16px;">NEW</div>
+                <div class="item-info-group">
+                    <div class="item-title" th:text="${request.title}">제목</div>
+                </div>
+            </a>
+        </div>
+
+        <div class="content-group">
+            <h4 class="group-label">BEST REVIEWS</h4>
+            <a th:each="review : ${bestReviews}" href="#" class="trending-item-card">
+                <div class="rank-tag" style="font-size: 24px; color: #ffcc00;">★</div>
+                <div class="item-info-group">
+                    <div class="item-title" th:text="${review.content}">후기 내용</div>
+                </div>
+            </a>
+        </div>
+
+        <div th:if="${#lists.isEmpty(urgentRequests) and #lists.isEmpty(newRequests)}" class="empty-state-msg" style="text-align: center; padding: 100px 0; color: #bbb;">
+            <i class="bi bi-fire" style="font-size: 3rem; margin-bottom: 20px; display: block; color: #ff79c6;"></i>
+            <p style="font-weight: 600;">데이터를 분석 중입니다.</p>
+        </div>
+
+    </div> </div>
             
             <div class="column-item">
                 <div class="title-row">

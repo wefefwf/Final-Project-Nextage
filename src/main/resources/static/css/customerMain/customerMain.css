@@ -113,27 +113,44 @@ body {
     font-weight: 500;
 }
 
-/* [1] 공통 스타일은 최소화 */
+/* [1] 공통 스타일 */
 .gray-display-box {
-    height: 800px;
+    height: 800px; /* 고정 높이 유지 */
     border-radius: 15px;
     border: 1px solid #ddd;
     width: 100%;
     box-sizing: border-box;
+    overflow: hidden; /* 자식 요소가 튀어나오지 않게 함 */
 }
 
-/* [2] 왼쪽 박스만 특별하게 타겟팅 (핵심!) */
+/* [2] 왼쪽 박스 스크롤 및 섹션 레이아웃 (수정됨) */
 .column-item:first-child .gray-display-box {
-    background-color: #f5f5f7 !important; /* 미세하게 맑은 회색 */
+    background-color: #f5f5f7 !important;
     display: flex;
     flex-direction: column;
     padding: 25px;
-    gap: 16px; /* 카드 사이 간격 */
-    height: auto; /* 내용 많아지면 늘어나게 */
-    min-height: 800px;
+    gap: 35px;         /* 각 섹션(URGENT, NEW 등) 사이의 큰 간격 */
+    overflow-y: auto;  /* 내부에서만 스크롤 발생 */
 }
 
-/* [3] 왼쪽 박스에 들어갈 '핫한 카드' 스타일 */
+/* 섹션별 그룹 및 라벨 스타일 */
+.content-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;         /* 카드와 카드 사이의 간격 */
+}
+
+.group-label {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px;
+    font-weight: 900;
+    color: #bbb;       /* 세련된 연회색 라벨 */
+    letter-spacing: 2px;
+    margin-bottom: 5px;
+    padding-left: 5px;
+}
+
+/* [3] 왼쪽 박스 카드 스타일 (지수님 원본 100% 유지) */
 .column-item:first-child .trending-item-card {
     display: flex;
     align-items: center;
@@ -143,23 +160,31 @@ body {
     text-decoration: none;
     transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
     border: 1px solid transparent;
+    flex-shrink: 0;    /* 스크롤 시 카드가 찌그러지지 않게 방지 */
 }
 
 .column-item:first-child .trending-item-card:hover {
-    transform: translateX(12px); /* 오른쪽으로 살짝 밀림 */
-    border-color: #bd93f9; /*테마 컬러 */
+    transform: translateX(12px);
+    border-color: #bd93f9;
     box-shadow: 0 10px 30px rgba(189, 147, 249, 0.1);
 }
 
-/* 랭킹 숫자 및 핫 배지 디테일 */
+/* 랭킹/D-Day 숫자 스타일 */
 .rank-tag {
     font-family: 'Montserrat', sans-serif;
-    font-size: 26px; font-weight: 900; color: #e5e5e7;
-    min-width: 40px; transition: 0.3s;
+    font-size: 26px; 
+    font-weight: 900; 
+    color: #e5e5e7;
+    min-width: 50px; 
+    transition: 0.3s;
 }
 .trending-item-card:hover .rank-tag { color: #bd93f9; }
 
-.hot-label {
-    background: #ff79c6; color: #fff; font-size: 10px; font-weight: 900;
-    padding: 2px 6px; border-radius: 4px; margin-right: 8px;
+/* 스크롤바 커스텀 (애플 스타일) */
+.column-item:first-child .gray-display-box::-webkit-scrollbar {
+    width: 5px;
+}
+.column-item:first-child .gray-display-box::-webkit-scrollbar-thumb {
+    background: #d2d2d7;
+    border-radius: 10px;
 }
