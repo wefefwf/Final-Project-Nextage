@@ -44,4 +44,6 @@ public interface CustomerRequestMapper {
 
     // 3. 베스트 후기 목록 조회 (BEST REVIEWS)
     List<RequestDTO> selectBestReviews();
+ // [추가] 카테고리별 의뢰 조회
+    List<RequestDTO> selectRequestsByCategory(String category);
 }

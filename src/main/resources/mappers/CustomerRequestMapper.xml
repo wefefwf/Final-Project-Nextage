@@ -40,6 +40,14 @@
         WHERE r.customer_id = #{customerId}
         ORDER BY r.created_at DESC
     </select>
+    
+<select id="selectRequestsByCategory" parameterType="string" resultType="com.nextage.web.domain.RequestDTO">
+        SELECT r.*, c.name as categoryName 
+        FROM request r
+        LEFT JOIN category c ON r.category_id = c.category_id
+        WHERE c.name = #{category}
+        ORDER BY r.created_at DESC
+    </select>
 
     <update id="updateStatus">
         UPDATE request SET status = #{status} 

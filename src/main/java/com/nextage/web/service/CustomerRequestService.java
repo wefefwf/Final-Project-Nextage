@@ -99,4 +99,8 @@ public class CustomerRequestService {
     public List<RequestDTO> getBestReviews() {
         return requestMapper.selectBestReviews();
     }
+ // [추가] 카테고리별 의뢰 조회
+    public List<RequestDTO> getRequestsByCategory(String category) {
+        return requestMapper.selectRequestsByCategory(category);
+    }
 }

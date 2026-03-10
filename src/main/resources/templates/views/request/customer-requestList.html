@@ -45,6 +45,7 @@
             </div>
 
             <div class="request-item" th:each="request : ${requestList}" 
+                 th:data-category="${request.categoryName}"
                  th:onclick="|location.href='/customer/request/detail/' + ${request.requestId}|">
                 
                 <img th:src="${request.thumbnailPath ?: '/image/no-image.png'}" class="item-thumbnail">
@@ -73,17 +74,31 @@
     </div>
 
     <script>
-        document.querySelectorAll('.filter-btn').forEach(button => {
-            button.addEventListener('click', function() {
-                // 모든 버튼에서 active 클래스 제거
-                document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-                // 클릭한 버튼만 활성화
-                this.classList.add('active');
+    document.querySelectorAll('.filter-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            // 1. 활성화 UI 처리
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+            
+            const selectedCategory = this.getAttribute('data-category');
+            const items = document.querySelectorAll('.request-item');
+            
+            // 2. 필터링 로직 (데이터 속성 기반으로 비교)
+            items.forEach(item => {
+                const itemCategory = item.getAttribute('data-category');
                 
-                const category = this.getAttribute('data-category');
-                console.log("선택된 카테고리:", category);
+                if (selectedCategory === 'all') {
+                    item.style.display = 'flex';
+                } else {
+                    if (itemCategory === selectedCategory) {
+                        item.style.display = 'flex';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                }
             });
         });
+    });
     </script>
 </th:block>
 </body>

@@ -3,7 +3,7 @@ package com.nextage.web.controller;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model; // [해결] 이 줄을 반드시 추가하세요!
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import com.nextage.web.domain.RequestDTO;
@@ -11,21 +11,31 @@ import com.nextage.web.service.CustomerRequestService;
 
 @Controller
 @RequestMapping("/customer/request")
-public class CustomerRequestController { // [참고] 오타 Cutomer -> Customer 수정 권장
+public class CustomerRequestController {
 
     @Autowired
     private CustomerRequestService requestService;
 
     @GetMapping("/write")
     public String writeForm() {
-        // [해결] 파일 경로 확인 (templates/ 생략)
         return "views/request/customer-requestForm"; 
     }
 
+    // [수정] 카테고리 필터링 기능을 추가한 리스트 메서드
     @GetMapping("/list")
-    public String requestList(Model model) {
-        List<RequestDTO> list = requestService.getAllRequests(); 
+    public String requestList(@RequestParam(value = "category", required = false) String category, Model model) {
+        List<RequestDTO> list;
+        
+        // 카테고리가 있으면 필터링, 없으면 전체 리스트 호출
+        if (category != null && !category.isEmpty()) {
+            list = requestService.getRequestsByCategory(category); 
+        } else {
+            list = requestService.getAllRequests();
+        }
+        
         model.addAttribute("requestList", list);
+        model.addAttribute("currentCategory", category); 
+        
         return "views/request/customer-requestList"; 
     }
 
@@ -34,13 +44,12 @@ public class CustomerRequestController { // [참고] 오타 Cutomer -> Customer 
                                 @RequestParam(value = "files", required = false) MultipartFile[] files) {
         dto.setCustomerId(1L); 
         requestService.registerRequest(dto, files);
-        return "redirect:/customer/request/list"; // [해결] 절대 경로 리다이렉트
+        return "redirect:/customer/request/list";
     }
     
- // 의뢰 상세 보기
-    @GetMapping("/detail/{requestId}") //승지언니랑 맞춰야할 곳 
+    // 의뢰 상세 보기
+    @GetMapping("/detail/{requestId}") //승지언니랑 맞춰야할곳
     public String requestDetail(@PathVariable("requestId") Long requestId, Model model) {
-        // DB에서 상세 데이터 가져오기 (서비스에 해당 메서드 구현 필요)
         RequestDTO request = requestService.getRequestDetail(requestId); 
         model.addAttribute("request", request);
         
