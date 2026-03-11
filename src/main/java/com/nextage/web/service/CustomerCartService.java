@@ -1,18 +1,15 @@
 package com.nextage.web.service;
-
 import com.nextage.web.domain.CartDTO;
 import com.nextage.web.mapper.CustomerCartMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class CustomerCartService {
-
     private final CustomerCartMapper customerCartMapper;
 
     // 1. 장바구니 아이템 목록 조회
@@ -27,14 +24,12 @@ public class CustomerCartService {
     @Transactional
     public void addToCart(CartDTO dto, Long customerId) {
         Long cartId = getOrCreateCartId(customerId);
-
         Long duplicateId = customerCartMapper.selectDuplicateCartItemId(
-                cartId, dto.getProductId());
-
+                cartId, dto.getKitId());   // getProductId() → getKitId()
         if (duplicateId != null) {
             customerCartMapper.updateCartItemQuantityAdd(duplicateId, dto.getQuantity());
         } else {
-            customerCartMapper.insertCartItem(cartId, dto.getProductId(), dto.getQuantity());
+            customerCartMapper.insertCartItem(cartId, dto.getKitId(), dto.getQuantity()); // productId → kitId
         }
     }
 
@@ -57,11 +52,9 @@ public class CustomerCartService {
     @Transactional
     public void deleteSelected(CartDTO dto, Long customerId) {
         Long cartId = getOrCreateCartId(customerId);
-
         List<Long> ids = dto.getIds().stream()
                 .map(Long::parseLong)
                 .collect(Collectors.toList());
-
         customerCartMapper.deleteCartItemsByIds(ids, cartId);
     }
 

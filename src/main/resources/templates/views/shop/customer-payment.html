@@ -1,78 +1,284 @@
-<div th:fragment="paymentModal">
-  <div id="payment-modal" class="modal" style="display:none;">
-    <div class="modal-content">
-      <span class="close" onclick="closePaymentModal()">&times;</span>
-      <h2>결제하기</h2>
-      <p id="product-name">상품명</p>
-      <p id="product-price">가격: 0원</p>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="customerPayment">
 
-      <input type="text" id="buyer-name" placeholder="이름" />
-      <input type="text" id="buyer-phone" placeholder="전화번호" />
-      <button id="pay-button">결제하기</button>
+<!-- ── 결제 모달 오버레이 ──────────────────────────────── -->
+<div id="paymentModalOverlay" style="
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.45);
+    backdrop-filter: blur(4px);
+    z-index: 10000;
+    align-items: center;
+    justify-content: center;
+">
+    <div id="paymentModalBox" style="
+        background: #fff;
+        border-radius: 24px;
+        padding: 40px 36px;
+        width: 420px;
+        max-width: 95vw;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+        position: relative;
+        animation: modalSlideUp 0.3s ease;
+    ">
+        <!-- 닫기 버튼 -->
+        <button onclick="closePaymentModal()" style="
+            position: absolute; top: 16px; right: 20px;
+            border: none; background: none;
+            font-size: 22px; color: #bbb; cursor: pointer;
+        ">✕</button>
+
+        <!-- 타이틀 -->
+        <div style="font-family:'Montserrat',sans-serif; font-size:20px;
+                    font-weight:900; color:#222; margin-bottom:6px;">
+            ORDER SUMMARY
+        </div>
+        <div style="font-size:13px; color:#aaa; margin-bottom:20px;">
+            결제 정보를 확인하고 진행하세요.
+        </div>
+
+        <!-- 주문 번호 -->
+        <div style="font-size:12px; color:#bbb; margin-bottom:14px;">
+            주문번호:
+            <span id="modalOrderNo"
+                  style="color:#aaa; font-weight:600; letter-spacing:0.5px;"></span>
+        </div>
+
+        <!-- 상품 목록 -->
+        <div id="modalItemList" style="
+            background:#fafafa; border-radius:14px;
+            padding:16px 18px; margin-bottom:20px;
+            max-height:180px; overflow-y:auto;
+            border:1px solid #f0f0f0;
+        "></div>
+
+        <!-- 금액 요약 -->
+        <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+            <span style="font-size:14px; color:#888;">상품 금액</span>
+            <span id="modalProductPrice"
+                  style="font-size:14px; font-weight:600; color:#333;">0원</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+            <span style="font-size:14px; color:#888;">배송비</span>
+            <span id="modalShipping"
+                  style="font-size:14px; font-weight:600; color:#333;">3,000원</span>
+        </div>
+
+        <hr style="border:none; border-top:1px solid #f0f0f0; margin:16px 0;">
+
+        <!-- 총 결제 금액 -->
+        <div style="display:flex; justify-content:space-between;
+                    align-items:center; margin-bottom:28px;">
+            <span style="font-size:16px; font-weight:700; color:#333;">총 결제 금액</span>
+            <span id="modalTotalAmount" style="
+                font-family:'Montserrat',sans-serif;
+                font-size:24px; font-weight:900;
+                background: linear-gradient(to right, #a78bfa, #a6c1ee);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+            ">0원</span>
+        </div>
+
+        <!-- 결제 버튼 -->
+        <button id="modalPayBtn" onclick="requestPayment()" style="
+            width:100%; padding:18px;
+            font-size:16px; font-weight:800; color:#fff;
+            background: linear-gradient(135deg, #bd93f9, #a6c1ee);
+            border:none; border-radius:14px; cursor:pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(189,147,249,0.35);
+        "
+        onmouseover="this.style.transform='translateY(-2px)'"
+        onmouseout="this.style.transform='translateY(0)'">
+            결제하기
+        </button>
+
+        <!-- 상태 메시지 -->
+        <div id="paymentStatusMsg" style="
+            text-align:center; margin-top:14px;
+            font-size:13px; color:#aaa; min-height:20px;
+        "></div>
     </div>
-  </div>
+</div>
 
-  <style>
-    .modal {
-      position: fixed;
-      z-index: 1000;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      overflow: auto;
-      background-color: rgba(0,0,0,0.5);
+<style>
+    @keyframes modalSlideUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to   { opacity: 1; transform: translateY(0); }
     }
-    .modal-content {
-      background-color: #fff;
-      margin: 10% auto;
-      padding: 20px;
-      width: 400px;
-      border-radius: 10px;
-      text-align: center;
-    }
-    .close {
-      float: right;
-      font-size: 24px;
-      cursor: pointer;
-    }
-  </style>
+</style>
 
-  <script src="https://cdn.iamport.kr/js/iamport.payment-1.2.0.js"></script>
-  <script>
-    let currentProduct = {};
+<!-- ✅ 포트원 v2 SDK -->
+<script src="https://cdn.portone.io/v2/browser-sdk.js"></script>
 
-    function openPaymentModal(product) {
-      currentProduct = product;
-      document.getElementById('product-name').innerText = product.name;
-      document.getElementById('product-price').innerText = '가격: ' + product.price.toLocaleString() + '원';
-      document.getElementById('payment-modal').style.display = 'block';
+<script th:inline="javascript">
+/*<![CDATA[*/
+    const SHIPPING_FEE  = 3000;
+    const FREE_SHIP_MIN = 50000;
+
+    const STORE_ID    = 'store-86babd64-b87f-4d03-8a11-45d711b38212';
+    const CHANNEL_KEY = 'channel-key-0b04d459-1cc2-4ee0-83a8-b8fef7d753eb';
+
+    let _paymentItems = [];
+    let _productTotal = 0;
+    let _totalAmount  = 0;
+    let _orderNo      = '';
+    let _cartItemIds = [];
+
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('paymentModalOverlay')
+            .addEventListener('click', function(e) {
+                if (e.target === this) closePaymentModal();
+            });
+    });
+
+    function openPaymentModal(items, productTotal, cartItemIds) {
+        _paymentItems = items;
+        _productTotal = productTotal;
+        _cartItemIds = cartItemIds || [];
+
+        var shippingFee = (productTotal > 0 && productTotal < FREE_SHIP_MIN)
+                          ? SHIPPING_FEE : 0;
+        _totalAmount = productTotal + shippingFee;
+
+        document.getElementById('modalOrderNo').textContent     = '\uC0DD\uC131 \uC911...';
+        document.getElementById('paymentStatusMsg').textContent = '';
+        document.getElementById('modalPayBtn').disabled         = true;
+
+        // 상품 목록 렌더
+        var listHtml = '';
+        items.forEach(function(it) {
+            listHtml += '<div style="display:flex; justify-content:space-between;'
+                      + 'padding:7px 0; border-bottom:1px solid #f5f5f5; font-size:13px;">'
+                      + '<span style="color:#444; flex:1; white-space:nowrap;'
+                      + 'overflow:hidden; text-overflow:ellipsis;">'
+                      + it.name + ' \xD7 ' + it.quantity
+                      + '<\/span>'
+                      + '<span style="color:#222; font-weight:600; margin-left:12px;">'
+                      + fmtNum(it.price * it.quantity) + '\uC6D0'
+                      + '<\/span>'
+                      + '<\/div>';
+        });
+        document.getElementById('modalItemList').innerHTML = listHtml;
+
+        document.getElementById('modalProductPrice').textContent = fmtNum(productTotal) + '\uC6D0';
+        document.getElementById('modalShipping').textContent
+            = (shippingFee === 0 && productTotal > 0) ? '\uBB34\uB8CC' : fmtNum(shippingFee) + '\uC6D0';
+        document.getElementById('modalTotalAmount').textContent = fmtNum(_totalAmount) + '\uC6D0';
+
+        document.getElementById('paymentModalOverlay').style.display = 'flex';
+
+        // order_no 사전 생성
+        fetch('/order/payment/create', {
+            method : 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body   : JSON.stringify({ totalAmount: _totalAmount })
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            _orderNo = data.orderNo;
+            document.getElementById('modalOrderNo').textContent = _orderNo;
+            document.getElementById('modalPayBtn').disabled = false;
+        })
+        .catch(function() {
+            document.getElementById('paymentStatusMsg').innerHTML
+                = '<span style="color:#ff6b6b;">\u274C \uC8FC\uBB38 \uC0DD\uC131\uC5D0 \uC2E4\uD328\uD588\uC2B5\uB2C8\uB2E4. \uB2E4\uC2DC \uC2DC\uB3C4\uD574\uC8FC\uC138\uC694.<\/span>';
+        });
     }
 
     function closePaymentModal() {
-      document.getElementById('payment-modal').style.display = 'none';
+        document.getElementById('paymentModalOverlay').style.display = 'none';
+        _orderNo = '';
     }
 
-    document.getElementById('pay-button').addEventListener('click', function() {
-      const IMP = window.IMP;
-      IMP.init('YOUR_IMP_MERCHANT_ID'); // 아임포트 가맹점 코드
-
-      IMP.request_pay({
-        pg: 'html5_inicis', // 예시 PG사
-        pay_method: 'card',
-        merchant_uid: 'mid_' + new Date().getTime(),
-        name: currentProduct.name,
-        amount: currentProduct.price,
-        buyer_name: document.getElementById('buyer-name').value,
-        buyer_tel: document.getElementById('buyer-phone').value,
-      }, function(rsp) {
-        if (rsp.success) {
-          alert('결제 성공! 결제번호: ' + rsp.imp_uid);
-          closePaymentModal();
-        } else {
-          alert('결제 실패: ' + rsp.error_msg);
+    function requestPayment() {
+        if (!_orderNo) {
+            document.getElementById('paymentStatusMsg').innerHTML
+                = '<span style="color:#ff6b6b;">\u274C \uC8FC\uBB38 \uC900\uBE44 \uC911\uC785\uB2C8\uB2E4. \uC7A0\uC2DC \uD6C4 \uB2E4\uC2DC \uC2DC\uB3C4\uD574\uC8FC\uC138\uC694.<\/span>';
+            return;
         }
-      });
-    });
-  </script>
-</div>
+
+        var productName = _paymentItems.length === 1
+            ? _paymentItems[0].name
+            : _paymentItems[0].name + ' \uC678 ' + (_paymentItems.length - 1) + '\uAC74';
+
+        // ✅ 카카오페이 테스트 결제
+        PortOne.requestPayment({
+            storeId    : STORE_ID,
+            channelKey : CHANNEL_KEY,
+            paymentId  : _orderNo,
+            orderName  : productName,
+            totalAmount: _totalAmount,
+            currency   : 'KRW',
+            payMethod  : 'EASY_PAY',
+            easyPay: {
+                easyPayProvider: 'KAKAOPAY'
+            },
+            customer: {
+                fullName   : '\uD14C\uC2A4\uD2B8 \uAD6C\uB9E4\uC790',
+                email      : 'test@nextage.com',
+                phoneNumber: '010-0000-0000',
+            },
+        })
+        .then(function(rsp) {
+            if (rsp.code !== undefined) {
+                document.getElementById('paymentStatusMsg').innerHTML
+                    = '<span style="color:#ff6b6b;">\u274C '
+                    + (rsp.message || '\uACB0\uC81C\uAC00 \uCDE8\uC18C\uB418\uC5C8\uC2B5\uB2C8\uB2E4.')
+                    + '<\/span>';
+                return;
+            }
+
+            // 서버 검증 요청
+            return fetch('/order/payment/verify', {
+                method : 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body   : JSON.stringify({
+                    impUid       : rsp.paymentId,
+                    orderNo      : _orderNo,
+                    totalAmount  : _totalAmount,
+                    paymentStatus: 'PAID',
+                    cartItemIds  : _cartItemIds
+                })
+            });
+        })
+        .then(function(r) {
+            if (!r) return;
+            return r.json();
+        })
+        .then(function(data) {
+		    if (!data) return;
+		    if (data.success) {
+		        document.getElementById('paymentStatusMsg').innerHTML
+		            = '<span style="color:#6dca8a; font-weight:700;">'
+		            + '\uACB0\uC81C\uAC00 \uC644\uB8CC\uB418\uC5C8\uC2B5\uB2C8\uB2E4!'
+		            + '<\/span>';
+
+		        var payBtn = document.getElementById('modalPayBtn');
+		        payBtn.disabled = true;
+		        payBtn.textContent = '\uACB0\uC81C \uC644\uB8CC';
+		        payBtn.style.background = 'linear-gradient(135deg, #6dca8a, #a8e6cf)';
+		        payBtn.style.boxShadow  = '0 4px 20px rgba(109,202,138,0.35)';
+
+		        setTimeout(function() {
+		            location.href = '/order/complete?orderNo=' + data.orderNo;
+		        }, 2000);
+		    } else {
+		        document.getElementById('paymentStatusMsg').innerHTML
+		            = '<span style="color:#ff6b6b;">\u274C ' + data.message + '<\/span>';
+		    }
+		})
+        .catch(function(err) {
+            document.getElementById('paymentStatusMsg').innerHTML
+                = '<span style="color:#ff6b6b;">\u274C \uC624\uB958\uAC00 \uBC1C\uC0DD\uD588\uC2B5\uB2C8\uB2E4: '
+                + err.message + '<\/span>';
+        });
+    }
+
+    function fmtNum(n) { return Number(n).toLocaleString('ko-KR'); }
+/*]]>*/
+</script>
+
+</th:block>
+</html>
