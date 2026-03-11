@@ -18,4 +18,6 @@ public interface CustomerOrderMapper {
 
     // order_no로 total_amount 조회 (금액 검증용)
     Integer selectTotalAmountByOrderNo(@Param("orderNo") String orderNo);
+    
+    Long selectOrderIdByOrderNo(@Param("orderNo") String orderNo);
 }

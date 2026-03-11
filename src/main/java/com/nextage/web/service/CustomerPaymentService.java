@@ -1,7 +1,9 @@
 package com.nextage.web.service;
 
+import com.nextage.web.domain.OrderItemDTO;
 import com.nextage.web.domain.PaymentDTO;
 import com.nextage.web.mapper.CustomerCartMapper;
+import com.nextage.web.mapper.CustomerOrderHistoryMapper;
 import com.nextage.web.mapper.CustomerOrderMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,8 +20,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CustomerPaymentService {
 
-    private final CustomerOrderMapper orderMapper;
-    private final CustomerCartMapper customerCartMapper;  // ✅ 추가
+    private final CustomerOrderMapper        orderMapper;
+    private final CustomerCartMapper         customerCartMapper;
+    private final CustomerOrderHistoryMapper customerOrderHistoryMapper;
 
     /**
      * 주문번호(order_no) 생성 + orders 테이블에 READY 상태로 선저장
@@ -29,7 +32,6 @@ public class CustomerPaymentService {
         String orderNo = "ORDER_"
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"))
                 + "_" + (int)(Math.random() * 9000 + 1000);
-
         orderMapper.insertOrder(orderNo, customerId, totalAmount);
         log.info("주문 생성 - orderNo: {}, customerId: {}, totalAmount: {}",
                 orderNo, customerId, totalAmount);
@@ -60,7 +62,16 @@ public class CustomerPaymentService {
         // TODO: 운영 전환 시 포트원 REST API로 imp_uid 실조회 후 이중 검증 추가
         orderMapper.updatePaymentStatus(dto.getOrderNo(), dto.getImpUid(), "PAID");
 
-        // 4. 결제한 장바구니 아이템 삭제
+        // 4. ✅ order_items 저장
+        if (dto.getOrderItems() != null && !dto.getOrderItems().isEmpty()) {
+            Long orderId = orderMapper.selectOrderIdByOrderNo(dto.getOrderNo());
+            for (OrderItemDTO item : dto.getOrderItems()) {
+                item.setOrderId(orderId);
+                customerOrderHistoryMapper.insertOrderItem(item);
+            }
+        }
+
+        // 5. 결제한 장바구니 아이템 삭제
         if (dto.getCartItemIds() != null && !dto.getCartItemIds().isEmpty()) {
             List<Long> ids = dto.getCartItemIds().stream()
                     .map(Long::parseLong)

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.nextage.web.mapper.CustomerKitReviewMapper">
+
+    <insert id="insertReview">
+        INSERT INTO kit_shop_review
+            (order_item_id, kit_id, customer_id, rating, content, created_at)
+        VALUES
+            (#{orderItemId}, #{kitId}, #{customerId}, #{rating}, #{content}, NOW())
+    </insert>
+
+    <select id="existsReview" resultType="boolean">
+        SELECT COUNT(*) > 0
+          FROM kit_shop_review
+         WHERE order_item_id = #{orderItemId}
+    </select>
+
+</mapper>
