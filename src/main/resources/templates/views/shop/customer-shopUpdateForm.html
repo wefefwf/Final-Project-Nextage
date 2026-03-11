@@ -4,8 +4,8 @@
       layout:decorate="~{layouts/customer-layout}">
 <head>
 <meta charset="UTF-8">
-<title>Nextage Kit Shop</title>
-<link rel="stylesheet" th:href="@{/css/customerShop/customerShopForm.css}" />
+<title>Nextage Kit Shop - Update</title>
+<link rel="stylesheet" th:href="@{/css/customerShop/customerShopUpdateForm.css}" />
 </head>
 <body>
 <th:block layout:fragment="content">
@@ -15,59 +15,124 @@
                 <h2>Update Kit</h2>
                 <p>상품 정보를 한 줄씩 차례대로 입력해주세요.</p>
             </div>
-           <form th:action="@{/customer/shop/update}" method="post" enctype="multipart/form-data">
-		    <input type="hidden" name="kitId" th:value="${kit.kitId}">
-		
-		    <div class="input-row">
-		        <div class="input-col full">
-		            <label class="label-style">상품명</label>
-		            <input type="text" name="name" class="field-style" 
-		                   th:value="${kit.name}" placeholder="상품 이름을 입력하세요" required>
-		        </div>
-		        
-		        <div class="input-col">
-		            <label class="label-style">제조사</label>
-		            <input type="text" name="manufacturer" class="field-style" 
-		                   th:value="${kit.manufacturer}" placeholder="브랜드명">
-		        </div>
-		        
-		        <div class="input-col">
-		            <label class="label-style">판매 가격</label>
-		            <input type="number" name="price" class="field-style" 
-		                   th:value="${kit.price}" placeholder="금액 입력" required>
-		        </div>
-		
-		        <div class="input-col full">
-		            <label class="label-style">재고량</label>
-		            <input type="number" name="stock" class="field-style" th:value="${kit.stock}">
-		        </div>
-		
-		        <div class="input-col full">
-		            <label class="label-style">상품 판매 상태</label>
-		            <select name="status" class="field-style">
-		                <option value="AVAILABLE" th:selected="${kit.status == 'AVAILABLE'}">판매 중 (Available)</option>
-		                <option value="OUT_OF_STOCK" th:selected="${kit.status == 'OUT_OF_STOCK'}">품절 (Out of Stock)</option>
-		                <option value="HIDDEN" th:selected="${kit.status == 'HIDDEN'}">판매 중지/숨김 (Hidden)</option>
-		            </select>
-		        </div>
-		    </div>
-		
-		    <hr style="border: 0; height: 1px; background: #eee; margin: 40px 0;">
-		    
-		    <div class="image-input-section">
-		        <label class="label-style">메인 대표 이미지 (변경 시에만 선택)</label>
-		        <div class="upload-dropzone">
-		            <p th:text="${kit.mainImage1}">기존 파일명.jpg</p>
-		            <input type="file" name="mainImageFile1" class="file-input-style">
-		        </div>
-		    </div>
-		    <div class="form-button-group">
-		        <button type="submit" class="submit-button">상품 정보 수정</button>
-		        <a th:href="@{/customer/shop/detail(id=${kit.kitId})}" class="cancel-button">취소</a>
-		    </div>
-		</form>
+            
+            <form th:action="@{/customer/shop/edit}" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="kitId" th:value="${kit.kitId}">
+        		<input type="hidden" name="page" th:value="${page}">
+                <div class="input-row">
+                    <div class="input-col full">
+                        <label class="label-style">상품명</label>
+                        <input type="text" name="name" class="field-style" 
+                               th:value="${kit.name}" placeholder="상품 이름을 입력하세요" required>
+                    </div>
+                    
+                    <div class="input-col">
+                        <label class="label-style">제조사</label>
+                        <input type="text" name="manufacturer" class="field-style" 
+                               th:value="${kit.manufacturer}" placeholder="브랜드명">
+                    </div>
+                    
+                    <div class="input-col">
+                        <label class="label-style">판매 가격</label>
+                        <input type="number" name="price" class="field-style" 
+                               th:value="${kit.price}" placeholder="금액 입력" required>
+                    </div>
+            
+                    <div class="input-col full">
+                        <label class="label-style">재고량</label>
+                        <input type="number" name="stock" class="field-style" th:value="${kit.stock}">
+                    </div>
+            
+                    <div class="input-col full">
+                        <label class="label-style">상품 판매 상태</label>
+                        <select name="status" class="field-style">
+                            <option value="AVAILABLE" th:selected="${kit.status == 'AVAILABLE'}">판매 중 (Available)</option>
+                            <option value="OUT_OF_STOCK" th:selected="${kit.status == 'OUT_OF_STOCK'}">품절 (Out of Stock)</option>
+                            <option value="HIDDEN" th:selected="${kit.status == 'HIDDEN'}">판매 중지/숨김 (Hidden)</option>
+                        </select>
+                    </div>
+                </div>
+               <hr style="border: 0; height: 1px; background: #eee; margin: 40px 0;">   
+                <div class="image-input-section">
+				    <label class="label-style">메인 대표 이미지 (변경 시에만 선택)</label>
+				    <div class="upload-dropzone update-mode">
+				        <div class="current-img-preview">
+				            <img id="preview1" th:src="${kit.mainImage1}" alt="현재 대표 이미지">
+				        </div>
+				        <div class="file-select-group">
+				            <i class="bi bi-image-fill"></i>
+				            <p class="current-file-text">
+				                현재 파일: <span th:text="${kit.mainImage1}">기존파일.jpg</span>
+				            </p>
+				            <input type="file" name="mainImageFile1" class="file-input-style" onchange="previewImage(this, 'preview1')">
+				        </div>
+				    </div>
+				</div>
+				
+				<div class="image-input-section">
+				    <label class="label-style">메인 서브 이미지 (변경 시에만 선택)</label>
+				    <div class="upload-dropzone update-mode">
+				        <div class="current-img-preview">
+				            <img id="preview2" th:src="${kit.mainImage2 != null ? kit.mainImage2 : '/img/no-image.png'}" 
+				                 th:alt="${kit.mainImage2 != null ? '현재 서브 이미지' : '등록된 이미지 없음'}">
+				        </div>
+				        <div class="file-select-group">
+				            <i class="bi bi-images"></i>
+				            <p class="current-file-text">
+				                현재 파일: <span th:text="${kit.mainImage2 != null ? kit.mainImage2 : '없음'}">없음</span>
+				            </p>
+				            <input type="file" name="mainImageFile2" class="file-input-style" onchange="previewImage(this, 'preview2')">
+				        </div>
+				    </div>
+				</div>
+				
+				<div class="image-input-section">
+				    <label class="label-style">상세 설명 이미지 (변경 시에만 선택)</label>
+				    <div class="upload-dropzone update-mode">
+				        <div class="current-img-preview">
+				            <img id="preview3" th:src="${kit.detailImage}" alt="현재 상세 이미지">
+				        </div>
+				        <div class="file-select-group">
+				            <i class="bi bi-file-earmark-richtext"></i>
+				            <p class="current-file-text">
+				                현재 파일: <span th:text="${kit.detailImage}">상세파일.jpg</span>
+				            </p>
+				            <input type="file" name="detailImageFile" class="file-input-style" onchange="previewImage(this, 'preview3')">
+				        </div>
+				    </div>
+				</div>
+	                <div class="form-button-group">
+					    <button type="submit" class="submit-button">상품 업데이트하기</button>
+					    <a th:href="@{/customer/shop/detail(page=${page},id=${kit.kitId})}" class="cancel-button">취소</a>
+					</div>
+				</div>
+            </form>
         </div>
     </div>
+    <script>
+        function previewImage(input, previewId) {
+            // 1. 선택된 파일이 있는지 확인
+            if (input.files && input.files[0]) {
+                
+                // 2. 파일을 읽어주는 도우미 생성
+                const reader = new FileReader();
+
+                // 3. 파일 읽기가 끝나면 실행할 일 지정
+                reader.onload = function(e) {
+                    // id가 preview1, 2, 3인 이미지 태그의 src를 읽어온 데이터로 교체!
+                    document.getElementById(previewId).src = e.target.result;
+                };
+
+                // 4. 파일을 데이터 URL(이미지 데이터)로 읽기 시작
+                reader.readAsDataURL(input.files[0]);
+                
+                // [보너스] 선택한 파일명으로 텍스트도 바꿔주기
+                const fileName = input.files[0].name;
+                // input 태그 근처에 있는 span을 찾아서 텍스트 변경 (jQuery 사용 시)
+                $(input).siblings('.current-file-text').find('span').text(fileName);
+            }
+        }
+    </script>
 </th:block>
 </body>
 </html>
