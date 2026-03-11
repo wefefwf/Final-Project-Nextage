@@ -90,7 +90,6 @@
     .shimmer { height: 38px; border-radius: var(--radius-pill); background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: shimmer 1.2s infinite; }
     @keyframes shimmer { to { background-position: -200% 0; } }
 
-    /* ── Form ── */
     .form-group { display: flex; flex-direction: column; gap: 12px; }
     .form-label { font-size: 0.78rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-secondary); margin-bottom: -4px; padding-left: 2px; }
     .apple-input { width: 100%; padding: 18px 20px; background: rgba(255,255,255,0.8); backdrop-filter: blur(12px); border: 1.5px solid var(--border); border-radius: var(--radius-lg); font-size: 0.95rem; font-family: inherit; color: var(--text-primary); outline: none; transition: all 0.25s var(--ease-apple); -webkit-appearance: none; }
@@ -98,7 +97,6 @@
     .apple-input:focus { background: #fff; border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
     .apple-input.textarea { resize: none; line-height: 1.6; }
 
-    /* ★ 희망가격 + 희망기간 */
     .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .input-col { display: flex; flex-direction: column; gap: 8px; }
     .input-prefix-wrap { position: relative; }
@@ -139,7 +137,6 @@
 
   <div class="page">
 
-    <!-- STEP 1 -->
     <div class="step-section active" id="step1">
       <div class="section-header">
         <div class="section-eyebrow">의뢰 시작하기</div>
@@ -149,14 +146,14 @@
       <div class="category-group">
         <div class="group-label">Clothes</div>
         <div class="category-grid">
-          <div class="category-card" onclick="selectCategory(this, '2D Clothes')">
+          <div class="category-card" onclick="selectCategory(this, 1)">
             <img src="/2d1.jpg" class="card-img">
             <div class="card-overlay">
               <div class="card-title">2D Clothes</div>
               <div class="card-desc">2D 캐릭터/애니 리폼</div>
             </div>
           </div>
-          <div class="category-card" onclick="selectCategory(this, '3D Clothes')">
+          <div class="category-card" onclick="selectCategory(this, 2)">
             <img src="/3d1.jpg" class="card-img">
             <div class="card-overlay">
               <div class="card-title">3D Clothes</div>
@@ -168,14 +165,14 @@
       <div class="category-group">
         <div class="group-label">Accessories</div>
         <div class="category-grid">
-          <div class="category-card" onclick="selectCategory(this, '3D Object')">
+          <div class="category-card" onclick="selectCategory(this, 3)">
             <img src="/object1.jpg" class="card-img">
             <div class="card-overlay">
               <div class="card-title">3D Object</div>
               <div class="card-desc">굿즈 제작, 오브젝트 모델링</div>
             </div>
           </div>
-          <div class="category-card" onclick="selectCategory(this, 'Metal')">
+          <div class="category-card" onclick="selectCategory(this, 4)">
             <img src="/metal.jpg" class="card-img">
             <div class="card-overlay">
               <div class="card-title">Metal</div>
@@ -186,7 +183,6 @@
       </div>
     </div>
 
-    <!-- STEP 2 -->
     <div class="step-section" id="step2">
       <div class="section-header">
         <div class="section-eyebrow">스타일 선택</div>
@@ -221,7 +217,6 @@
       </div>
     </div>
 
-    <!-- STEP 3 -->
     <div class="step-section" id="step3">
       <div class="section-header">
         <div class="section-eyebrow">상세 내용</div>
@@ -229,14 +224,10 @@
         <p>상세할수록 더 정확한 매칭이 가능합니다.</p>
       </div>
       <div class="form-group">
-
         <div class="form-label">의뢰 제목</div>
         <input type="text" id="reqTitle" class="apple-input" placeholder="예: 빈티지 자수 리폼">
-
         <div class="form-label" style="margin-top:8px;">요청사항</div>
         <textarea id="reqDetail" class="apple-input textarea" rows="5" placeholder="작업자에게 전달할 내용을 자유롭게 적어주세요."></textarea>
-
-        <!-- ★ 희망가격 + 희망기간 -->
         <div class="input-row" style="margin-top:8px;">
           <div class="input-col">
             <div class="form-label">희망 가격</div>
@@ -258,7 +249,6 @@
             </select>
           </div>
         </div>
-
         <div class="form-label" style="margin-top:8px;">참고 파일 첨부 <span style="color:var(--text-tertiary);font-weight:400;">(선택)</span></div>
         <label class="file-label" for="fileInput">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
@@ -278,13 +268,13 @@
 
   <script>
     let currentStep = 1;
-    let selectedCategory = '';
+    let selectedCategory = null; // 숫자 ID가 담길 변수
     const selectedTags = new Set();
 
     function selectCategory(el, val) {
       document.querySelectorAll('.category-card').forEach(c => c.classList.remove('active'));
       el.classList.add('active');
-      selectedCategory = val;
+      selectedCategory = val; // 여기서 숫자가 담김
     }
 
     function toggleTag(el, tag) {
@@ -315,35 +305,35 @@
     }
 
     const tagDictionary = {
-      '심플':['#심플한','#미니멀','#클린','#베이직','#모노톤','#뉴트럴'],
-      '미니멀':['#미니멀','#심플한','#클린','#모노크롬'],
-      '화려':['#화려한','#글램','#맥시멀','#볼드','#컬러풀'],
-      '빈티지':['#빈티지','#레트로','#90년대','#워싱','#클래식','#올드스쿨'],
-      '레트로':['#레트로','#빈티지','#복고풍','#80년대','#90년대','#필름감성'],
-      '사이버':['#사이버펑크','#테크웨어','#미래적인','#네온','#디지털'],
-      '펑크':['#사이버펑크','#펑크','#스터드','#체인','#엣지있는','#다크'],
-      '로맨틱':['#로맨틱','#페미닌','#플로럴','#핑크톤','#드레시','#우아한'],
-      '귀여운':['#귀여운','#키치','#파스텔','#러블리','#달달한'],
-      '캐주얼':['#캐주얼','#데일리','#편안한','#릴렉스핏'],
-      '스트릿':['#스트릿','#어반','#힙합','#스케이터','#그래픽','#오버핏'],
-      '고스':['#고스','#다크','#블랙','#엣지있는','#미스터리','#올블랙'],
-      'y2k':['#Y2K','#2000년대','#버터플라이','#글리터','#베이비블루','#로우라이즈'],
-      '아방':['#아방가르드','#실험적인','#비대칭','#예술적인','#독창적인'],
-      '자수':['#핸드메이드','#자수','#아트워크','#수공예','#디테일','#유니크'],
-      '리폼':['#리폼','#업사이클','#커스텀','#유니크','#DIY'],
-      '블랙':['#올블랙','#블랙온블랙','#다크톤','#모노크롬'],
-      '화이트':['#올화이트','#클린','#화이트톤','#청량한'],
-      '베이지':['#베이지','#뉴트럴','#어스톤','#내추럴','#따뜻한'],
-      '파스텔':['#파스텔','#소프트','#연한톤','#봄느낌','#포근한'],
-      '오버핏':['#오버핏','#루즈핏','#빅사이즈','#여유로운'],
-      '슬림':['#슬림핏','#타이트','#바디컨','#핏한','#세련된'],
-      '데님':['#데님','#청바지','#워싱','#캐주얼','#아메카지'],
-      '가죽':['#레더','#가죽','#엣지있는','#펑크','#바이커'],
-      '니트':['#니트','#코지','#따뜻한','#겨울감성','#포근한'],
-      '봄':['#봄코디','#플로럴','#파스텔','#상큼한'],
-      '여름':['#여름코디','#청량한','#시원한','#린넨','#비치'],
-      '가을':['#가을코디','#어스톤','#레이어드','#따뜻한','#브라운'],
-      '겨울':['#겨울코디','#코지','#두꺼운','#롱코트','#니트'],
+        '심플':['#심플한','#미니멀','#클린','#베이직','#모노톤','#뉴트럴'],
+        '미니멀':['#미니멀','#심플한','#클린','#모노크롬'],
+        '화려':['#화려한','#글램','#맥시멀','#볼드','#컬러풀'],
+        '빈티지':['#빈티지','#레트로','#90년대','#워싱','#클래식','#올드스쿨'],
+        '레트로':['#레트로','#빈티지','#복고풍','#80년대','#90년대','#필름감성'],
+        '사이버':['#사이버펑크','#테크웨어','#미래적인','#네온','#디지털'],
+        '펑크':['#사이버펑크','#펑크','#스터드','#체인','#엣지있는','#다크'],
+        '로맨틱':['#로맨틱','#페미닌','#플로럴','#핑크톤','#드레시','#우아한'],
+        '귀여운':['#귀여운','#키치','#파스텔','#러블리','#달달한'],
+        '캐주얼':['#캐주얼','#데일리','#편안한','#릴렉스핏'],
+        '스트릿':['#스트릿','#어반','#힙합','#스케이터','#그래픽','#오버핏'],
+        '고스':['#고스','#다크','#블랙','#엣지있는','#미스터리','#올블랙'],
+        'y2k':['#Y2K','#2000년대','#버터플라이','#글리터','#베이비블루','#로우라이즈'],
+        '아방':['#아방가르드','#실험적인','#비대칭','#예술적인','#독창적인'],
+        '자수':['#핸드메이드','#자수','#아트워크','#수공예','#디테일','#유니크'],
+        '리폼':['#리폼','#업사이클','#커스텀','#유니크','#DIY'],
+        '블랙':['#올블랙','#블랙온블랙','#다크톤','#모노크롬'],
+        '화이트':['#올화이트','#클린','#화이트톤','#청량한'],
+        '베이지':['#베이지','#뉴트럴','#어스톤','#내추럴','#따뜻한'],
+        '파스텔':['#파스텔','#소프트','#연한톤','#봄느낌','#포근한'],
+        '오버핏':['#오버핏','#루즈핏','#빅사이즈','#여유로운'],
+        '슬림':['#슬림핏','#타이트','#바디컨','#핏한','#세련된'],
+        '데님':['#데님','#청바지','#워싱','#캐주얼','#아메카지'],
+        '가죽':['#레더','#가죽','#엣지있는','#펑크','#바이커'],
+        '니트':['#니트','#코지','#따뜻한','#겨울감성','#포근한'],
+        '봄':['#봄코디','#플로럴','#파스텔','#상큼한'],
+        '여름':['#여름코디','#청량한','#시원한','#린넨','#비치'],
+        '가을':['#가을코디','#어스톤','#레이어드','#따뜻한','#브라운'],
+        '겨울':['#겨울코디','#코지','#두꺼운','#롱코트','#니트']
     };
 
     function findRelatedTags(query) {
@@ -421,40 +411,62 @@
       document.getElementById('backBtn').style.display = currentStep === 1 ? 'none' : 'inline';
     }
 
+    // [수정: 데이터 필드명 및 categoryId 타입 전송]
     function submitRequest() {
-      const title  = document.getElementById('reqTitle').value.trim();
-      const detail = document.getElementById('reqDetail').value.trim();
-      const budget = document.getElementById('reqBudget').value;
-      const deadline = document.getElementById('reqDeadline').value;
+        const title  = document.getElementById('reqTitle').value.trim();
+        const detail = document.getElementById('reqDetail').value.trim();
+        const budget = document.getElementById('reqBudget').value;
+        const deadlineDays = document.getElementById('reqDeadline').value;
 
-      if (!title) { alert('의뢰 제목을 입력해 주세요.'); return; }
+        if (!title) { alert('의뢰 제목을 입력해 주세요.'); return; }
+        if (!selectedCategory) { alert('카테고리를 선택해 주세요.'); return; }
 
-      const formData = new FormData();
-      formData.append('category', selectedCategory);
-      formData.append('tags', [...selectedTags].join(','));
-      formData.append('title', title);
-      formData.append('detail', detail);
-      formData.append('budget', budget || 0);
-      formData.append('deadline', deadline || 0);
-      const file = document.getElementById('fileInput').files[0];
-      if (file) formData.append('file', file);
+        let finalDueDate = "";
+        const date = new Date();
+        if (deadlineDays && deadlineDays !== "0") {
+            date.setDate(date.getDate() + parseInt(deadlineDays));
+            finalDueDate = date.toISOString().split('T')[0];
+        } else {
+            date.setFullYear(date.getFullYear() + 1); 
+            finalDueDate = date.toISOString().split('T')[0];
+        }
 
-      const btn = document.getElementById('mainBtn');
-      btn.innerText = '제출 중…';
-      btn.disabled = true;
+        const formData = new FormData();
+        // DTO 필드명에 맞춰서 categoryId(Long) 전달
+        formData.append('categoryId', selectedCategory); 
+        formData.append('title', title);
+        formData.append('description', detail);
+        formData.append('hopePrice', budget || 0); 
+        formData.append('requestedDueDate', finalDueDate);
 
-      fetch('/api/request/submit', { method: 'POST', body: formData })
-        .then(res => { if (!res.ok) throw new Error(); return res.json(); })
-        .then(() => {
-          btn.innerText = '✓ 접수 완료';
-          btn.style.background = '#34c759';
-          setTimeout(() => window.location.href = '/request/list', 1000);
+        const tagsString = [...selectedTags].map(tag => tag.replace('#', '').trim()).join(',');
+        formData.append('tags', tagsString);
+
+        const file = document.getElementById('fileInput').files[0];
+        if (file) formData.append('files', file);
+
+        const btn = document.getElementById('mainBtn');
+        btn.innerText = '제출 중…';
+        btn.disabled = true;
+
+        fetch('/customer/request/insert', { 
+            method: 'POST', 
+            body: formData 
+        })
+        .then(res => {
+            if (res.ok) {
+                btn.innerText = '✓ 접수 완료';
+                btn.style.background = '#34c759';
+                setTimeout(() => window.location.href = '/customer/request/list', 1000);
+            } else {
+                throw new Error();
+            }
         })
         .catch(() => {
-          btn.innerText = '의뢰 제출하기';
-          btn.disabled = false;
-          btn.style.background = '';
-          alert('제출 중 오류가 발생했어요. 다시 시도해 주세요.');
+            btn.innerText = '의뢰 제출하기';
+            btn.disabled = false;
+            btn.style.background = '';
+            alert('제출 중 오류가 발생했어요. 다시 시도해 주세요.');
         });
     }
 

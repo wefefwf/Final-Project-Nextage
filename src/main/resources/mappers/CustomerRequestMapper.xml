@@ -27,15 +27,19 @@
 </select>
     
     <select id="selectRequestDetail" resultType="com.nextage.web.domain.RequestDTO">
-        SELECT r.*, 
-               COALESCE(a.image_url, '/image/no-image.png') as thumbnailPath,
-               c.name as categoryName  
-        FROM request r
-        LEFT JOIN (SELECT * FROM attachment WHERE is_thumbnail = 1 AND ref_type = 'REQ') a 
-               ON r.request_id = a.ref_id
-        LEFT JOIN category c ON r.category_id = c.category_id
-        WHERE r.request_id = #{requestId}
-    </select>
+    SELECT r.*, 
+           COALESCE(a.image_url, '/image/no-image.png') as thumbnailPath,
+           c.name as categoryName,
+           /* 태그 가져오는 부분 추가 */
+           (SELECT GROUP_CONCAT(tag_name SEPARATOR ',') 
+            FROM request_tag 
+            WHERE request_id = r.request_id) as tags
+    FROM request r
+    LEFT JOIN (SELECT * FROM attachment WHERE is_thumbnail = 1 AND ref_type = 'REQ') a 
+           ON r.request_id = a.ref_id
+    LEFT JOIN category c ON r.category_id = c.category_id
+    WHERE r.request_id = #{requestId}
+</select>
 
     <select id="selectRequestsByCustomerId" resultType="com.nextage.web.domain.RequestDTO">
     SELECT r.*, 
@@ -69,6 +73,10 @@
     <delete id="deleteRequest">
         DELETE FROM request WHERE request_id = #{requestId}
     </delete>
+    
+    <delete id="deleteTagsByRequestId">
+    DELETE FROM request_tag WHERE request_id = #{requestId}
+	</delete>
 
 <select id="selectUrgentRequests" resultType="com.nextage.web.domain.RequestDTO">
         SELECT r.*, c.name as categoryName 

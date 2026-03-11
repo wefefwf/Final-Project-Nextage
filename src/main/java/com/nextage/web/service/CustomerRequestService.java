@@ -88,9 +88,16 @@ public class CustomerRequestService {
         requestMapper.updateStatus(requestId, status);
     }
 
-    // 6. 의뢰글 삭제
+ // 6. 의뢰글 삭제
+    @Transactional // 데이터 삭제 시에는 반드시 트랜잭션을 걸어주세요!
     public void removeRequest(Long requestId) {
+        // 1. 태그 삭제 (이 부분이 추가되어야 합니다)
+        requestMapper.deleteTagsByRequestId(requestId);
+        
+        // 2. 첨부파일 DB 기록 삭제
         requestMapper.deleteAttachmentsByRequestId(requestId);
+        
+        // 3. 실제 의뢰글 삭제
         requestMapper.deleteRequest(requestId);
     }
     

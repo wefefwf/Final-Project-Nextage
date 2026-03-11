@@ -3,62 +3,237 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/customer-layout}">
 <head>
-    <meta charset="UTF-8">
-    <title>Nextage | 의뢰 상세</title>
-    <link rel="stylesheet" th:href="@{/css/customerRequest/customerRequestDetail.css}" />
+  <meta charset="UTF-8">
+  <title>Nextage | 의뢰 상세</title>
+  <style>
+    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
+    :root {
+      --bg: #f8f8f8;
+      --white: #ffffff;
+      --border: #ebebeb;
+      --text-1: #1a1a1a;
+      --text-2: #444;
+      --text-3: #888;
+      --text-4: #bbb;
+      --pink: #ff79c6;
+      --pink-bg: rgba(255,121,198,0.08);
+      --green: #34c759;
+      --blue: #007aff;
+      --red: #ff3b30;
+      --r-xl: 20px;
+      --r-lg: 14px;
+      --r-pill: 999px;
+      --ease: cubic-bezier(0.4,0,0.2,1);
+      --spring: cubic-bezier(0.34,1.56,0.64,1);
+    }
+
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    body {
+      background: var(--bg);
+      font-family: 'Pretendard', -apple-system, sans-serif;
+      color: var(--text-1);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .wrap {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 48px 20px 100px;
+    }
+    .wrap > * { animation: up .5s var(--ease) both; }
+    .wrap > *:nth-child(1){ animation-delay:.00s }
+    .wrap > *:nth-child(2){ animation-delay:.07s }
+    .wrap > *:nth-child(3){ animation-delay:.13s }
+    @keyframes up { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+
+    .back {
+      display:inline-flex; align-items:center; gap:4px;
+      font-size:.84rem; font-weight:600; color:var(--text-3);
+      text-decoration:none; margin-bottom:22px; transition:color .15s;
+    }
+    .back:hover { color:var(--pink); }
+
+    .title-row {
+      display:flex; align-items:flex-start; justify-content:space-between;
+      gap:16px; margin-bottom:20px;
+    }
+    .title-left { flex:1; min-width:0; }
+    .meta-row { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:12px; }
+
+    .badge {
+      display:inline-flex; align-items:center; gap:5px;
+      padding:4px 11px; border-radius:var(--r-pill);
+      font-size:.68rem; font-weight:700;
+    }
+    .bdot { width:5px; height:5px; border-radius:50%; }
+    .b-open { background:var(--pink-bg); color:var(--pink); }
+    .b-open .bdot { background:var(--pink); animation:blink 1.4s ease-in-out infinite; }
+    .b-selected { background:rgba(52,199,89,.1); color:var(--green); }
+    .b-selected .bdot { background:var(--green); }
+    .b-paid { background:rgba(0,122,255,.1); color:var(--blue); }
+    .b-paid .bdot { background:var(--blue); }
+    .b-done { background:rgba(0,0,0,.05); color:var(--text-3); }
+    .b-done .bdot { background:var(--text-3); }
+    @keyframes blink{ 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.3;transform:scale(.5)} }
+
+    .cat { font-size:.7rem; font-weight:700; color:var(--text-4); text-transform:uppercase; letter-spacing:.06em; }
+    .req-title { font-size:clamp(1.5rem,3vw,2rem); font-weight:800; letter-spacing:-.05em; line-height:1.2; }
+    .req-date { display:flex; align-items:center; gap:4px; font-size:.74rem; color:var(--text-4); margin-top:7px; }
+
+    .tag-row { display:flex; flex-wrap:wrap; gap:6px; margin-top:12px; }
+    .tag {
+      padding:5px 12px; border-radius:var(--r-pill);
+      background:var(--pink-bg); color:var(--pink);
+      font-size:.72rem; font-weight:700;
+      animation:tagpop .35s var(--spring) both;
+    }
+    @keyframes tagpop{ from{opacity:0;transform:scale(.7)} to{opacity:1;transform:scale(1)} }
+
+    .title-actions { display:flex; gap:8px; flex-shrink:0; padding-top:2px; }
+    .btn {
+      display:inline-flex; align-items:center; gap:6px;
+      padding:10px 18px; border-radius:var(--r-lg);
+      border:1px solid var(--border); background:var(--white);
+      font-size:.82rem; font-weight:700; font-family:inherit;
+      cursor:pointer; transition:all .2s var(--ease);
+      text-decoration:none; color:var(--text-1); white-space:nowrap;
+    }
+    .btn:hover { border-color:var(--text-1); transform:translateY(-1px); box-shadow:0 4px 12px rgba(0,0,0,.07); }
+    .btn-del { color:var(--red); border-color:rgba(255,59,48,.2); background:rgba(255,59,48,.04); }
+
+    .content-layout {
+      display:grid; grid-template-columns: 1fr 360px; gap:16px; align-items:start;
+    }
+    @media(max-width:680px){ .content-layout{ grid-template-columns:1fr } }
+
+    .img-card {
+      background:var(--white); border:1px solid var(--border);
+      border-radius:var(--r-xl); overflow:hidden; aspect-ratio: 4/3;
+    }
+    .img-card img { width:100%; height:100%; object-fit:cover; display:block; transition:transform .7s var(--ease); }
+    
+    .side-stack { display:flex; flex-direction:column; gap:12px; }
+    .info-card { background:var(--white); border:1px solid var(--border); border-radius:var(--r-xl); padding:24px; }
+    .info-card-label { font-size:.62rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text-4); margin-bottom:10px; }
+    .info-card-text { font-size:.9rem; line-height:1.8; color:var(--text-2); word-break:keep-all; }
+
+    .stat-card { background:var(--white); border:1px solid var(--border); border-radius:var(--r-xl); overflow:hidden; }
+    .stat-item { padding:18px 24px; display:flex; align-items:center; justify-content:space-between; }
+    .stat-item + .stat-item { border-top:1px solid var(--border); }
+    .stat-item-label { font-size:.72rem; font-weight:700; color:var(--text-3); }
+    .stat-item-val { font-size:1rem; font-weight:800; letter-spacing:-.03em; }
+    .stat-item-val.pink { color:var(--pink); }
+
+    .overlay { position:fixed; inset:0; z-index: 9999 !important; background:rgba(0,0,0,.18); backdrop-filter:blur(10px); display:none; align-items:center; justify-content:center; }
+    .overlay.on { display:flex; }
+    .modal { background:#fff; border-radius:var(--r-xl); padding:30px; text-align:center; max-width:320px; animation:mpop .35s var(--spring) both; }
+    @keyframes mpop{ from{opacity:0;transform:scale(.8)} to{opacity:1;transform:scale(1)} }
+    .mbtn { flex:1; padding:13px; border-radius:var(--r-lg); border:none; font-weight:700; cursor:pointer; }
+    .mbtn.cancel { background:var(--bg); }
+    .mbtn.del { background:var(--red); color:#fff; }
+  </style>
 </head>
 <body>
 <th:block layout:fragment="content">
-    <div class="detail-wrapper">
-        <div class="request-detail-header">
-            <div class="status-badge" 
-                 th:classappend="${request.status == 'OPEN' ? 'status-open' : 
-                                 (request.status == 'SELECTED' ? 'status-selected' : 
-                                 (request.status == 'PAID' ? 'status-paid' : 'status-completed'))}"
-                 th:text="${request.status == 'OPEN' ? '의뢰중' : 
-                           (request.status == 'SELECTED' ? '낙찰완료' : 
-                           (request.status == 'PAID' ? '결제완료' : '작업완료'))}">상태</div>
-            
-            <h1 th:text="${request.title}">의뢰 제목</h1>
-            <div class="meta-data">
-                <span th:text="${request.categoryName}">카테고리</span> | 
-                <span th:text="${request.createdAt}">작성일</span>
-            </div>
+<div class="wrap">
+
+  <a href="/customer/request/list" class="back">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
+    내 의뢰 목록
+  </a>
+
+  <div class="title-row">
+    <div class="title-left">
+      <div class="meta-row">
+        <div class="badge" th:classappend="${request.status=='OPEN'?'b-open':(request.status=='SELECTED'?'b-selected':(request.status=='PAID'?'b-paid':'b-done'))}">
+          <span class="bdot"></span>
+          <span th:text="${request.status=='OPEN'?'의뢰 받는 중':(request.status=='SELECTED'?'낙찰 완료':(request.status=='PAID'?'결제 완료':'작업 완료'))}">상태</span>
         </div>
-
-        <div class="request-detail-body">
-            <div class="image-section">
-                <img th:src="${request.thumbnailPath ?: '/image/no-image.png'}" alt="의뢰 이미지" style="max-width: 100%; border-radius: 12px;">
-            </div>
-            
-            <div class="info-section">
-                <h3>의뢰 상세 내용</h3>
-                <p th:text="${request.description}">의뢰 설명이 여기에 출력됩니다.</p>
-                <div class="price-box">
-                    <span>희망 가격</span>
-                    <strong th:text="|₩ ${#numbers.formatInteger(request.hopePrice, 0, 'COMMA')}|">0</strong>
-                </div>
-            </div>
-        </div>
-
-        <div class="action-buttons">
-            <th:block th:if="${request.status == 'OPEN'}">
-                <button class="btn-edit" th:onclick="|location.href='/customer/request/edit/' + ${request.requestId}|">수정하기</button>
-                <button class="btn-delete">삭제하기</button>
-            </th:block>
-
-            <button th:if="${request.status == 'SELECTED'}" class="btn-pay">결제하기</button>
-
-            <button th:if="${request.status == 'PAID'}" class="btn-info" disabled>작업이 진행 중입니다</button>
-
-            <button th:if="${request.status == 'COMPLETED'}" class="btn-review">리뷰 작성하기</button>
-        </div>
-
-        <hr class="section-divider">
-
-        <div th:replace="~{views/request/bid-comments :: bidCommentsFragment}"></div>
-
+        <span class="cat" th:text="${request.categoryName}">카테고리</span>
+      </div>
+      <div class="req-title" th:text="${request.title}">의뢰 제목</div>
+      <div class="req-date" th:text="${request.createdAt}">작성일</div>
+      
+      <div class="tag-row" th:if="${request.tags != null}">
+        <span class="tag" th:each="tag : ${#strings.arraySplit(request.tags, ',')}" th:text="${tag}"></span>
+      </div>
     </div>
+
+    <div class="title-actions" th:if="${request.status=='OPEN'}">
+      <a class="btn" th:href="@{/customer/request/edit/{id}(id=${request.requestId})}">수정</a>
+      <button class="btn btn-del" onclick="openModal()">삭제</button>
+    </div>
+  </div>
+
+  <div class="content-layout">
+    <div class="img-card">
+      <img th:src="${request.thumbnailPath ?: '/image/no-image.png'}" alt="의뢰 이미지">
+    </div>
+
+    <div class="side-stack">
+      <div class="info-card">
+        <div class="info-card-label">요청사항</div>
+        <p class="info-card-text" th:text="${request.description}">상세 내용</p>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-item">
+          <span class="stat-item-label">희망 가격</span>
+          <span class="stat-item-val pink" th:text="${request.hopePrice > 0 ? '₩' + #numbers.formatInteger(request.hopePrice, 0, 'COMMA') : '협의'}"></span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-item-label">희망 기간</span>
+          <span class="stat-item-val" 
+                th:text="${request.requestedDueDate != null and request.requestedDueDate != '' ? request.requestedDueDate : '기간 협의'}"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top: 60px;">
+      <h3 style="margin-bottom: 20px; font-weight: 800;">제안 목록</h3>
+      <div th:replace="~{views/request/bid-comments :: bidCommentsFragment}"></div>
+  </div>
+
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <h3>의뢰를 삭제할까요?</h3>
+    <p style="font-size:0.85rem; color:var(--text-3); margin:10px 0 20px;">삭제하면 복구할 수 없습니다.</p>
+    <div style="display:flex; gap:8px;">
+      <button class="mbtn cancel" onclick="closeModal()">취소</button>
+      <button class="mbtn del" onclick="confirmDelete()">삭제하기</button>
+    </div>
+  </div>
+</div>
+
+<script th:inline="javascript">
+  /* 타임리프 인라인 변수를 안전하게 선언하는 방식 */
+  const REQUEST_ID = /*[[${request.requestId}]]*/ 0;
+  
+  function openModal() { 
+    document.getElementById('overlay').classList.add('on'); 
+  }
+  
+  function closeModal() { 
+    document.getElementById('overlay').classList.remove('on'); 
+  }
+  
+  function confirmDelete() {
+	  console.log('ddd');
+    fetch(`/api/request/${REQUEST_ID}`, { method:'DELETE' })
+      .then(r => { 
+        if(r.ok) {
+          window.location.href='/customer/request/list';
+        } else {
+          alert('삭제에 실패했습니다.');
+        }
+      })
+      .catch(err => console.error('Error:', err));
+  }
+</script>
 </th:block>
 </body>
 </html>

@@ -2,6 +2,7 @@ package com.nextage.web.controller;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -54,5 +55,23 @@ public class CustomerRequestController {
         model.addAttribute("request", request);
         
         return "views/request/customer-requestDetail"; 
+    }
+ // --- 아래 삭제 로직이 추가되었습니다 ---
+
+    /**
+     * 의뢰 삭제 처리 (AJAX 대응)
+     * HTML의 fetch 주소와 맞추기 위해 @DeleteMapping 사용
+     */
+    @DeleteMapping("/{requestId}")
+    @ResponseBody
+    public ResponseEntity<String> deleteRequest(@PathVariable("requestId") Long requestId) {
+        try {
+            // Service에서 태그 -> 첨부파일 -> 의뢰 순으로 삭제함
+            requestService.removeRequest(requestId);
+            return ResponseEntity.ok("success");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("fail");
+        }
     }
 }
