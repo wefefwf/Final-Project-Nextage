@@ -817,3 +817,102 @@ body.modal-open {
 .btn-step-primary:hover {
     background-color: rgb(19, 125, 255);
 }
+
+.bid-create-section {
+    margin-bottom: 24px;
+}
+
+.bid-create-card {
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 16px;
+    padding: 22px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+}
+
+.bid-create-header {
+    margin-bottom: 18px;
+}
+
+.bid-create-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.bid-create-subtitle {
+    font-size: 14px;
+    color: #777;
+    margin: 0;
+}
+
+.bid-create-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.bid-create-form-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+}
+
+.bid-create-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.bid-create-form-group.full {
+    width: 100%;
+}
+
+.bid-create-form-group label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+}
+
+.bid-create-input,
+.bid-create-select,
+.bid-create-textarea {
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: 14px;
+    line-height: 1.5;
+    outline: none;
+    background: #fff;
+}
+
+.bid-create-input:focus,
+.bid-create-select:focus,
+.bid-create-textarea:focus {
+    border-color: #4285f4;
+}
+
+.bid-create-textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.bid-create-actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.btn-submit-bid-create {
+    background-color: #4285f4;
+    color: #fff;
+    border: none;
+    padding: 10px 22px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.btn-submit-bid-create:hover {
+    background-color: rgb(19, 125, 255);
+}
