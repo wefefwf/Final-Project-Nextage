@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.nextage.web.mapper.OrderMapper">
+<mapper namespace="com.nextage.web.mapper.CustomerOrderMapper">
 
     <!-- 주문 사전 생성 -->
     <insert id="insertOrder">

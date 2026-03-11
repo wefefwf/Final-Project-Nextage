@@ -1,7 +1,7 @@
 package com.nextage.web.controller;
 
 import com.nextage.web.domain.PaymentDTO;
-import com.nextage.web.service.PaymentService;
+import com.nextage.web.service.CustomerPaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -15,9 +15,9 @@ import java.util.Map;
 @Controller                          // ✅ @RestController → @Controller 로 변경
 @RequestMapping("/order")
 @RequiredArgsConstructor
-public class OrderController {
+public class CustomerOrderController {
 
-    private final PaymentService paymentService;
+    private final CustomerPaymentService paymentService;
 
     // 임시 테스트용 customer_id (로그인 연동 후 제거)
     private static final Long TEMP_CUSTOMER_ID = 1L;

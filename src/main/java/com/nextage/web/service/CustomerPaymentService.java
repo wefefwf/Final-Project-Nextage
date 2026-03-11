@@ -2,7 +2,7 @@ package com.nextage.web.service;
 
 import com.nextage.web.domain.PaymentDTO;
 import com.nextage.web.mapper.CustomerCartMapper;
-import com.nextage.web.mapper.OrderMapper;
+import com.nextage.web.mapper.CustomerOrderMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -16,9 +16,9 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class PaymentService {
+public class CustomerPaymentService {
 
-    private final OrderMapper orderMapper;
+    private final CustomerOrderMapper orderMapper;
     private final CustomerCartMapper customerCartMapper;  // ✅ 추가
 
     /**

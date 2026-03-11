@@ -462,7 +462,7 @@
                     </div>
 
                     <!-- 빈 장바구니 -->
-                    <div class="cart-empty" th:if="${#lists.isEmpty(cartItems)}">
+                    <div class="cart-empty" id="cartEmpty" th:if="${#lists.isEmpty(cartItems)}">
                         <div class="cart-empty-icon">🛒</div>
                         <div class="cart-empty-text">장바구니가 비어 있어요.</div>
                     </div>
@@ -519,12 +519,20 @@
         const CART_FREE_SHIPPING_THRESHOLD = 50000;
 
         function toggleAll(master) {
-            document.querySelectorAll('.item-checkbox').forEach(cb => cb.checked = master.checked);
+            document.querySelectorAll('.item-checkbox').forEach(cb => {
+                if (!cb.closest('.cart-item-card').classList.contains('soldout')) {
+                    cb.checked = master.checked;
+                }
+            });
             updateSummary();
         }
 
         function selectAll() {
-            document.querySelectorAll('.item-checkbox').forEach(cb => cb.checked = true);
+            document.querySelectorAll('.item-checkbox').forEach(cb => {
+                if (!cb.closest('.cart-item-card').classList.contains('soldout')) {
+                    cb.checked = true;
+                }
+            });
             document.getElementById('checkAll').checked = true;
             updateSummary();
         }
@@ -577,8 +585,11 @@
             document.getElementById('summaryShipping').textContent      = (!shipping && total > 0) ? '무료' : fmt(shipping) + '원';
             document.getElementById('summaryDiscount').textContent      = '- 0원';
             document.getElementById('summaryTotal').textContent         = fmt(total + shipping) + '원';
-            const all = document.querySelectorAll('.item-checkbox');
-            document.getElementById('checkAll').checked = all.length > 0 && checked.length === all.length;
+
+            // 품절 제외한 상품만 기준으로 전체선택 체크박스 상태 계산
+            const allAvailable = document.querySelectorAll('.item-checkbox:not(:disabled)');
+            const allChecked   = document.querySelectorAll('.item-checkbox:not(:disabled):checked');
+            document.getElementById('checkAll').checked = allAvailable.length > 0 && allChecked.length === allAvailable.length;
         }
 
         function deleteItem(id) {
@@ -588,6 +599,7 @@
                     const card = document.querySelector('.cart-item-card[data-id="' + id + '"]');
                     if (card) card.remove();  // ✅ 애니메이션 제거, 바로 삭제
                     updateSummary();
+                    checkEmptyCart();
                     showToast('상품이 삭제되었습니다.');
                 } else {
                     showToast('삭제 중 오류가 발생했습니다.');
@@ -606,12 +618,14 @@
                 body: JSON.stringify({ ids })
             }).then(res => {
                 if (res.ok) {
-                    ids.forEach(id => {
-                        const card = document.querySelector('.cart-item-card[data-id="' + id + '"]');
-                        if (card) card.remove();
-                    });
-                    updateSummary();
-                    showToast(ids.length + '개 상품이 삭제되었습니다.');
+                	ids.forEach(id => {
+                	    const card = document.querySelector('.cart-item-card[data-id="' + id + '"]');
+                	    if (card) card.remove();
+                	});
+
+                	updateSummary();
+                	checkEmptyCart();  
+                	showToast(ids.length + '개 상품이 삭제되었습니다.');
                 }
             });
         }
@@ -623,12 +637,41 @@
                 body: JSON.stringify({ cartItemId: id, quantity: qty })
             });
         }
+        
+        function checkEmptyCart() {
+            const list = document.getElementById('cartItemList');
+            const items = list.querySelectorAll('.cart-item-card');
+            const empty = document.getElementById('cartEmpty');
+
+            if (items.length === 0) {
+                if (!empty) {
+                    const div = document.createElement('div');
+                    div.id = 'cartEmpty';
+                    div.className = 'cart-empty';
+                    div.innerHTML = `
+                        <div class="cart-empty-icon">🛒</div>
+                        <div class="cart-empty-text">장바구니가 비어 있어요.</div>
+                    `;
+                    list.appendChild(div);
+                }
+            } else {
+                if (empty) empty.remove();
+            }
+        }
 
         function goCheckout() {
             const checked = document.querySelectorAll('.item-checkbox:checked');
             if (!checked.length) { showToast('결제할 상품을 선택해주세요.'); return; }
 
-            const items = Array.from(checked).map(cb => {
+            //  품절 상품 체크박스는 disabled라 선택 자체가 안되지만
+            //  혹시 모르니 soldout 카드는 한 번 더 필터링
+            const validChecked = Array.from(checked).filter(cb => {
+                return !cb.closest('.cart-item-card').classList.contains('soldout');
+            });
+
+            if (!validChecked.length) { showToast('품절 상품은 결제할 수 없습니다.'); return; }
+
+            const items = validChecked.map(cb => {
                 const card = cb.closest('.cart-item-card');
                 return {
                     name    : card.querySelector('.cart-item-name').textContent.trim(),
@@ -637,7 +680,7 @@
                 };
             });
 
-            const cartItemIds  = Array.from(checked).map(cb => cb.dataset.id);
+            const cartItemIds  = validChecked.map(cb => cb.dataset.id);
             const productTotal = items.reduce((sum, it) => sum + it.price * it.quantity, 0);
             openPaymentModal(items, productTotal, cartItemIds);
         }
