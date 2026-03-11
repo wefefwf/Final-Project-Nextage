@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nextage.web.mapper.ChatMapper">
+
+    <select id="selectMyChatRooms" resultType="com.nextage.web.domain.ChatRoomDTO">
+        <![CDATA[
+        SELECT 
+            cr.room_id as roomId,
+            b.company_name as partnerName,
+            IFNULL(m.content, '대화 내용이 없습니다.') as lastMessage,
+            CASE 
+                /* 1. 메시지가 없는 경우 */
+                WHEN m.send_at IS NULL THEN '' 
+                
+                /* 2. 해가 바뀐 경우 (작년 이전): YYYY-MM-DD */
+                WHEN YEAR(m.send_at) < YEAR(CURDATE()) THEN DATE_FORMAT(m.send_at, '%Y-%m-%d')
+                
+                /* 3. 오늘인 경우: HH:mm */
+                WHEN DATE(m.send_at) = CURDATE() THEN DATE_FORMAT(m.send_at, '%H:%i')
+                
+                /* 4. 어제인 경우: '어제' */
+                WHEN DATE(m.send_at) = DATE_SUB(CURDATE(), INTERVAL 1 DAY) THEN '어제'
+                
+                /* 5. 올해 내 다른 날짜: MM-DD */
+                ELSE DATE_FORMAT(m.send_at, '%m-%d')
+            END as lastMessageTime
+        FROM chat_room cr
+        JOIN business b ON cr.business_id = b.business_id
+        LEFT JOIN (
+            /* 중복 방지를 위한 최신 메시지 추출 서브쿼리 */
+            SELECT t1.room_id, t1.content, t1.send_at
+            FROM chat_message t1
+            INNER JOIN (
+                SELECT room_id, MAX(message_id) as max_id
+                FROM chat_message
+                GROUP BY room_id
+            ) t2 ON t1.message_id = t2.max_id
+        ) m ON cr.room_id = m.room_id
+        WHERE cr.customer_id = #{customerId}
+        ORDER BY IFNULL(m.send_at, cr.created_at) DESC
+        ]]>
+    </select>
+
+    <select id="selectMessages" resultType="com.nextage.web.domain.ChatMessageDTO">
+        SELECT 
+            message_id as messageId,
+            room_id as roomId,
+            sender_id as senderId, 
+            sender_type as senderType, 
+            content, 
+            DATE_FORMAT(send_at, '%H:%i') as sendAt
+        FROM chat_message
+        WHERE room_id = #{roomId}
+        ORDER BY send_at ASC
+    </select>
+
+</mapper>

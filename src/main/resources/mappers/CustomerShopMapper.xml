@@ -55,5 +55,18 @@
 		        kit_id = #{kitDto.kitId}
 		</update>
 	
+	<!-- 제품추가 -->
+	<insert id="insertKit" parameterType="KitDTO">
+    INSERT INTO kit (name, manufacturer, price, stock, main_image1, main_image2, detail_image)
+    VALUES (
+        #{kitDto.name}, 
+        #{kitDto.manufacturer}, 
+        #{kitDto.price}, 
+        #{kitDto.stock}, 
+        #{kitDto.mainImage1}, 
+        #{kitDto.mainImage2}, 
+        #{kitDto.detailImage}
+    )
+</insert>
 	
 </mapper>

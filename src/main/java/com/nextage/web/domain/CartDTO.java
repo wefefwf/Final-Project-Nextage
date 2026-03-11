@@ -18,10 +18,10 @@ public class CartDTO {
     private String  imageUrl;
     private int     price;
     private int     quantity;
-    private String  kitStatus;     // ✅ 추가 — ACTIVE / SOLDOUT
+    private String  kitStatus;   //  DELETED 제외용 (쿼리에서 이미 필터링)
+    private int     stock;       //  품절 판단용
 
     // ── 추가 / 수정 요청용 ───────────────────────────
-    // ── 선택 삭제 요청용 ─────────────────────────────
     private List<String> ids;
 
     // ── 결제 요청용 ──────────────────────────────────
@@ -29,6 +29,6 @@ public class CartDTO {
 
     // ── 편의 메서드 ──────────────────────────────────
     public boolean isSoldOut() {
-        return "SOLDOUT".equals(kitStatus);
+        return stock <= 0;   // stock 0 이하면 품절
     }
 }

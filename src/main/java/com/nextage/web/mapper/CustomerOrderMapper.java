@@ -4,7 +4,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 @Mapper
-public interface OrderMapper {
+public interface CustomerOrderMapper {
 
     // 주문 사전 생성 (payment_status = READY)
     void insertOrder(@Param("orderNo")      String orderNo,

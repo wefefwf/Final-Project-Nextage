@@ -15,5 +15,11 @@ public interface BidsMapper {
 	int insertBid(BidDTO bid);
 	
 	List<BidDTO> selectBidsByBusinessId(@Param("businessId") Long businessId);
+	
+	int updateBidStatus(@Param("bidId") Long bidId, @Param("status") String status);
+
+    int resetOtherBidsToRejected(@Param("requestId") Long requestId, @Param("selectedBidId") Long selectedBidId);
+
+    BidDTO selectBidById(@Param("bidId") Long bidId);
 
 }

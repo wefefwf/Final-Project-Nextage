@@ -29,8 +29,9 @@ public class CustomerCartController {
 
     // GET /cart
     @GetMapping
-    public String cartPage(@AuthenticationPrincipal UserDetails userDetails,
-                           Model model) {
+    public String cartPage(
+            @AuthenticationPrincipal UserDetails userDetails,
+            Model model) {
         List<CartDTO> cartItems = customerCartService.getCartItems(getCustomerId(userDetails));
         model.addAttribute("cartItems", cartItems);
         return "views/shop/customer-cart";
@@ -44,16 +45,17 @@ public class CustomerCartController {
         return ResponseEntity.ok().build();
     }
 
-    // DELETE /cart/delete/{cartItemId}
+    // DELETE /cart/delete/{cartItemId}  — 단건 삭제
     @DeleteMapping("/delete/{cartItemId}")
     @ResponseBody
-    public ResponseEntity<Void> deleteItem(@PathVariable Long cartItemId) {
+    public ResponseEntity<Void> deleteItem(
+            @PathVariable("cartItemId") Long cartItemId) {
         customerCartService.deleteCartItem(cartItemId);
         return ResponseEntity.ok().build();
     }
 
-    // DELETE /cart/delete/selected
-    @DeleteMapping("/delete/selected")
+    // DELETE /cart/delete-selected  — 선택 삭제 ✅ URL 변경
+    @DeleteMapping("/delete-selected")
     @ResponseBody
     public ResponseEntity<Void> deleteSelected(
             @RequestBody CartDTO dto,

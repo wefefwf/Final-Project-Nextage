@@ -10,8 +10,8 @@
 }
 
 /* [2] 상단 섹션 */
-.detail-header { text-align: center; margin-bottom: 30px; margin-top: 50px;}
-.detail-header h1 { font-size: 38px; font-weight: 900; color: #222; }
+.detail-header { text-align: center; margin-bottom: 70px; margin-top: 50px; }
+.detail-header h1 { font-size: 38px; font-weight: 900; color: #222; margin-bottom: 15px; }
 
 .admin-action-row {
     display: flex;

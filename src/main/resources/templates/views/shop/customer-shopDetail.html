@@ -37,23 +37,29 @@
 
                     <p class="manufacturer-text" th:text="${kit.manufacturer}">제조사명</p>
                     <p class="product-name-display" th:text="${kit.name}">상품명</p>
-                    
+
                     <div class="info-bottom-group">
-                        <h2 class="price-text"><span th:text="${#numbers.formatInteger(kit.price, 0, 'COMMA')}">0</span>원</h2>
+                        <h2 class="price-text">
+                            <span th:text="${#numbers.formatInteger(kit.price, 0, 'COMMA')}">0</span>원
+                        </h2>
                         <p class="stock-text">남은 수량: <span th:text="${kit.stock}">0</span>개</p>
 
                         <div class="purchase-btn-group">
-                        	<!-- 수량 0개 이상 -->
-						    <th:block th:if="${kit.stock > 0}">
-						        <button class="btn-cart">장바구니 추가</button>
-						        <button class="btn-buy">바로 결제하기</button>
-						    </th:block>
-							<!-- 수량 0개 -->
-						    <th:block th:if="${kit.stock == 0}">
-						        <button class="btn-cart disabled" disabled>장바구니 추가</button>
-						        <button class="btn-buy disabled" disabled>바로 결제하기</button>
-						    </th:block>
-						</div>
+                            <!-- 재고 있을 때 -->
+                            <th:block th:if="${kit.stock > 0}">
+                                <button type="button" class="btn-cart"
+                                        th:onclick="|addToCart(${kit.kitId})|">장바구니 추가</button>
+                                <button type="button" class="btn-buy"
+                                        onclick="buyNow()">바로 결제하기</button>
+                            </th:block>
+                            <!-- 품절일 때 -->
+                            <th:block th:if="${kit.stock <= 0}">
+                                <button type="button" class="btn-cart disabled"
+                                        style="background-color:#ccc; cursor:not-allowed;">품절</button>
+                                <button type="button" class="btn-buy disabled" disabled
+                                        style="background-color:#999; cursor:not-allowed;">구매 불가</button>
+                            </th:block>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -68,7 +74,10 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
-    <script>
+
+    <!-- ✅ th:inline="javascript" 추가 -->
+    <script th:inline="javascript">
+    /*<![CDATA[*/
     $(document).ready(function(){
         setTimeout(function() {
             var $wrapper = $('.slick-wrapper');
@@ -84,18 +93,58 @@
                 autoplay: true,
                 autoplaySpeed: 2000,
                 arrows: true,
-                prevArrow: '<button type="button" class="slick-prev">〈</button>',
-                nextArrow: '<button type="button" class="slick-next">〉</button>'
+                prevArrow: '<button type="button" class="slick-prev">\u3008<\/button>',
+                nextArrow: '<button type="button" class="slick-next">\u3009<\/button>'
             });
-        }, 300); 
+        }, 300);
     });
 
     function deleteKit(id) {
-        if(confirm("정말로 이 상품을 삭제하시겠습니까?")) {
+        if (confirm("\uC815\uB9D0\uB85C \uC774 \uC0C1\uD488\uC744 \uC0AD\uC81C\uD558\uC2DC\uACA0\uC2B5\uB2C8\uAE4C?")) {
             location.href = "/customer/shop/delete?id=" + id;
         }
     }
+
+    function addToCart(kitId) {
+        fetch('/cart/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ kitId: kitId, quantity: 1 })
+        })
+        .then(res => {
+            if (res.ok) {
+                if (confirm("\uC7A5\uBC14\uAD6C\uB2C8\uC5D0 \uCD94\uAC00\uB418\uC5C8\uC2B5\uB2C8\uB2E4. \uC7A5\uBC14\uAD6C\uB2C8\uB85C \uC774\uB3D9\uD558\uC2DC\uACA0\uC2B5\uB2C8\uAE4C?")) {
+                    location.href = "/cart";
+                }
+            } else {
+                alert("\uC7A5\uBC14\uAD6C\uB2C8 \uCD94\uAC00 \uC2E4\uD328");
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert("\uC624\uB958 \uBC1C\uC0DD");
+        });
+    }
+
+    function buyNow() {
+        const itemName  = /*[[${kit.name}]]*/ '\uC0C1\uD488\uBA85';   // ✅ Thymeleaf 인라인 치환
+        const itemPrice = /*[[${kit.price}]]*/ 0;                      // ✅ Thymeleaf 인라인 치환
+
+        const item = {
+            name    : itemName,
+            price   : itemPrice,
+            quantity: 1
+        };
+        const items        = [item];
+        const productTotal = item.price * item.quantity;
+
+        openPaymentModal(items, productTotal, []);
+    }
+    /*]]>*/
     </script>
+
+    <th:block th:replace="~{views/shop/customer-payment :: customerPayment}"></th:block>
 </th:block>
 </body>
 </html>
+
