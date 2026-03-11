@@ -7,7 +7,7 @@
 	<!-- 갯수 맞춰 갖고오기 -->
 	<select id="getKitListPaged" resultType="KitDTO">
 	    SELECT * FROM kit 
-	    WHERE status = 'ACTIVE' 
+	    WHERE status != 'DELETED'
 	    <choose>
 	        <when test="sort == 'price_desc'">
 	            ORDER BY price DESC
@@ -22,21 +22,38 @@
 	    LIMIT #{offset}, #{size}
 	</select>
 	<!--  전체 갯수 -->
-	<select id="getTotalKitCount" resultType="int">
+	<select id="getTotalKitCount" resultType="long">
 	    SELECT COUNT(*) FROM kit 
-	    WHERE status = 'ACTIVE'
+	    WHERE status != 'DELETED'
 	</select>
 	<!-- 게시물 하나 들고오기 -->
-	<select id="getDetail" parameterType="int" resultType="KitDTO">
-		SELECT * FROM kit 
-		WHERE kit_id = #{id} AND status = 'ACTIVE'
+	<select id="getDetail" parameterType="long" resultType="KitDTO">
+	    SELECT * FROM kit 
+	    WHERE kit_id = #{id} AND status != 'DELETED'
 	</select>
 	
 	<!-- 지우기 근데 결제내역에서 지워지면 안되서 status를 DELETED로 바꿔야함 -->
-	<update id="deleteShop" parameterType="int">
+	<update id="deleteShop" parameterType="long">
 	    UPDATE kit 
 	    SET status = 'DELETED' 
 	    WHERE kit_id = #{id}
 	</update>
-
+	
+	<!-- 업데이트 -->
+	<update id="updateKit">
+		    UPDATE kit 
+		    SET 
+		        name = #{kitDto.name},
+		        manufacturer = #{kitDto.manufacturer},
+		        price = #{kitDto.price},
+		        stock = #{kitDto.stock},
+		        main_image1 = #{kitDto.mainImage1},
+		        main_image2 = #{kitDto.mainImage2},
+		        detail_image = #{kitDto.detailImage},
+		        status = #{kitDto.status}
+		    WHERE 
+		        kit_id = #{kitDto.kitId}
+		</update>
+	
+	
 </mapper>

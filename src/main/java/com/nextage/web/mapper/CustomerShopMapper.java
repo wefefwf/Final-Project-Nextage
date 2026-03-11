@@ -14,11 +14,14 @@ public interface CustomerShopMapper {
 	public List<KitDTO> getKitListPaged(@Param("offset")int offset ,@Param("size")int size,@Param("sort")String sort);
 	
 	//총 갯수 가져오기
-	public int getTotalKitCount();
+	public long getTotalKitCount();
 	
 	//게시글 하나 가져오기
-	public KitDTO getDetail(int id);
+	public KitDTO getDetail(long id);
 	
 	//게시글 하나 지우기
-	public void deleteShop(int id);
+	public void deleteShop(long id);
+	
+	//게시글 업데이트
+	public void updateKit(@Param("kitDto") KitDTO kitDto);
 }

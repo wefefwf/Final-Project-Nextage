@@ -1,0 +1,189 @@
+@charset "UTF-8";
+
+/* [1] 기본 레이아웃 */
+.product-page-wrapper {
+    font-family: 'Pretendard', sans-serif;
+    background: #ffffff;
+    padding: 80px 20px;
+    min-height: 100vh;
+}
+
+.glass-card {
+    max-width: 800px; 
+    margin: 0 auto; 
+    padding: 60px;
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 40px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    border: 1px solid #f2f2f2;
+}
+
+/* [2] 헤더 타이틀 */
+.form-header-title { text-align: center; margin-bottom: 50px; }
+.form-header-title h2 {
+    font-size: 2.5rem; font-weight: 800;
+    background: linear-gradient(90deg, #333, #888);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    margin-bottom: 10px;
+}
+.form-header-title p { color: #86868b; font-size: 1.1rem; }
+
+/* [3] 입력 필드 & 이미지 박스 공통 */
+.input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-bottom: 25px; }
+.input-col.full { grid-column: span 2; }
+
+.label-style { 
+    display: block; font-weight: 700; font-size: 1rem; color: #1d1d1f; 
+    margin-bottom: 12px; margin-left: 5px; 
+}
+
+/* 배경색 #f5f5f7 통일 및 트랜지션 설정 */
+.field-style, .upload-dropzone {
+    width: 100%; border-radius: 20px; background: #f5f5f7;
+    border: 2px solid transparent; 
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-sizing: border-box;
+}
+
+.field-style { padding: 18px 24px; font-size: 1rem; }
+.upload-dropzone { 
+    padding: 50px 40px; text-align: center; border: 2px dashed #e5e5e7;
+}
+
+/* 호버 및 포커스 상태 (배경 흰색 + 핑크 테두리) */
+.field-style:focus, .upload-dropzone:hover {
+    background: #fff !important;
+    border-color: #ffb6c1 !important;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+    outline: none;
+}
+
+/* [4] 이미지 섹션 전용 레이아웃 */
+.image-input-section { margin-bottom: 45px; }
+.image-input-section:first-of-type { margin-top: -10px !important; }
+
+.upload-dropzone i { font-size: 2.2rem; color: #ffb6c1; margin-bottom: 12px; display: block; }
+.upload-dropzone p { font-size: 0.95rem; color: #86868b; font-weight: 500; }
+.file-input-style { margin-top: 10px; font-size: 0.9rem; color: #1d1d1f; }
+
+/* [5] 구분선 및 하단 버튼 그룹 (6:3 비율) */
+hr { border: 0; height: 1px; background: #eee; margin: 30px 0 !important; }
+
+.form-button-group {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+    width: 100%;
+}
+
+/* 버튼 공통 속성 */
+.submit-button, .cancel-button {
+    padding: 20px;
+    border-radius: 20px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+}
+
+/* 등록 버튼 (6 비율) */
+.submit-button {
+    flex: 2; 
+    background: #1d1d1f;
+    color: #fff;
+}
+
+/* 취소 버튼 (3 비율) */
+.cancel-button {
+    flex: 1; 
+    background: #e5e5e7;
+    color: #1d1d1f;
+}
+
+/* 버튼 호버 효과 */
+.submit-button:hover {
+    background: #000;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.cancel-button:hover {
+    background: #d2d2d7;
+    transform: translateY(-3px);
+}
+
+.submit-button:active, .cancel-button:active {
+    transform: translateY(-1px);
+}
+/* customerShopForm.css 하단 기존 미리보기 코드를 이 내용으로 교체 */
+
+/* 1. 수정 모드일 때 드롭존 전체 레이아웃 (이미지-정보 덩어리 배치) */
+.upload-dropzone.update-mode {
+    display: flex;
+    align-items: center; /* 이미지와 정보 덩어리의 세로 중앙을 맞춤 */
+    gap: 30px; /* 이미지와 정보 사이 간격 확대 */
+    padding: 20px; /* 내부 패딩 조정 */
+    text-align: left; /* 기본 텍스트 정렬은 왼쪽 */
+}
+
+/* 2. 기존 이미지 미리보기 박스 */
+.current-img-preview {
+    width: 120px; /* 등록 폼 아이콘 크기에 맞춰 살짝 키움 */
+    height: 120px;
+    border-radius: 15px; /* 카드의 둥근 느낌 유지 */
+    overflow: hidden;
+    background-color: #fff; /* 이미지가 돋보이게 흰색 배경 */
+    border: 1px solid #eee;
+    flex-shrink: 0; /* 크기 고정 */
+    box-shadow: 0 5px 15px rgba(0,0,0,0.03); /* 미세한 그림자 */
+}
+
+.current-img-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* 이미지가 박스에 꽉 차게 */
+}
+
+/* 3. 오른쪽 정보 덩어리 (핵심: 가로 중앙 정렬 적용) */
+.file-select-group {
+    flex: 1; /* 남은 공간 모두 차지 */
+    display: flex;
+    flex-direction: column; /* 세로로 쌓기 */
+    align-items: center; /* ★★★ 이 줄이 내부 요소들을 가로 중앙으로 정렬시킵니다 ★★★ */
+    justify-content: center;
+    gap: 8px; /* 요소들 사이 간격 */
+}
+
+/* 4. 정보 덩어리 내부 요소 스타일 조정 */
+.file-select-group i {
+    font-size: 2rem !important; /* 등록 폼 아이콘 크기와 통일 */
+    margin-bottom: 5px !important;
+}
+
+.file-select-group p {
+    margin-bottom: 5px !important;
+    text-align: center; /* 텍스트도 중앙 정렬 */
+}
+
+.current-file-text {
+    font-size: 0.9rem;
+    color: #888;
+}
+
+.current-file-text span {
+    color: #ff79c6; /* 파일명에 포인트 컬러 */
+    font-weight: 600;
+}
+
+/* 5. 파일 선택 버튼 스타일 (등록 폼과 통일) */
+.file-select-group .file-input-style {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: #1d1d1f;
+    text-align: center; /* 파일 선택 버튼 자체도 중앙 정렬 느낌 */
+}
