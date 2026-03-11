@@ -347,21 +347,14 @@
             .cart-layout { grid-template-columns: 1fr; }
         }
 
-        /* 품절 카드 스타일 */
         .cart-item-card.soldout {
             background: #fafafa;
             border-color: #f0f0f0;
         }
 
-        .cart-item-card.soldout .cart-item-name {
-            color: #aaa;
-        }
+        .cart-item-card.soldout .cart-item-name { color: #aaa; }
+        .cart-item-card.soldout .cart-item-img  { opacity: 0.5; }
 
-        .cart-item-card.soldout .cart-item-img {
-            opacity: 0.5;
-        }
-
-        /* 상품명 링크 호버 */
         a.cart-item-name:hover {
             color: #bd93f9;
             text-decoration: underline;
@@ -400,7 +393,10 @@
 
                     <div th:each="item : ${cartItems}"
                          class="cart-item-card"
-                         th:attr="data-id=${item.cartItemId}, data-price=${item.price}"
+                         th:attr="data-id=${item.cartItemId},
+                                  data-price=${item.price},
+                                  data-kit-id=${item.kitId},
+                                  data-name=${item.productName}"
                          th:classappend="${item.soldOut} ? ' soldout' : ''">
 
                         <input type="checkbox" class="custom-checkbox item-checkbox"
@@ -424,7 +420,6 @@
                                 상품명
                             </a>
                             <div class="cart-item-option">기본 옵션</div>
-                            <!-- 품절 배지 -->
                             <div th:if="${item.soldOut}"
                                  style="display:inline-block; font-size:11px; font-weight:700;
                                         padding:3px 10px; border-radius:4px;
@@ -433,7 +428,7 @@
                             </div>
                         </div>
 
-                        <!-- 수량 조절 — 품절 시 비활성화 -->
+                        <!-- 수량 조절 -->
                         <div class="cart-qty-control"
                              th:style="${item.soldOut} ? 'opacity:0.4; pointer-events:none;' : ''">
                             <button class="qty-btn" onclick="changeQty(this, -1)">−</button>
@@ -446,7 +441,7 @@
                             <button class="qty-btn" onclick="changeQty(this, 1)">+</button>
                         </div>
 
-                        <!-- 가격 — 품절 시 흐리게 -->
+                        <!-- 가격 -->
                         <div class="cart-item-price-wrap"
                              th:style="${item.soldOut} ? 'opacity:0.4;' : ''">
                             <div class="cart-item-price"
@@ -586,7 +581,6 @@
             document.getElementById('summaryDiscount').textContent      = '- 0원';
             document.getElementById('summaryTotal').textContent         = fmt(total + shipping) + '원';
 
-            // 품절 제외한 상품만 기준으로 전체선택 체크박스 상태 계산
             const allAvailable = document.querySelectorAll('.item-checkbox:not(:disabled)');
             const allChecked   = document.querySelectorAll('.item-checkbox:not(:disabled):checked');
             document.getElementById('checkAll').checked = allAvailable.length > 0 && allChecked.length === allAvailable.length;
@@ -597,7 +591,7 @@
             fetch('/cart/delete/' + id, { method: 'DELETE' }).then(res => {
                 if (res.ok) {
                     const card = document.querySelector('.cart-item-card[data-id="' + id + '"]');
-                    if (card) card.remove();  // ✅ 애니메이션 제거, 바로 삭제
+                    if (card) card.remove();
                     updateSummary();
                     checkEmptyCart();
                     showToast('상품이 삭제되었습니다.');
@@ -612,20 +606,19 @@
             if (!checked.length) { showToast('삭제할 상품을 선택해주세요.'); return; }
             if (!confirm(checked.length + '개 상품을 삭제할까요?')) return;
             const ids = Array.from(checked).map(cb => cb.dataset.id);
-            fetch('/cart/delete-selected', {   // ✅ URL 변경
+            fetch('/cart/delete-selected', {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ ids })
             }).then(res => {
                 if (res.ok) {
-                	ids.forEach(id => {
-                	    const card = document.querySelector('.cart-item-card[data-id="' + id + '"]');
-                	    if (card) card.remove();
-                	});
-
-                	updateSummary();
-                	checkEmptyCart();  
-                	showToast(ids.length + '개 상품이 삭제되었습니다.');
+                    ids.forEach(id => {
+                        const card = document.querySelector('.cart-item-card[data-id="' + id + '"]');
+                        if (card) card.remove();
+                    });
+                    updateSummary();
+                    checkEmptyCart();
+                    showToast(ids.length + '개 상품이 삭제되었습니다.');
                 }
             });
         }
@@ -637,21 +630,18 @@
                 body: JSON.stringify({ cartItemId: id, quantity: qty })
             });
         }
-        
+
         function checkEmptyCart() {
-            const list = document.getElementById('cartItemList');
+            const list  = document.getElementById('cartItemList');
             const items = list.querySelectorAll('.cart-item-card');
             const empty = document.getElementById('cartEmpty');
-
             if (items.length === 0) {
                 if (!empty) {
                     const div = document.createElement('div');
-                    div.id = 'cartEmpty';
+                    div.id        = 'cartEmpty';
                     div.className = 'cart-empty';
-                    div.innerHTML = `
-                        <div class="cart-empty-icon">🛒</div>
-                        <div class="cart-empty-text">장바구니가 비어 있어요.</div>
-                    `;
+                    div.innerHTML = '<div class="cart-empty-icon">🛒</div>'
+                                  + '<div class="cart-empty-text">장바구니가 비어 있어요.</div>';
                     list.appendChild(div);
                 }
             } else {
@@ -663,18 +653,16 @@
             const checked = document.querySelectorAll('.item-checkbox:checked');
             if (!checked.length) { showToast('결제할 상품을 선택해주세요.'); return; }
 
-            //  품절 상품 체크박스는 disabled라 선택 자체가 안되지만
-            //  혹시 모르니 soldout 카드는 한 번 더 필터링
             const validChecked = Array.from(checked).filter(cb => {
                 return !cb.closest('.cart-item-card').classList.contains('soldout');
             });
-
             if (!validChecked.length) { showToast('품절 상품은 결제할 수 없습니다.'); return; }
 
             const items = validChecked.map(cb => {
                 const card = cb.closest('.cart-item-card');
                 return {
-                    name    : card.querySelector('.cart-item-name').textContent.trim(),
+                    kitId   : card.dataset.kitId,    // ✅ 추가
+                    name    : card.dataset.name,      // ✅ data-name 에서 가져옴
                     price   : parseInt(card.dataset.price),
                     quantity: parseInt(card.querySelector('.qty-display').value)
                 };
@@ -698,7 +686,6 @@
     /*]]>*/
     </script>
 
-    <!-- 결제 모달 — 이 페이지에서만 include -->
     <th:block th:replace="~{views/shop/customer-payment :: customerPayment}"></th:block>
 
 </th:block>

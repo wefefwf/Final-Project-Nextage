@@ -239,7 +239,14 @@
                     orderNo      : _orderNo,
                     totalAmount  : _totalAmount,
                     paymentStatus: 'PAID',
-                    cartItemIds  : _cartItemIds
+                    cartItemIds  : _cartItemIds,
+                    orderItems   : _paymentItems.map(function(it) {
+                        return {
+                            kitId   : it.kitId,
+                            quantity: it.quantity,
+                            price   : it.price
+                        };
+                    })
                 })
             });
         })
@@ -250,6 +257,7 @@
         .then(function(data) {
 		    if (!data) return;
 		    if (data.success) {
+
 		        document.getElementById('paymentStatusMsg').innerHTML
 		            = '<span style="color:#6dca8a; font-weight:700;">'
 		            + '\uACB0\uC81C\uAC00 \uC644\uB8CC\uB418\uC5C8\uC2B5\uB2C8\uB2E4!'

@@ -20,4 +20,6 @@ public class PaymentDTO {
     // ── 주문 생성 시 필요 ────────────────────────────────
     private Long         customerId;    // customer_id
     private List<String> cartItemIds;   // 결제한 cart_item_id 목록
+    
+    private List<OrderItemDTO> orderItems;
 }

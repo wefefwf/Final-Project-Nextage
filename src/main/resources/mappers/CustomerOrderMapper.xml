@@ -24,5 +24,9 @@
           FROM orders
          WHERE order_no = #{orderNo}
     </select>
+    
+    <select id="selectOrderIdByOrderNo" resultType="Long">
+	    SELECT order_id FROM orders WHERE order_no = #{orderNo}
+	</select>
 
 </mapper>
