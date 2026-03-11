@@ -13,48 +13,47 @@
     </insert>
 
     <select id="selectAllRequests" resultType="com.nextage.web.domain.RequestDTO">
-    SELECT r.*, 
-           COALESCE(a.image_url, '/image/no-image.png') as thumbnailPath,
-           c.name as categoryName,
-           (SELECT GROUP_CONCAT(tag_name SEPARATOR ',') 
-            FROM request_tag 
-            WHERE request_id = r.request_id) as tags
-    FROM request r
-    LEFT JOIN (SELECT * FROM attachment WHERE is_thumbnail = 1 AND ref_type = 'REQ') a 
-           ON r.request_id = a.ref_id
-    LEFT JOIN category c ON r.category_id = c.category_id
-    ORDER BY r.created_at DESC
-</select>
-    
+        SELECT r.*,
+               a.image_url AS thumbnailPath,
+               c.name AS categoryName,
+               (SELECT GROUP_CONCAT(tag_name SEPARATOR ',')
+                FROM request_tag
+                WHERE request_id = r.request_id) AS tags
+        FROM request r
+        LEFT JOIN (SELECT * FROM attachment WHERE is_thumbnail = 1 AND ref_type = 'REQ') a
+               ON r.request_id = a.ref_id
+        LEFT JOIN category c ON r.category_id = c.category_id
+        ORDER BY r.created_at DESC
+    </select>
+
     <select id="selectRequestDetail" resultType="com.nextage.web.domain.RequestDTO">
-    SELECT r.*, 
-           COALESCE(a.image_url, '/image/no-image.png') as thumbnailPath,
-           c.name as categoryName,
-           /* 태그 가져오는 부분 추가 */
-           (SELECT GROUP_CONCAT(tag_name SEPARATOR ',') 
-            FROM request_tag 
-            WHERE request_id = r.request_id) as tags
-    FROM request r
-    LEFT JOIN (SELECT * FROM attachment WHERE is_thumbnail = 1 AND ref_type = 'REQ') a 
-           ON r.request_id = a.ref_id
-    LEFT JOIN category c ON r.category_id = c.category_id
-    WHERE r.request_id = #{requestId}
-</select>
+        SELECT r.*,
+               a.image_url AS thumbnailPath,
+               c.name AS categoryName,
+               (SELECT GROUP_CONCAT(tag_name SEPARATOR ',')
+                FROM request_tag
+                WHERE request_id = r.request_id) AS tags
+        FROM request r
+        LEFT JOIN (SELECT * FROM attachment WHERE is_thumbnail = 1 AND ref_type = 'REQ') a
+               ON r.request_id = a.ref_id
+        LEFT JOIN category c ON r.category_id = c.category_id
+        WHERE r.request_id = #{requestId}
+    </select>
 
     <select id="selectRequestsByCustomerId" resultType="com.nextage.web.domain.RequestDTO">
-    SELECT r.*, 
-           c.name as categoryName,
-           (SELECT GROUP_CONCAT(tag_name SEPARATOR ',') 
-            FROM request_tag 
-            WHERE request_id = r.request_id) as tags
-    FROM request r
-    LEFT JOIN category c ON r.category_id = c.category_id
-    WHERE r.customer_id = #{customerId}
-    ORDER BY r.created_at DESC
-</select>
-    
-<select id="selectRequestsByCategory" parameterType="string" resultType="com.nextage.web.domain.RequestDTO">
-        SELECT r.*, c.name as categoryName 
+        SELECT r.*,
+               c.name AS categoryName,
+               (SELECT GROUP_CONCAT(tag_name SEPARATOR ',')
+                FROM request_tag
+                WHERE request_id = r.request_id) AS tags
+        FROM request r
+        LEFT JOIN category c ON r.category_id = c.category_id
+        WHERE r.customer_id = #{customerId}
+        ORDER BY r.created_at DESC
+    </select>
+
+    <select id="selectRequestsByCategory" parameterType="string" resultType="com.nextage.web.domain.RequestDTO">
+        SELECT r.*, c.name AS categoryName
         FROM request r
         LEFT JOIN category c ON r.category_id = c.category_id
         WHERE c.name = #{category}
@@ -62,7 +61,7 @@
     </select>
 
     <update id="updateStatus">
-        UPDATE request SET status = #{status} 
+        UPDATE request SET status = #{status}
         WHERE request_id = #{requestId}
     </update>
 
@@ -73,40 +72,40 @@
     <delete id="deleteRequest">
         DELETE FROM request WHERE request_id = #{requestId}
     </delete>
-    
-    <delete id="deleteTagsByRequestId">
-    DELETE FROM request_tag WHERE request_id = #{requestId}
-	</delete>
 
-<select id="selectUrgentRequests" resultType="com.nextage.web.domain.RequestDTO">
-        SELECT r.*, c.name as categoryName 
+    <delete id="deleteTagsByRequestId">
+        DELETE FROM request_tag WHERE request_id = #{requestId}
+    </delete>
+
+    <select id="selectUrgentRequests" resultType="com.nextage.web.domain.RequestDTO">
+        SELECT r.*, c.name AS categoryName
         FROM request r
         LEFT JOIN category c ON r.category_id = c.category_id
         WHERE r.status = 'OPEN' AND r.requested_due_date >= CURDATE()
-        ORDER BY r.requested_due_date ASC 
+        ORDER BY r.requested_due_date ASC
         LIMIT 5
     </select>
 
     <select id="selectNewRequests" resultType="com.nextage.web.domain.RequestDTO">
-        SELECT r.*, c.name as categoryName 
+        SELECT r.*, c.name AS categoryName
         FROM request r
         LEFT JOIN category c ON r.category_id = c.category_id
         WHERE r.status = 'OPEN'
-        ORDER BY r.created_at DESC 
+        ORDER BY r.created_at DESC
         LIMIT 5
     </select>
 
     <select id="selectBestReviews" resultType="com.nextage.web.domain.RequestDTO">
-        SELECT r.title as description, r.request_id 
+        SELECT r.title AS description, r.request_id
         FROM request r
         WHERE r.status = 'COMPLETED'
         ORDER BY r.created_at DESC
         LIMIT 3
     </select>
-    
+
     <insert id="insertTag">
-    INSERT INTO request_tag (request_id, tag_name)
-    VALUES (#{requestId}, #{tagName})
-</insert>
+        INSERT INTO request_tag (request_id, tag_name)
+        VALUES (#{requestId}, #{tagName})
+    </insert>
 
 </mapper>
