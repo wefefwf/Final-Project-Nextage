@@ -26,17 +26,17 @@
                     
                     <div class="input-col">
                         <label class="label-style">제조사</label>
-                        <input type="text" name="manufacturer" class="field-style" placeholder="브랜드명">
+                        <input type="text" name="manufacturer" class="field-style" placeholder="브랜드명" required>
                     </div>
                     
                     <div class="input-col">
                         <label class="label-style">판매 가격</label>
-                        <input type="number" name="price" class="field-style" placeholder="금액 입력" required>
+                        <input type="number" name="price" class="field-style" placeholder="금액 입력" min="0" step="1" required>
                     </div>
 
                     <div class="input-col full">
                         <label class="label-style">초기 재고량</label>
-                        <input type="number" name="stock" class="field-style" value="0">
+                        <input type="number" name="stock" class="field-style" placeholder="0" min="0" step="1" required>
                     </div>
                 </div>
 
@@ -56,7 +56,7 @@
                     <div class="upload-dropzone">
                         <i class="bi bi-images"></i>
                         <p>서브 이미지를 선택하세요.</p>
-                        <input type="file" name="mainImageFile2" class="file-input-style">
+                        <input type="file" name="mainImageFile2" class="file-input-style" required>
                     </div>
                 </div>
 
@@ -75,6 +75,28 @@
             </form>
         </div>
     </div>
+    <script>
+ // 모든 숫자형 input 요소를 대상으로 정규식 검사
+    document.querySelectorAll('input[type="number"]').forEach(input => {
+    let lastValue = input.value;
+
+    input.addEventListener('input', function() {
+        // 1. 진짜 다 지운 거면(빈 칸) 정상적인 지우기로 인정!
+        if (this.value === '') {
+            // 문자가 섞여서 지워진 건지 확인 (lastValue가 있었는데 갑자기 빈 칸이 된 경우)
+            if (lastValue !== '') {
+                // 문자를 쳐서 지워진 건지 체크하는 로직 (이건 상황 봐서 결정!)
+                // 일단은 빈 칸 허용을 위해 백업만 비워둡니다.
+                lastValue = '';
+            }
+            return;
+        }
+
+        // 2. 정상 숫자면 백업 갱신
+        lastValue = this.value;
+    });
+});
+    </script>
 </th:block>
 </body>
 </html>

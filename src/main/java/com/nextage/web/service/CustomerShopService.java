@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.nextage.web.domain.KitDTO;
@@ -53,6 +54,20 @@ public class CustomerShopService {
 	    }
 
 	    return dbPath;
+	}
+	
+	//insert하기
+	public void addKit(KitDTO kitDto,
+			MultipartFile file1, 
+            MultipartFile file2, 
+            MultipartFile detailFile){
+		
+		//기존꺼 빼고 이미지 이름만 uuid바꿔 저장
+		kitDto.setMainImage1(uploadFile(file1));
+		kitDto.setMainImage2(uploadFile(file2));
+		kitDto.setDetailImage(uploadFile(detailFile));
+		
+		shopMapper.insertKit(kitDto);
 	}
 	
 	//페이지에 해당하는 리스트 가져오기

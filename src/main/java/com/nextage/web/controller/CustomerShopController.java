@@ -57,6 +57,17 @@ public class CustomerShopController {
     
     
     //샵 추가 로직 post
+    @PostMapping("/customer/shopForm")
+    public String insertKit(KitDTO kitDto, 
+    		@RequestParam("mainImageFile1") MultipartFile file1, 
+            @RequestParam("mainImageFile2") MultipartFile file2, 
+            @RequestParam("detailImageFile") MultipartFile detailFile){
+    	
+    	shopService.addKit(kitDto, file1, file2, detailFile);
+    	
+    	return "redirect:/customer/shop";
+    }
+    
     
     
     //샵 상세페이지가기

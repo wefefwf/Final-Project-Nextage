@@ -29,18 +29,18 @@
                     <div class="input-col">
                         <label class="label-style">제조사</label>
                         <input type="text" name="manufacturer" class="field-style" 
-                               th:value="${kit.manufacturer}" placeholder="브랜드명">
+                               th:value="${kit.manufacturer}" placeholder="브랜드명" required>
                     </div>
                     
                     <div class="input-col">
                         <label class="label-style">판매 가격</label>
                         <input type="number" name="price" class="field-style" 
-                               th:value="${kit.price}" placeholder="금액 입력" required>
+                               th:value="${kit.price}" placeholder="금액 입력" required min="0" step="1" >
                     </div>
             
                     <div class="input-col full">
                         <label class="label-style">재고량</label>
-                        <input type="number" name="stock" class="field-style" th:value="${kit.stock}">
+                        <input type="number" name="stock" class="field-style" th:value="${kit.stock}" min="0" step="1" required>
                     </div>
             
                     <div class="input-col full">
@@ -110,6 +110,27 @@
         </div>
     </div>
     <script>
+    document.querySelectorAll('input[type="number"]').forEach(input => {
+        // 1. 페이지 열렸을 때 기존 DB 값을 백업
+        let lastValue = input.value;
+
+        input.addEventListener('input', function() {
+            // 2. 사용자가 직접 지워서 빈 칸('')이 된 경우
+            if (this.value === '') {
+                // 문자가 섞여서 브라우저가 강제로 지운 건지 확인
+                if (lastValue !== '') {
+                    // 이 시점에서는 사용자가 '진짜 지우고 싶어서' 지운 건지, 
+                    // '문자를 쳐서' 지워진 건지 구분이 모호하므로
+                    // 보통은 빈 칸 입력을 허용해줘야 다음 숫자를 칠 수 있습니다.
+                    lastValue = ''; 
+                }
+                return;
+            }
+
+            // 3. 정상적인 숫자 입력이면 백업 갱신
+            lastValue = this.value;
+        });
+    });
         function previewImage(input, previewId) {
             // 1. 선택된 파일이 있는지 확인
             if (input.files && input.files[0]) {

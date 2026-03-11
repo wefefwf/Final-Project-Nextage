@@ -24,4 +24,7 @@ public interface CustomerShopMapper {
 	
 	//게시글 업데이트
 	public void updateKit(@Param("kitDto") KitDTO kitDto);
+	
+	//게시글 추가
+	public void insertKit(@Param("kitDto") KitDTO kitDto);
 }

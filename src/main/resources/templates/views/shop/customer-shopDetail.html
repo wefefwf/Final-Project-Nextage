@@ -50,8 +50,8 @@
 						    </th:block>
 							<!-- 수량 0개 -->
 						    <th:block th:if="${kit.stock == 0}">
-						        <button class="btn-cart disabled" disabled>장바구니 추가</button>
-						        <button class="btn-buy disabled" disabled>바로 결제하기</button>
+						        <button class="btn-cart" th:onclick="|addToCart(${kit.kitId})|">장바구니 추가</button>
+						        <button class="btn-buy" onclick="buyNow()">바로 결제하기</button>
 						    </th:block>
 						</div>
                     </div>
@@ -95,7 +95,54 @@
             location.href = "/customer/shop/delete?id=" + id;
         }
     }
+    
+
+    function addToCart(kitId) {
+
+        fetch('/cart/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                kitId: kitId,
+                quantity: 1
+            })
+        })
+        .then(res => {
+            if(res.ok){
+                if(confirm("장바구니에 추가되었습니다. 장바구니로 이동하시겠습니까?")){
+                    location.href = "/cart";
+                }
+            } else {
+                alert("장바구니 추가 실패");
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert("오류 발생");
+        });
+    }
+	
+    function buyNow() {
+	
+    	const itemName = /*[[${kit.name}]]*/ '상품명';
+        const itemPrice = /*[[${kit.price}]]*/ 0;
+        
+        const item = {
+                name: itemName,
+                price: itemPrice,
+                quantity: 1
+            };
+
+    	const items = [item];
+    	const total = item.price;
+
+    	openPaymentModal(items, total, []);
+    	}
+
     </script>
+    <th:block th:replace="~{views/shop/customer-payment :: customerPayment}"></th:block>
 </th:block>
 </body>
 </html>
