@@ -20,6 +20,8 @@ public class RequestDTO {
     private String categoryName;     // 카테고리 ID 대신 "2D Reform" 출력용
     private String customerNickname; // 작성자 이름 출력용
     
+    private String tags;
+    
     // 사진 정보를 담기 위한 리스트
     private List<AttachmentDTO> attachmentList;
     

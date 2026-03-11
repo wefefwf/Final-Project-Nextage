@@ -31,6 +31,9 @@ public interface CustomerRequestMapper {
     void deleteAttachmentsByRequestId(Long requestId); // 첨부파일 먼저 삭제
     void deleteRequest(Long requestId); // 의뢰글 삭제
     
+ // [추가] 의뢰 등록 시 태그를 하나씩 저장하는 메서드
+    void insertTag(@Param("requestId") Long requestId, @Param("tagName") String tagName);
+    
  // ===========================================================
     // [메인 페이지 트렌드 박스용 추가 메서드]
     // XML의 id값과 반드시 일치해야 데이터가 뜹니다!
