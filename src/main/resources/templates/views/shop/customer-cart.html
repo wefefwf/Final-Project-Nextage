@@ -346,20 +346,26 @@
             .cart-page-wrapper { width: 100%; padding: 20px; }
             .cart-layout { grid-template-columns: 1fr; }
         }
-        
+
         /* 품절 카드 스타일 */
-		.cart-item-card.soldout {
-		    background: #fafafa;
-		    border-color: #f0f0f0;
-		}
-		
-		.cart-item-card.soldout .cart-item-name {
-		    color: #aaa;
-		}
-		
-		.cart-item-card.soldout .cart-item-img {
-		    opacity: 0.5;
-		}
+        .cart-item-card.soldout {
+            background: #fafafa;
+            border-color: #f0f0f0;
+        }
+
+        .cart-item-card.soldout .cart-item-name {
+            color: #aaa;
+        }
+
+        .cart-item-card.soldout .cart-item-img {
+            opacity: 0.5;
+        }
+
+        /* 상품명 링크 호버 */
+        a.cart-item-name:hover {
+            color: #bd93f9;
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -393,60 +399,67 @@
                 <div class="cart-item-list" id="cartItemList">
 
                     <div th:each="item : ${cartItems}"
-				     class="cart-item-card"
-				     th:attr="data-id=${item.cartItemId}, data-price=${item.price}"
-				     th:classappend="${item.soldOut} ? ' soldout' : ''">
-				
-				    <input type="checkbox" class="custom-checkbox item-checkbox"
-				           th:attr="data-id=${item.cartItemId}, data-price=${item.price}"
-				           th:disabled="${item.soldOut}"
-				           onchange="updateSummary()">
-				
-				    <!-- 이미지 -->
-				    <div class="cart-item-img-placeholder" th:if="${item.imageUrl == null}">🛍️</div>
-				    <img class="cart-item-img"
-				         th:if="${item.imageUrl != null}"
-				         th:src="${item.imageUrl}"
-				         th:alt="${item.productName}">
-				
-				    <!-- 상품 정보 -->
-				    <div class="cart-item-info">
-				        <div class="cart-item-name" th:text="${item.productName}">상품명</div>
-				        <div class="cart-item-option">기본 옵션</div>
-				        <!-- ✅ 품절 배지 -->
-				        <div th:if="${item.soldOut}"
-				             style="display:inline-block; font-size:11px; font-weight:700;
-				                    padding:3px 10px; border-radius:4px;
-				                    background:#ff6b6b; color:#fff; margin-top:4px;">
-				            품절
-				        </div>
-				    </div>
-				
-				    <!-- 수량 조절 — 품절 시 비활성화 -->
-				    <div class="cart-qty-control" th:style="${item.soldOut} ? 'opacity:0.4; pointer-events:none;' : ''">
-				        <button class="qty-btn" onclick="changeQty(this, -1)">−</button>
-				        <input type="number" class="qty-display"
-				               th:value="${item.quantity}"
-				               min="1" max="99"
-				               onchange="onQtyInput(this)"
-				               th:attr="data-id=${item.cartItemId}"
-				               th:disabled="${item.soldOut}">
-				        <button class="qty-btn" onclick="changeQty(this, 1)">+</button>
-				    </div>
-				
-				    <!-- 가격 — 품절 시 흐리게 -->
-				    <div class="cart-item-price-wrap" th:style="${item.soldOut} ? 'opacity:0.4;' : ''">
-				        <div class="cart-item-price"
-				             th:text="${#numbers.formatInteger(item.price * item.quantity, 3, 'COMMA') + '원'}"></div>
-				        <div class="cart-item-price-label"
-				             th:text="${#numbers.formatInteger(item.price, 3, 'COMMA') + '원 / 개'}"></div>
-				    </div>
-				
-				    <!-- 삭제 버튼 -->
-				    <button class="cart-item-delete"
-				            th:onclick="'deleteItem(' + ${item.cartItemId} + ')'"
-				            title="삭제">✕</button>
-				</div>
+                         class="cart-item-card"
+                         th:attr="data-id=${item.cartItemId}, data-price=${item.price}"
+                         th:classappend="${item.soldOut} ? ' soldout' : ''">
+
+                        <input type="checkbox" class="custom-checkbox item-checkbox"
+                               th:attr="data-id=${item.cartItemId}, data-price=${item.price}"
+                               th:disabled="${item.soldOut}"
+                               onchange="updateSummary()">
+
+                        <!-- 이미지 -->
+                        <div class="cart-item-img-placeholder" th:if="${item.imageUrl == null}">🛍️</div>
+                        <img class="cart-item-img"
+                             th:if="${item.imageUrl != null}"
+                             th:src="${item.imageUrl}"
+                             th:alt="${item.productName}">
+
+                        <!-- 상품 정보 -->
+                        <div class="cart-item-info">
+                            <a class="cart-item-name"
+                               th:href="@{/customer/shop/detail(id=${item.kitId}, page=1)}"
+                               th:text="${item.productName}"
+                               style="text-decoration:none; color:inherit; cursor:pointer;">
+                                상품명
+                            </a>
+                            <div class="cart-item-option">기본 옵션</div>
+                            <!-- 품절 배지 -->
+                            <div th:if="${item.soldOut}"
+                                 style="display:inline-block; font-size:11px; font-weight:700;
+                                        padding:3px 10px; border-radius:4px;
+                                        background:#ff6b6b; color:#fff; margin-top:4px;">
+                                품절
+                            </div>
+                        </div>
+
+                        <!-- 수량 조절 — 품절 시 비활성화 -->
+                        <div class="cart-qty-control"
+                             th:style="${item.soldOut} ? 'opacity:0.4; pointer-events:none;' : ''">
+                            <button class="qty-btn" onclick="changeQty(this, -1)">−</button>
+                            <input type="number" class="qty-display"
+                                   th:value="${item.quantity}"
+                                   min="1" max="99"
+                                   onchange="onQtyInput(this)"
+                                   th:attr="data-id=${item.cartItemId}"
+                                   th:disabled="${item.soldOut}">
+                            <button class="qty-btn" onclick="changeQty(this, 1)">+</button>
+                        </div>
+
+                        <!-- 가격 — 품절 시 흐리게 -->
+                        <div class="cart-item-price-wrap"
+                             th:style="${item.soldOut} ? 'opacity:0.4;' : ''">
+                            <div class="cart-item-price"
+                                 th:text="${#numbers.formatInteger(item.price * item.quantity, 3, 'COMMA') + '원'}"></div>
+                            <div class="cart-item-price-label"
+                                 th:text="${#numbers.formatInteger(item.price, 3, 'COMMA') + '원 / 개'}"></div>
+                        </div>
+
+                        <!-- 삭제 버튼 -->
+                        <button class="cart-item-delete"
+                                th:onclick="'deleteItem(' + ${item.cartItemId} + ')'"
+                                title="삭제">✕</button>
+                    </div>
 
                     <!-- 빈 장바구니 -->
                     <div class="cart-empty" th:if="${#lists.isEmpty(cartItems)}">
@@ -490,7 +503,8 @@
                     <p class="summary-note">* 50,000원 이상 무료배송</p>
 
                     <button class="btn-checkout" onclick="goCheckout()">결제하기</button>
-                    <button class="btn-continue-shopping" onclick="location.href='/customer/shop'">쇼핑 계속하기</button>
+                    <button class="btn-continue-shopping"
+                            onclick="location.href='/customer/shop'">쇼핑 계속하기</button>
                 </div>
             </div>
 
@@ -500,160 +514,150 @@
     <div class="cart-toast" id="cartToast"></div>
 
     <script th:inline="javascript">
-	/*<![CDATA[*/
-	    // ✅ CART_ 접두사로 customer-payment.html의 SHIPPING_FEE와 충돌 방지
-	    const CART_SHIPPING_FEE = 3000;
-	    const CART_FREE_SHIPPING_THRESHOLD = 50000;
-	
-	    function toggleAll(master) {
-	        document.querySelectorAll('.item-checkbox').forEach(cb => cb.checked = master.checked);
-	        updateSummary();
-	    }
-	
-	    function selectAll() {
-	        document.querySelectorAll('.item-checkbox').forEach(cb => cb.checked = true);
-	        document.getElementById('checkAll').checked = true;
-	        updateSummary();
-	    }
-	
-	    function deselectAll() {
-	        document.querySelectorAll('.item-checkbox').forEach(cb => cb.checked = false);
-	        document.getElementById('checkAll').checked = false;
-	        updateSummary();
-	    }
-	
-	    function changeQty(btn, delta) {
-	        const input = btn.parentElement.querySelector('.qty-display');
-	        let val = Math.max(1, Math.min(99, parseInt(input.value) + delta));
-	        input.value = val;
-	        updateItemPrice(input);
-	        updateSummary();
-	        syncQty(input.dataset.id, val);
-	    }
-	
-	    function onQtyInput(input) {
-	        let val = parseInt(input.value);
-	        if (isNaN(val) || val < 1) val = 1;
-	        if (val > 99) val = 99;
-	        input.value = val;
-	        updateItemPrice(input);
-	        updateSummary();
-	        syncQty(input.dataset.id, val);
-	    }
-	
-	    function updateItemPrice(qtyInput) {
-	        const card = qtyInput.closest('.cart-item-card');
-	        if (!card) return;
-	        const unitPrice = parseInt(card.dataset.price);
-	        const qty = parseInt(qtyInput.value);
-	        card.querySelector('.cart-item-price').textContent = fmt(unitPrice * qty) + '원';
-	        card.querySelector('.cart-item-price-label').textContent = fmt(unitPrice) + '원 / 개';
-	    }
-	
-	    function updateSummary() {
-	        const checked = document.querySelectorAll('.item-checkbox:checked');
-	        let total = 0;
-	        checked.forEach(cb => {
-	            const card = cb.closest('.cart-item-card');
-	            total += parseInt(card.dataset.price) * parseInt(card.querySelector('.qty-display').value);
-	        });
-	        // ✅ CART_ 접두사 변수 사용
-	        const shipping = (total > 0 && total < CART_FREE_SHIPPING_THRESHOLD) ? CART_SHIPPING_FEE : 0;
-	        document.getElementById('summarySelectedCount').textContent = checked.length + '개 선택';
-	        document.getElementById('selectedCountText').textContent = checked.length + '개 선택됨';
-	        document.getElementById('summaryProductPrice').textContent = fmt(total) + '원';
-	        document.getElementById('summaryShipping').textContent = (!shipping && total > 0) ? '무료' : fmt(shipping) + '원';
-	        document.getElementById('summaryDiscount').textContent = '- 0원';
-	        document.getElementById('summaryTotal').textContent = fmt(total + shipping) + '원';
-	        const all = document.querySelectorAll('.item-checkbox');
-	        document.getElementById('checkAll').checked = all.length > 0 && checked.length === all.length;
-	    }
-	
-	    function deleteItem(id) {
-	        if (!confirm('해당 상품을 삭제할까요?')) return;
-	        fetch('/cart/delete/' + id, { method: 'DELETE' }).then(res => {
-	            if (res.ok) {
-	                const card = document.querySelector('.cart-item-card[data-id="' + id + '"]');
-	                if (card) {
-	                    card.style.transition = 'all 0.3s';
-	                    card.style.opacity = '0';
-	                    card.style.height = '0';
-	                    card.style.overflow = 'hidden';
-	                    card.style.padding = '0';
-	                    card.style.margin = '0';
-	                    setTimeout(function() { card.remove(); updateSummary(); }, 300);
-	                }
-	                showToast('상품이 삭제되었습니다.');
-	            } else {
-	                showToast('삭제 중 오류가 발생했습니다.');
-	            }
-	        });
-	    }
-	
-	    function deleteSelected() {
-	        const checked = document.querySelectorAll('.item-checkbox:checked');
-	        if (!checked.length) { showToast('삭제할 상품을 선택해주세요.'); return; }
-	        if (!confirm(checked.length + '개 상품을 삭제할까요?')) return;
-	        const ids = Array.from(checked).map(cb => cb.dataset.id);
-	        fetch('/cart/delete/selected', {
-	            method: 'DELETE',
-	            headers: { 'Content-Type': 'application/json' },
-	            body: JSON.stringify({ ids })
-	        }).then(res => {
-	            if (res.ok) {
-	                ids.forEach(id => {
-	                    const card = document.querySelector('.cart-item-card[data-id="' + id + '"]');
-	                    if (card) card.remove();
-	                });
-	                updateSummary();
-	                showToast(ids.length + '개 상품이 삭제되었습니다.');
-	            }
-	        });
-	    }
-	
-	    function syncQty(id, qty) {
-	        fetch('/cart/update', {
-	            method: 'PUT',
-	            headers: { 'Content-Type': 'application/json' },
-	            body: JSON.stringify({ cartItemId: id, quantity: qty })
-	        });
-	    }
-	
-	    function goCheckout() {
-	        const checked = document.querySelectorAll('.item-checkbox:checked');
-	        if (!checked.length) { showToast('결제할 상품을 선택해주세요.'); return; }
-	
-	        const items = Array.from(checked).map(cb => {
-	            const card = cb.closest('.cart-item-card');
-	            return {
-	                name    : card.querySelector('.cart-item-name').textContent.trim(),
-	                price   : parseInt(card.dataset.price),
-	                quantity: parseInt(card.querySelector('.qty-display').value)
-	            };
-	        });
-	        
-	        const cartItemIds = Array.from(checked).map(cb => cb.dataset.id);
+    /*<![CDATA[*/
+        const CART_SHIPPING_FEE = 3000;
+        const CART_FREE_SHIPPING_THRESHOLD = 50000;
 
-	        const productTotal = items.reduce((sum, it) => sum + it.price * it.quantity, 0);
-	        openPaymentModal(items, productTotal, cartItemIds);
-	    }
-	
-	    function showToast(msg) {
-	        const t = document.getElementById('cartToast');
-	        t.textContent = msg;
-	        t.classList.add('show');
-	        setTimeout(() => t.classList.remove('show'), 2500);
-	    }
-	
-	    function fmt(n) { return n.toLocaleString('ko-KR'); }
-	
-	    document.addEventListener('DOMContentLoaded', updateSummary);
-	/*]]>*/
-	</script>
+        function toggleAll(master) {
+            document.querySelectorAll('.item-checkbox').forEach(cb => cb.checked = master.checked);
+            updateSummary();
+        }
 
-	<!-- 결제 모달 — 이 페이지에서만 include -->
+        function selectAll() {
+            document.querySelectorAll('.item-checkbox').forEach(cb => cb.checked = true);
+            document.getElementById('checkAll').checked = true;
+            updateSummary();
+        }
+
+        function deselectAll() {
+            document.querySelectorAll('.item-checkbox').forEach(cb => cb.checked = false);
+            document.getElementById('checkAll').checked = false;
+            updateSummary();
+        }
+
+        function changeQty(btn, delta) {
+            const input = btn.parentElement.querySelector('.qty-display');
+            let val = Math.max(1, Math.min(99, parseInt(input.value) + delta));
+            input.value = val;
+            updateItemPrice(input);
+            updateSummary();
+            syncQty(input.dataset.id, val);
+        }
+
+        function onQtyInput(input) {
+            let val = parseInt(input.value);
+            if (isNaN(val) || val < 1) val = 1;
+            if (val > 99) val = 99;
+            input.value = val;
+            updateItemPrice(input);
+            updateSummary();
+            syncQty(input.dataset.id, val);
+        }
+
+        function updateItemPrice(qtyInput) {
+            const card = qtyInput.closest('.cart-item-card');
+            if (!card) return;
+            const unitPrice = parseInt(card.dataset.price);
+            const qty = parseInt(qtyInput.value);
+            card.querySelector('.cart-item-price').textContent = fmt(unitPrice * qty) + '원';
+            card.querySelector('.cart-item-price-label').textContent = fmt(unitPrice) + '원 / 개';
+        }
+
+        function updateSummary() {
+            const checked = document.querySelectorAll('.item-checkbox:checked');
+            let total = 0;
+            checked.forEach(cb => {
+                const card = cb.closest('.cart-item-card');
+                total += parseInt(card.dataset.price) * parseInt(card.querySelector('.qty-display').value);
+            });
+            const shipping = (total > 0 && total < CART_FREE_SHIPPING_THRESHOLD) ? CART_SHIPPING_FEE : 0;
+            document.getElementById('summarySelectedCount').textContent = checked.length + '개 선택';
+            document.getElementById('selectedCountText').textContent    = checked.length + '개 선택됨';
+            document.getElementById('summaryProductPrice').textContent  = fmt(total) + '원';
+            document.getElementById('summaryShipping').textContent      = (!shipping && total > 0) ? '무료' : fmt(shipping) + '원';
+            document.getElementById('summaryDiscount').textContent      = '- 0원';
+            document.getElementById('summaryTotal').textContent         = fmt(total + shipping) + '원';
+            const all = document.querySelectorAll('.item-checkbox');
+            document.getElementById('checkAll').checked = all.length > 0 && checked.length === all.length;
+        }
+
+        function deleteItem(id) {
+            if (!confirm('해당 상품을 삭제할까요?')) return;
+            fetch('/cart/delete/' + id, { method: 'DELETE' }).then(res => {
+                if (res.ok) {
+                    const card = document.querySelector('.cart-item-card[data-id="' + id + '"]');
+                    if (card) card.remove();  // ✅ 애니메이션 제거, 바로 삭제
+                    updateSummary();
+                    showToast('상품이 삭제되었습니다.');
+                } else {
+                    showToast('삭제 중 오류가 발생했습니다.');
+                }
+            });
+        }
+
+        function deleteSelected() {
+            const checked = document.querySelectorAll('.item-checkbox:checked');
+            if (!checked.length) { showToast('삭제할 상품을 선택해주세요.'); return; }
+            if (!confirm(checked.length + '개 상품을 삭제할까요?')) return;
+            const ids = Array.from(checked).map(cb => cb.dataset.id);
+            fetch('/cart/delete-selected', {   // ✅ URL 변경
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ids })
+            }).then(res => {
+                if (res.ok) {
+                    ids.forEach(id => {
+                        const card = document.querySelector('.cart-item-card[data-id="' + id + '"]');
+                        if (card) card.remove();
+                    });
+                    updateSummary();
+                    showToast(ids.length + '개 상품이 삭제되었습니다.');
+                }
+            });
+        }
+
+        function syncQty(id, qty) {
+            fetch('/cart/update', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ cartItemId: id, quantity: qty })
+            });
+        }
+
+        function goCheckout() {
+            const checked = document.querySelectorAll('.item-checkbox:checked');
+            if (!checked.length) { showToast('결제할 상품을 선택해주세요.'); return; }
+
+            const items = Array.from(checked).map(cb => {
+                const card = cb.closest('.cart-item-card');
+                return {
+                    name    : card.querySelector('.cart-item-name').textContent.trim(),
+                    price   : parseInt(card.dataset.price),
+                    quantity: parseInt(card.querySelector('.qty-display').value)
+                };
+            });
+
+            const cartItemIds  = Array.from(checked).map(cb => cb.dataset.id);
+            const productTotal = items.reduce((sum, it) => sum + it.price * it.quantity, 0);
+            openPaymentModal(items, productTotal, cartItemIds);
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('cartToast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2500);
+        }
+
+        function fmt(n) { return n.toLocaleString('ko-KR'); }
+
+        document.addEventListener('DOMContentLoaded', updateSummary);
+    /*]]>*/
+    </script>
+
+    <!-- 결제 모달 — 이 페이지에서만 include -->
     <th:block th:replace="~{views/shop/customer-payment :: customerPayment}"></th:block>
-    
+
 </th:block>
 </body>
 </html>
