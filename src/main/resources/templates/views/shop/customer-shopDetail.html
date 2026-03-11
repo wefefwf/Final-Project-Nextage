@@ -45,13 +45,13 @@
                         <div class="purchase-btn-group">
                         	<!-- 수량 0개 이상 -->
 						    <th:block th:if="${kit.stock > 0}">
-						        <button class="btn-cart">장바구니 추가</button>
-						        <button class="btn-buy">바로 결제하기</button>
+						        <button type="button" class="btn-cart" th:onclick="|addToCart(${kit.kitId})|">장바구니 추가</button>
+						        <button type="button" class="btn-buy" onclick="buyNow()">바로 결제하기</button>
 						    </th:block>
 							<!-- 수량 0개 -->
-						    <th:block th:if="${kit.stock == 0}">
-						        <button class="btn-cart" th:onclick="|addToCart(${kit.kitId})|">장바구니 추가</button>
-						        <button class="btn-buy" onclick="buyNow()">바로 결제하기</button>
+						    <th:block th:if="${kit.stock <= 0}">
+						        <button type="button" class="btn-cart disabled" onclick="alert('품절된 상품입니다.')" style="background-color: #ccc; cursor: not-allowed;">품절</button>
+						        <button type="button" class="btn-buy disabled" disabled style="background-color: #999; cursor: not-allowed;">구매 불가</button>
 						    </th:block>
 						</div>
                     </div>
