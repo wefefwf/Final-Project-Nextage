@@ -43,9 +43,17 @@
                         <p class="stock-text">남은 수량: <span th:text="${kit.stock}">0</span>개</p>
 
                         <div class="purchase-btn-group">
-                            <button class="btn-cart">장바구니 추가</button>
-                            <button class="btn-buy">바로 결제하기</button>
-                        </div>
+                        	<!-- 수량 0개 이상 -->
+						    <th:block th:if="${kit.stock > 0}">
+						        <button class="btn-cart">장바구니 추가</button>
+						        <button class="btn-buy">바로 결제하기</button>
+						    </th:block>
+							<!-- 수량 0개 -->
+						    <th:block th:if="${kit.stock == 0}">
+						        <button class="btn-cart disabled" disabled>장바구니 추가</button>
+						        <button class="btn-buy disabled" disabled>바로 결제하기</button>
+						    </th:block>
+						</div>
                     </div>
                 </div>
             </div>

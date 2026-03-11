@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/customer-layout}">
+<head>
+<meta charset="UTF-8">
+<title>Nextage Kit Shop</title>
+<link rel="stylesheet" th:href="@{/css/customerShop/customerShopForm.css}" />
+</head>
+<body>
+<th:block layout:fragment="content">
+    <div class="product-page-wrapper">
+        <div class="glass-card">
+            <div class="form-header-title">
+                <h2>Update Kit</h2>
+                <p>상품 정보를 한 줄씩 차례대로 입력해주세요.</p>
+            </div>
+           <form th:action="@{/customer/shop/update}" method="post" enctype="multipart/form-data">
+		    <input type="hidden" name="kitId" th:value="${kit.kitId}">
+		
+		    <div class="input-row">
+		        <div class="input-col full">
+		            <label class="label-style">상품명</label>
+		            <input type="text" name="name" class="field-style" 
+		                   th:value="${kit.name}" placeholder="상품 이름을 입력하세요" required>
+		        </div>
+		        
+		        <div class="input-col">
+		            <label class="label-style">제조사</label>
+		            <input type="text" name="manufacturer" class="field-style" 
+		                   th:value="${kit.manufacturer}" placeholder="브랜드명">
+		        </div>
+		        
+		        <div class="input-col">
+		            <label class="label-style">판매 가격</label>
+		            <input type="number" name="price" class="field-style" 
+		                   th:value="${kit.price}" placeholder="금액 입력" required>
+		        </div>
+		
+		        <div class="input-col full">
+		            <label class="label-style">재고량</label>
+		            <input type="number" name="stock" class="field-style" th:value="${kit.stock}">
+		        </div>
+		
+		        <div class="input-col full">
+		            <label class="label-style">상품 판매 상태</label>
+		            <select name="status" class="field-style">
+		                <option value="AVAILABLE" th:selected="${kit.status == 'AVAILABLE'}">판매 중 (Available)</option>
+		                <option value="OUT_OF_STOCK" th:selected="${kit.status == 'OUT_OF_STOCK'}">품절 (Out of Stock)</option>
+		                <option value="HIDDEN" th:selected="${kit.status == 'HIDDEN'}">판매 중지/숨김 (Hidden)</option>
+		            </select>
+		        </div>
+		    </div>
+		
+		    <hr style="border: 0; height: 1px; background: #eee; margin: 40px 0;">
+		    
+		    <div class="image-input-section">
+		        <label class="label-style">메인 대표 이미지 (변경 시에만 선택)</label>
+		        <div class="upload-dropzone">
+		            <p th:text="${kit.mainImage1}">기존 파일명.jpg</p>
+		            <input type="file" name="mainImageFile1" class="file-input-style">
+		        </div>
+		    </div>
+		    <div class="form-button-group">
+		        <button type="submit" class="submit-button">상품 정보 수정</button>
+		        <a th:href="@{/customer/shop/detail(id=${kit.kitId})}" class="cancel-button">취소</a>
+		    </div>
+		</form>
+        </div>
+    </div>
+</th:block>
+</body>
+</html>

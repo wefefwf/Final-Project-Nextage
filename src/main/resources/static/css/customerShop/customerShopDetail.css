@@ -202,3 +202,12 @@
 .slick-dots li.slick-active button:before { 
     color: #ff79c6 !important; 
 }
+/* 재고가 0일 때 버튼 스타일 */
+.purchase-btn-group button.disabled {
+    background: #f0f0f0 !important; /* 배경을 회색으로 */
+    color: #bbb !important;         /* 글자색을 흐리게 */
+    border: 1px solid #ddd !important;
+    cursor: not-allowed !important; /* 마우스 올리면 '금지' 표시 */
+    box-shadow: none !important;    /* 그림자 제거 */
+    background-image: none !important; /* 그라데이션 제거 */
+}

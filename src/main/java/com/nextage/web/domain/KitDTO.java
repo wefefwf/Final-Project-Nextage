@@ -22,4 +22,5 @@ public class KitDTO {
     private String mainImage2;   // 대표 이미지2 (선택)
     private String detailImage;  // 상세 이미지
     private LocalDateTime createdAt; // 등록일
+    private String status; //상태
 }

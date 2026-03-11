@@ -57,7 +57,7 @@
     padding: 0 15px;
     box-sizing: border-box;
     display: flex !important;
-    justify-content: space-between !important; /* 양쪽 끝 정렬 */
+    justify-content: space-between !important; 
     align-items: center;
 }
 
@@ -112,7 +112,7 @@
     color: #ff79c6 !important;
 }
 
-/* --- [3] 상품 카드 레이아웃 (기존 카드 코드 유지) --- */
+/* --- [3] 상품 카드 레이아웃 --- */
 .row.row-cols-1.row-cols-md-3.g-4 {
     width: 1200px;
     margin: 10px auto; 
@@ -136,9 +136,41 @@
 
 .card-body { padding: 20px !important; }
 .card-text.text-muted { font-size: 13px; color: #999 !important; margin-bottom: 5px; }
+
+/* 핵심: 제목과 배지의 중심축을 일치시키는 구간 */
 .card-title {
-    font-size: 17px; font-weight: 600; color: #333; margin-bottom: 20px;
-    height: 2.8em; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    font-size: 17px; 
+    font-weight: 600; 
+    color: #333; 
+    margin-bottom: 20px;
+    height: 2.8em; 
+    
+    /* 중심축 정렬 적용 */
+    display: flex !important;
+    align-items: center !important; 
+    gap: 6px !important;
+    
+    /* 기존 줄바꿈 유지 설정 (필요 시) */
+    white-space: normal;
+    overflow: hidden;
+}
+
+.badge-soldout {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    
+    height: 19px !important; 
+    line-height: 1 !important;
+    padding: 0 8px !important;
+    font-size: 11px;
+    font-weight: 700;
+    color: #fff;
+    background-color: #c0c0c0;
+    border-radius: 4px;
+    
+    /* 미세하게 아래로 보일 때 조절 (폰트 기준선 보정) */
+    transform: translateY(-1px) !important;
 }
 
 .price-container {
@@ -198,7 +230,7 @@
     font-size: 18px;
     background-color: #fff;
 }
-/* --- 글쓰기 버튼 스타일 (기존과 동일하되 여백 확인) --- */
+
 .btn-write {
     display: inline-block;
     background-color: rgb(192, 192, 192);
@@ -210,7 +242,7 @@
     text-decoration: none !important;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     transition: all 0.3s ease;
-    white-space: nowrap; /* 글자 줄바꿈 방지 */
+    white-space: nowrap;
 }
 
 .btn-write:hover {
@@ -218,7 +250,10 @@
     transform: translateY(-2px);
 }
 
-/* 오른쪽 그룹 내 버튼 사이 간격 */
 .gap-2 {
     gap: 12px !important;
+}
+
+.kit-card.sold-out img {
+    filter: grayscale(0.5) opacity(0.8);
 }

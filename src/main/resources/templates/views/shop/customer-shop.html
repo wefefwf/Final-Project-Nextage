@@ -46,7 +46,10 @@
 		                     th:src="@{${kit.mainImage1}}" />
 						<div class="card-body">
 						    <p class="card-text text-muted mb-1" th:text="${kit.manufacturer}">제조사</p>
-						    <h5 class="card-title" th:text="${kit.name}">상품명</h5>
+						    <h5 class="card-title">
+						        <span th:text="${kit.name}">상품명</span>
+						        <span th:if="${kit.stock == 0}" class="badge-soldout">품절</span>
+						    </h5>
 						    <div class="price-container">
 						        <span class="view-detail-text">상세보기</span>
 						        <p class="card-text fw-bold" 

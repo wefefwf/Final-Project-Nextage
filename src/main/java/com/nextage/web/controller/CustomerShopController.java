@@ -72,4 +72,13 @@ public class CustomerShopController {
     	shopService.deleteShop(id);
     	return "redirect:/customer/shop";
     }
+    
+    //업데이트 폼 가기
+    @GetMapping("customer/shop/edit")
+    public String goShopUpdate(@RequestParam("id") int id,@RequestParam(value = "page", defaultValue = "1") int page,Model model){
+    	KitDTO kit = shopService.getDetail(id);
+    	model.addAttribute("kit",kit);
+    	model.addAttribute("page", page);
+    	return "views/shop/customer-shopUpdateForm";
+    }
 }
