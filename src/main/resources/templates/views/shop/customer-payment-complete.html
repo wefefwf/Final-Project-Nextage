@@ -83,7 +83,7 @@
             display: flex; gap: 12px;
             animation: fadeUp 0.5s ease 0.35s both;
         ">
-            <button onclick="location.href='/customer/shop'" style="
+            <button onclick="location.href='/shop'" style="
                 padding: 14px 28px;
                 font-size: 14px; font-weight: 700; color: #fff;
                 background: linear-gradient(135deg, #bd93f9, #a6c1ee);
@@ -122,8 +122,8 @@
 
     <script th:inline="javascript">
     /*<![CDATA[*/
-        // 리다이렉트 대상 — 결제 전 페이지로 돌아감 (기본: 쇼핑 페이지)
-        var redirectUrl = /*[[${redirectUrl}]]*/ '/customer/shop';
+        // 리다이렉트 대상 — 결제 전 페이지로 돌아감 (기본: 구매내역)
+        var redirectUrl = /*[[${redirectUrl}]]*/ '/order/history';
 
         var count = 5;
         var timer = setInterval(function() {
