@@ -31,9 +31,11 @@
             </div>
             
             <div class="header-right">
-                <select class="form-select-sm sort-select">
-                    <option>최신순</option>
-                    <option>금액 높은순</option>
+                <!-- ✅ 수정: id, value 추가 + 금액 낮은순 추가 -->
+                <select class="form-select-sm sort-select" id="sortSelect">
+                    <option value="latest">최신순</option>
+                    <option value="price-high">금액 높은순</option>
+                    <option value="price-low">금액 낮은순</option>
                 </select>
                 <a th:href="@{/customer/request/write}" class="write-btn">의뢰하기</a>
             </div>
@@ -44,8 +46,11 @@
                 <p>등록된 의뢰가 없습니다. 첫 번째 주인공이 되어보세요!</p>
             </div>
 
+            <!-- ✅ 수정: data-price, data-date 속성 추가 -->
             <div class="request-item" th:each="request : ${requestList}" 
                  th:data-category="${request.categoryName}"
+                 th:data-price="${request.hopePrice}"
+                 th:data-date="${request.createdAt}"
                  th:onclick="|location.href='/customer/request/detail/' + ${request.requestId}|">
                 
                 <img th:src="${request.thumbnailPath ?: '/image/no-image.png'}" class="item-thumbnail">
@@ -73,32 +78,53 @@
         </div>
     </div>
 
+    <!-- ✅ 수정: 필터 + 정렬 통합 스크립트 -->
     <script>
+    let currentCategory = 'all';
+
+    function applyFilterAndSort() {
+        const sortValue = document.getElementById('sortSelect').value;
+        const list = document.querySelector('.request-list');
+        const items = Array.from(document.querySelectorAll('.request-item'));
+
+        // 카테고리 필터
+        items.forEach(item => {
+            const itemCategory = item.getAttribute('data-category');
+            item.style.display = (currentCategory === 'all' || itemCategory === currentCategory) ? 'flex' : 'none';
+        });
+
+        // 보이는 항목 / 숨겨진 항목 분리
+        const visibleItems = items.filter(item => item.style.display !== 'none');
+        const hiddenItems  = items.filter(item => item.style.display === 'none');
+
+        // 정렬
+        visibleItems.sort((a, b) => {
+            if (sortValue === 'price-high') {
+                return parseInt(b.getAttribute('data-price')) - parseInt(a.getAttribute('data-price'));
+            } else if (sortValue === 'price-low') {
+                return parseInt(a.getAttribute('data-price')) - parseInt(b.getAttribute('data-price'));
+            } else {
+                // 최신순
+                return (b.getAttribute('data-date') || '').localeCompare(a.getAttribute('data-date') || '');
+            }
+        });
+
+        // DOM 재정렬
+        [...visibleItems, ...hiddenItems].forEach(item => list.appendChild(item));
+    }
+
+    // 카테고리 필터 버튼
     document.querySelectorAll('.filter-btn').forEach(button => {
-        button.addEventListener('click', function() {
-            // 1. 활성화 UI 처리
+        button.addEventListener('click', function () {
             document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
             this.classList.add('active');
-            
-            const selectedCategory = this.getAttribute('data-category');
-            const items = document.querySelectorAll('.request-item');
-            
-            // 2. 필터링 로직 (데이터 속성 기반으로 비교)
-            items.forEach(item => {
-                const itemCategory = item.getAttribute('data-category');
-                
-                if (selectedCategory === 'all') {
-                    item.style.display = 'flex';
-                } else {
-                    if (itemCategory === selectedCategory) {
-                        item.style.display = 'flex';
-                    } else {
-                        item.style.display = 'none';
-                    }
-                }
-            });
+            currentCategory = this.getAttribute('data-category');
+            applyFilterAndSort();
         });
     });
+
+    // 정렬 select
+    document.getElementById('sortSelect').addEventListener('change', applyFilterAndSort);
     </script>
 </th:block>
 </body>
