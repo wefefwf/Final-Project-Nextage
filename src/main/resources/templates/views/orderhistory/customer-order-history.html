@@ -58,12 +58,39 @@
         }
         .order-date { font-size: 12px; color: #bbb; }
 
-        .order-status {
-            font-size: 11px; font-weight: 700;
-            padding: 4px 12px; border-radius: 20px;
-            background: linear-gradient(135deg, #bd93f9, #a6c1ee);
-            color: #fff; white-space: nowrap;
+        .badge-group {
+            display: flex; flex-direction: column; align-items: flex-end; gap: 8px;
         }
+
+        /* 결제 상태 뱃지 */
+		.order-status {
+		    font-size: 16px; font-weight: 700;
+		    color: #bd93f9; white-space: nowrap;
+		    display: inline-block;
+		    margin-right: 10px;
+		}
+
+        /* 수락 상태 뱃지 */
+        .accept-badge {
+            font-size: 13px; font-weight: 700;
+            padding: 7px 18px; border-radius: 20px;
+            white-space: nowrap; display: inline-block;
+        }
+        .accept-pending  { background: #fff8e1; color: #f59e0b; border: 1px solid #fde68a; }
+        .accept-accepted { background: #eefbf3; color: #2ecc71; border: 1px solid #a7f3d0; }
+        .accept-rejected { background: #fff5f5; color: #ff6b6b; border: 1px solid #ffc2c2; }
+
+        /* 배송 상태 뱃지 */
+        .delivery-badge {
+            font-size: 13px; font-weight: 700;
+            padding: 7px 18px; border-radius: 20px;
+            white-space: nowrap; display: inline-block;
+        }
+        .delivery-checking { background: #fef3e2; color: #e67e22; border: 1px solid #fad7a0; }
+        .delivery-ready    { background: #eaf4fb; color: #2e86c1; border: 1px solid #aed6f1; }
+        .delivery-ing      { background: #e8f0fe; color: #4285f4; border: 1px solid #c5d8fd; }
+        .delivery-done     { background: #f0f0f0; color: #888;    border: 1px solid #e0e0e0; }
+        .delivery-cancel   { background: #fff5f5; color: #ff6b6b; border: 1px solid #ffc2c2; }
 
         .order-items-preview {
             display: flex; gap: 10px;
@@ -77,8 +104,6 @@
         .preview-placeholder {
             width: 64px; height: 64px; border-radius: 10px;
             background: linear-gradient(135deg, #f5f0ff, #ede9fe);
-            display: flex; align-items: center;
-            justify-content: center; font-size: 24px;
         }
         .preview-more {
             width: 64px; height: 64px; border-radius: 10px;
@@ -103,7 +128,6 @@
         .detail-arrow { font-size: 13px; color: #bd93f9; font-weight: 600; }
 
         .empty-state { text-align: center; padding: 80px 0; color: #bbb; }
-        .empty-icon { font-size: 60px; margin-bottom: 20px; }
         .empty-text { font-size: 16px; font-weight: 500; margin-bottom: 20px; }
         .btn-shop {
             display: inline-block; padding: 14px 32px;
@@ -169,12 +193,42 @@
                         <div class="order-date"
                              th:text="${#temporals.format(order.createdAt, 'yyyy-MM-dd HH:mm')}"></div>
                     </div>
-                    <span class="order-status">결제완료</span>
+
+                    <!-- 뱃지 그룹 -->
+                    <div class="badge-group">
+
+                        <!-- 결제 완료 고정 뱃지 -->
+                        <span class="order-status">결제완료</span>
+
+                        <!-- 배송 상태: 1=결제확인중, 2=배송준비, 3=배송중, 4=배송완료, 9=취소 -->
+                        <span class="delivery-badge delivery-checking"
+                              th:if="${order.deliveryStatus == 1}">결제확인중</span>
+                        <span class="delivery-badge delivery-ready"
+                              th:if="${order.deliveryStatus == 2}">배송준비</span>
+                        <span class="delivery-badge delivery-ing"
+                              th:if="${order.deliveryStatus == 3}">배송중</span>
+                        <span class="delivery-badge delivery-done"
+                              th:if="${order.deliveryStatus == 4}">배송완료</span>
+                        <span class="delivery-badge delivery-cancel"
+                              th:if="${order.deliveryStatus == 9}">취소</span>
+
+                        <!-- 개인거래(bid_id 있음)일 때만 업체 수락 상태 표시 -->
+                        <th:block th:if="${order.bidId != null}">
+                            <span class="accept-badge accept-pending"
+                                  th:if="${order.acceptStatus == 'PENDING'}">검토중</span>
+                            <span class="accept-badge accept-accepted"
+                                  th:if="${order.acceptStatus == 'ACCEPTED'}">수락됨</span>
+                            <span class="accept-badge accept-rejected"
+                                  th:if="${order.acceptStatus == 'REJECTED'}">거절됨</span>
+                        </th:block>
+
+                    </div>
                 </div>
 
                 <div class="order-items-preview">
                     <th:block th:each="item, iter : ${order.items}" th:if="${iter.index < 4}">
-                        <div class="preview-placeholder" th:if="${item.imageUrl == null}">🛍️</div>
+                        <div class="preview-placeholder"
+                             th:if="${item.imageUrl == null}"></div>
                         <img class="preview-img"
                              th:if="${item.imageUrl != null}"
                              th:src="${item.imageUrl}"
@@ -182,7 +236,7 @@
                     </th:block>
                     <div class="preview-more"
                          th:if="${#lists.size(order.items) > 4}"
-                         th:text="'+' + (${#lists.size(order.items)} - 4)">+2</div>
+                         th:text="'+' + (${#lists.size(order.items)} - 4)"></div>
                 </div>
 
                 <div class="order-card-footer">
@@ -193,7 +247,7 @@
                               th:text="${#numbers.formatInteger(order.totalAmount, 3, 'COMMA') + '원'}">
                             0원
                         </span>
-                        <span class="detail-arrow">상세 보러가기 →</span>
+                        <span class="detail-arrow">상세 보러가기 &rarr;</span>
                     </div>
                 </div>
 
@@ -204,7 +258,7 @@
         <div class="pagination" th:if="${totalPages > 1}">
             <a class="page-btn"
                th:classappend="${currentPage == 1} ? 'disabled'"
-               th:href="@{/order/history(page=${currentPage - 1})}">‹</a>
+               th:href="@{/order/history(page=${currentPage - 1})}">&lsaquo;</a>
 
             <th:block th:each="i : ${#numbers.sequence(1, totalPages)}">
                 <a class="page-btn"
@@ -215,7 +269,7 @@
 
             <a class="page-btn"
                th:classappend="${currentPage == totalPages} ? 'disabled'"
-               th:href="@{/order/history(page=${currentPage + 1})}">›</a>
+               th:href="@{/order/history(page=${currentPage + 1})}">&rsaquo;</a>
         </div>
 
     </div>
