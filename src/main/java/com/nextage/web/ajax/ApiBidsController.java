@@ -28,13 +28,36 @@ public class ApiBidsController {
 	private final BidService bidService;
 
 	@PostMapping("/")
-	public ResponseEntity<String> createBid(@RequestBody BidDTO bid) {
-		int result = bidService.addBid(bid);
-		if (result == 1) {
-			return ResponseEntity.ok("Bid created successfully");
-		} else {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to create bid");
-		}
+	public ResponseEntity<Map<String, Object>> createBid(@RequestBody BidDTO bid) {
+	    Map<String, Object> result = new HashMap<>();
+
+	    try {
+	        int saved = bidService.addBid(bid);
+
+	        result.put("success", true);
+	        result.put("message", "제안이 등록되었습니다.");
+	        result.put("data", bid);
+
+	        return ResponseEntity.ok(result);
+
+	    } catch (IllegalArgumentException e) {
+	        result.put("success", false);
+	        result.put("message", e.getMessage());
+	        return ResponseEntity.badRequest().body(result);
+
+	    } 
+//	    catch (Exception e) {
+//	        result.put("success", false);
+//	        result.put("message", "제안 등록 중 오류가 발생했습니다.");
+//	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result);
+//	    }
+	    catch (Exception e) {
+	        e.printStackTrace();
+	        result.put("success", false);
+	        result.put("message", e.getMessage());
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result);
+	    }
+	    
 	}
 
 	@GetMapping("/request/{requestId}")
