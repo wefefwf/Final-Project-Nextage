@@ -8,115 +8,185 @@
     <link rel="stylesheet" th:href="@{/css/portfolio/portfolio.css}" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css"/>
+    
+    <style>
+        /* 부트스트랩 모달 커스텀 스타일 (기존 레이아웃 방해 금지) */
+        .modal-content {
+            border-radius: 35px !important;
+            border: none !important;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.15) !important;
+            overflow: hidden;
+        }
+        .modal-header { border-bottom: none !important; padding: 30px 40px 10px !important; }
+        .modal-body { padding: 10px 40px 40px !important; }
+        #modalImg { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 20px; }
+        .btn-close { background-color: #f8f9fa; border-radius: 50%; opacity: 1; }
+    </style>
 </head>
 <body>
 <th:block layout:fragment="content">
 <div class="portfolio-content">
     
     <div class="top-row">
-    <div class="profile-section">
-        <h2 class="section-title">프로필</h2>
-        <div class="profile-image-container">
-            <img src="/images/default-profile.png" alt="프로필">
-        </div>
-        <div class="profile-btns">
-            <button type="button" class="btn-modify">프로필 수정</button>
-            <button type="button" class="btn-delete">프로필 삭제</button>
-        </div>
-    </div>
-
-    <div class="info-section">
-        <div class="location-group">
-            <h2 class="section-title">위치</h2>
-            <div class="info-box">
-                <span>서울특별시 강남구 테헤란로 (테스트 위치)</span>
-                <div class="box-actions">
-                    <button type="button" class="btn-box-edit">수정</button>
-                    <button type="button" class="btn-box-del">삭제</button>
-                </div>
+        <div class="profile-section">
+            <h2 class="section-title">프로필</h2>
+            <div class="profile-image-container">
+                <img src="/images/default-profile.png" alt="프로필">
+            </div>
+            <div class="profile-btns">
+                <button type="button" class="btn-modify">프로필 수정</button>
+                <button type="button" class="btn-delete">프로필 삭제</button>
             </div>
         </div>
 
-        <div class="career-group">
-            <h2 class="section-title">경력</h2>
-            <div class="career-container">
-                <div class="info-box career-item">
-                    <span>테스트 경력사항 1번입니다.</span>
-                    <div class="box-actions">
-                        <button type="button" class="btn-box-edit">수정</button>
-                        <button type="button" class="btn-box-del">삭제</button>
-                    </div>
-                </div>
-                <div class="info-box career-item">
-                    <span>테스트 경력사항 1번입니다.</span>
-                    <div class="box-actions">
-                        <button type="button" class="btn-box-edit">수정</button>
-                        <button type="button" class="btn-box-del">삭제</button>
-                    </div>
-                </div>
-                <div class="info-box career-item">
-                    <span>테스트 경력사항 1번입니다.</span>
+        <div class="info-section">
+            <div class="location-group">
+                <h2 class="section-title">위치</h2>
+                <div class="info-box">
+                    <span>서울특별시 강남구 테헤란로 (테스트 위치)</span>
                     <div class="box-actions">
                         <button type="button" class="btn-box-edit">수정</button>
                         <button type="button" class="btn-box-del">삭제</button>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-</div>
-<div class="work-section">
-    <h2 class="section-title">작업 포트폴리오</h2>
-    
-    <div class="work-grid">
-        <div class="work-card">
-            <div class="card-img-holder">
-                <img src="/images/sample1.jpg" alt="작업물">
-            </div>
-            <div class="card-footer">
-                <div class="card-info-wrap">
-                    <p class="order-num">No. 20260312-001</p>
-                    <h3 class="card-text">린넨 셔츠 사이즈 수선 의뢰</h3>
-                    <p class="work-period">2026.03.12 ~ 2026.03.20</p>
-                </div>
-                <i class="arrow-icon">▶</i>
-            </div>
-        </div>
 
-        <div class="work-card">
-            <div class="card-img-holder">
-                <img src="/images/sample1.jpg" alt="작업물">
-            </div>
-            <div class="card-footer">
-                <div class="card-info-wrap">
-                    <p class="order-num">No. 20260312-002</p>
-                    <h3 class="card-text">겨울 코트 소매 길이 수선</h3>
-                    <p class="work-period">2026.03.13 ~ 2026.03.21</p>
+            <div class="career-group">
+                <h2 class="section-title">경력</h2>
+                <div class="career-container">
+                    <div class="info-box career-item">
+                        <span>테스트 경력사항 1번입니다.</span>
+                        <div class="box-actions">
+                            <button type="button" class="btn-box-edit">수정</button>
+                            <button type="button" class="btn-box-del">삭제</button>
+                        </div>
+                    </div>
+                    <div class="info-box career-item">
+                        <span>테스트 경력사항 2번입니다.</span>
+                        <div class="box-actions">
+                            <button type="button" class="btn-box-edit">수정</button>
+                            <button type="button" class="btn-box-del">삭제</button>
+                        </div>
+                    </div>
+                    <div class="info-box career-item">
+                        <span>테스트 경력사항 3번입니다.</span>
+                        <div class="box-actions">
+                            <button type="button" class="btn-box-edit">수정</button>
+                            <button type="button" class="btn-box-del">삭제</button>
+                        </div>
+                    </div>
                 </div>
-                <i class="arrow-icon">▶</i>
-            </div>
-        </div>
-
-        <div class="work-card">
-            <div class="card-img-holder">
-                <img src="/images/sample1.jpg" alt="작업물">
-            </div>
-            <div class="card-footer">
-                <div class="card-info-wrap">
-                    <p class="order-num">No. 20260312-003</p>
-                    <h3 class="card-text">정장 바지 허리 줄임 의뢰</h3>
-                    <p class="work-period">2026.03.14 ~ 2026.03.22</p>
-                </div>
-                <i class="arrow-icon">▶</i>
             </div>
         </div>
     </div>
 
-    <div class="pagination-placeholder" style="margin-top: 100px; text-align: center;">
-        [ 1 2 3 4 5 ]
-    </div> 
+    <div class="work-section">
+        <h2 class="section-title">작업 포트폴리오</h2>
+        
+        <div class="work-grid">
+            <div class="work-card" data-bs-toggle="modal" data-bs-target="#workModal" onclick="fillModal(this)" style="cursor: pointer;">
+                <div class="card-img-holder">
+                    <img src="/images/sample1.jpg" alt="작업물">
+                </div>
+                <div class="card-footer">
+                    <div class="card-info-wrap">
+                        <p class="order-num">No. 20260312-001</p>
+                        <h3 class="card-text">린넨 셔츠 사이즈 수선 의뢰</h3>
+                        <p class="work-period">2026.03.12 ~ 2026.03.20</p>
+                    </div>
+                    <i class="arrow-icon">▶</i>
+                </div>
+            </div>
+
+            <div class="work-card" data-bs-toggle="modal" data-bs-target="#workModal" onclick="fillModal(this)" style="cursor: pointer;">
+                <div class="card-img-holder">
+                    <img src="/images/sample1.jpg" alt="작업물">
+                </div>
+                <div class="card-footer">
+                    <div class="card-info-wrap">
+                        <p class="order-num">No. 20260312-002</p>
+                        <h3 class="card-text">겨울 코트 소매 길이 수선</h3>
+                        <p class="work-period">2026.03.13 ~ 2026.03.21</p>
+                    </div>
+                    <i class="arrow-icon">▶</i>
+                </div>
+            </div>
+
+            <div class="work-card" data-bs-toggle="modal" data-bs-target="#workModal" onclick="fillModal(this)" style="cursor: pointer;">
+                <div class="card-img-holder">
+                    <img src="/images/sample1.jpg" alt="작업물">
+                </div>
+                <div class="card-footer">
+                    <div class="card-info-wrap">
+                        <p class="order-num">No. 20260312-003</p>
+                        <h3 class="card-text">정장 바지 허리 줄임 의뢰</h3>
+                        <p class="work-period">2026.03.14 ~ 2026.03.22</p>
+                    </div>
+                    <i class="arrow-icon">▶</i>
+                </div>
+            </div>
+        </div>
+
+        <div class="pagination-placeholder" style="margin-top: 100px; text-align: center; color: #333; font-weight: 500;">
+            [ 1 2 3 4 5 ]
+        </div> 
+    </div>
+
+    <div class="modal fade" id="workModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="modalTitle" style="font-weight: 500; color: #333;">작업물 상세</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+		    <div class="row g-4">
+		        <div class="col-md-6">
+		            <div class="modal-slider">
+		                <div><img id="modalImg" src="" alt="작업물" class="square-img"></div>
+		                <div><img src="/images/sample1.jpg" alt="추가이미지1" class="square-img"></div>
+		            </div>
+		        </div>
+		        
+		        <div class="col-md-6 d-flex flex-column position-relative">
+		            <div class="modal-info-content">
+		                <p id="modalOrderNum" class="order-num" style="font-size: 13px; color: #999; margin-bottom: 5px;"></p>
+		                <p id="modalPeriod" class="work-period" style="font-size: 14px; color: #666; margin-bottom: 20px;"></p>
+		                
+		                <h5 class="detail-label">요구 사항</h5>
+		                <p class="detail-text" id="modalRequirement">요청하신 린넨 셔츠의 소매와 품을 슬림하게 수선해 주세요.</p>
+		                
+		                <h5 class="detail-label">후기 내용</h5>
+		                <p class="detail-text" id="modalReview" style="font-style: italic;">"정말 마음에 들게 수선되었습니다! 배송도 빠르고 친절하시네요."</p>
+		            </div>
+		
+		            <div class="modal-actions" style="margin-top: auto; text-align: right;">
+		                <button type="button" class="btn-hide" onclick="toggleVisibility(this)">이 게시물 숨기기</button>
+		            </div>
+		        </div>
+		    </div>
+		</div>
+        </div>
+      </div>
+    </div>
+
 </div>
-</div>
+
+<script>
+function fillModal(element) {
+    // 클릭한 카드 내부 요소에서 데이터 추출
+    const imgPath = element.querySelector('img').src;
+    const titleText = element.querySelector('.card-text').innerText;
+    const orderNumText = element.querySelector('.order-num').innerText;
+    const periodText = element.querySelector('.work-period').innerText;
+
+    // 모달 내 각 요소에 데이터 주입
+    document.getElementById('modalImg').src = imgPath;
+    document.getElementById('modalTitle').innerText = titleText;
+    document.getElementById('modalOrderNum').innerText = orderNumText;
+    document.getElementById('modalPeriod').innerText = periodText;
+}
+</script>
 </th:block>
 </body>
 </html>
