@@ -10,16 +10,20 @@ import com.nextage.web.domain.BidDTO;
 @Mapper
 public interface BidsMapper {
 
-	List<BidDTO> selectBidsByRequestId(@Param("requestId") Long requestId);
-	
 	int insertBid(BidDTO bid);
-	
-	List<BidDTO> selectBidsByBusinessId(@Param("businessId") Long businessId);
-	
-	int updateBidStatus(@Param("bidId") Long bidId, @Param("status") String status);
 
-    int resetOtherBidsToRejected(@Param("requestId") Long requestId, @Param("selectedBidId") Long selectedBidId);
+	List<BidDTO> selectBidsByRequestId(Long requestId);
 
-    BidDTO selectBidById(@Param("bidId") Long bidId);
+	List<BidDTO> selectBidsByBusinessId(Long businessId);
+
+	BidDTO selectBidById(Long bidId);
+
+	void updateBidStatus(@Param("bidId") Long bidId, @Param("status") String status);
+
+	void resetOtherBidsToRejected(@Param("requestId") Long requestId, @Param("selectedBidId") Long selectedBidId);
+
+	Integer selectLowestBidPriceByRequestId(Long requestId);
+
+	int countActiveBidByRequestIdAndBusinessId(@Param("requestId") Long requestId, @Param("businessId") Long businessId);
 
 }

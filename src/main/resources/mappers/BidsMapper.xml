@@ -56,5 +56,29 @@
           AND bid_id != #{selectedBidId}
           AND status = 'ACTIVE'
     </update>
-
+    
+    <!-- 현재 의뢰글 최저 입찰가 -->
+    <select id="selectLowestBidPriceByRequestId" parameterType="long" resultType="java.lang.Integer">
+	    SELECT MIN(price)
+	    FROM bids
+	    WHERE request_id = #{requestId}
+	      AND status = 'ACTIVE'
+	</select>
+	
+	<!-- 같은업체 제안여부 -->
+	<select id="countActiveBidByRequestIdAndBusinessId" resultType="int">
+	    SELECT COUNT(*)
+	    FROM bids
+	    WHERE request_id = #{requestId}
+	      AND business_id = #{businessId}
+	      AND status != 'HIDDEN'
+	</select>
+	
+	<!-- 의뢰글 정보 조회 -->
+	<select id="selectRequestById" parameterType="long" resultType="com.nextage.web.domain.RequestDTO">
+	    SELECT request_id, hope_price, status
+	    FROM request
+	    WHERE request_id = #{requestId}
+	</select>
+	
 </mapper>

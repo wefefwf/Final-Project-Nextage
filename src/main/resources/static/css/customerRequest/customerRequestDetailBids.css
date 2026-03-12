@@ -1,918 +1,1472 @@
 /* 제안 리스트 컨테이너 */
 .bid-comments-container {
-    margin-top: 40px;
-    padding-bottom: 60px;
+	margin-top: 40px;
+	padding-bottom: 60px;
 }
 
 .bid-section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 20px;
 }
 
 .section-title {
-    font-size: 1.2rem;
-    font-weight: 700;
-    margin-bottom: 0;
+	font-size: 1.2rem;
+	font-weight: 700;
+	margin-bottom: 0;
 }
 
 .bid-count {
-    color: #3498db;
-    margin-left: 5px;
+	color: #3498db;
+	margin-left: 5px;
 }
 
 .bid-top-actions {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+	display: flex;
+	align-items: center;
+	gap: 10px;
 }
 
 /* 제안 카드 */
 .bid-item {
-    background: #fff;
-    border: 1px solid #eee;
-    border-radius: 14px;
-    padding: 22px;
-    margin-bottom: 16px;
-    transition: all 0.25s ease;
-    overflow: visible;
+	background: #fff;
+	border: 1px solid #eee;
+	border-radius: 14px;
+	padding: 22px;
+	margin-bottom: 16px;
+	transition: all 0.25s ease;
+	overflow: visible;
 }
 
 .bid-selected {
-    border: 2px solid #0071e3;
-    background: #f3f8ff;
+	border: 2px solid #ffc3e9;
+	background: #fff;
 }
 
 .bid-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-    position: relative;
-    overflow: visible;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 15px;
+	position: relative;
+	overflow: visible;
 }
 
 .bid-header-left {
-    display: flex;
-    align-items: center;
-    gap: 12px;
+	display: flex;
+	align-items: center;
+	gap: 12px;
 }
 
 .bid-compare-check {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 4px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-right: 4px;
 }
 
 .bid-compare-checkbox {
-    width: 18px;
-    height: 18px;
-    cursor: pointer;
+	width: 18px;
+	height: 18px;
+	cursor: pointer;
 }
 
 /* 업체 정보 */
 .pro-info {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    cursor: pointer;
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	cursor: pointer;
 }
 
 .pro-info:hover {
-    background-color: #f5f5f7;
-    border-radius: 12px;
-    transition: background 0.2s ease;
+	background-color: #f5f5f7;
+	border-radius: 12px;
+	transition: background 0.2s ease;
 }
 
 .pro-arrow {
-    margin-left: 6px;
-    font-size: 0.8rem;
-    color: #999;
-    transition: transform 0.2s ease;
+	margin-left: 6px;
+	font-size: 0.8rem;
+	color: #999;
+	transition: transform 0.2s ease;
 }
 
 .pro-info:hover .pro-arrow {
-    transform: rotate(180deg);
+	transform: rotate(180deg);
 }
 
 .pro-avatar img {
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
-    object-fit: cover;
+	width: 45px;
+	height: 45px;
+	border-radius: 50%;
+	object-fit: cover;
 }
 
 .pro-text {
-    display: flex;
-    flex-direction: column;
+	display: flex;
+	flex-direction: column;
 }
 
 .pro-name {
-    display: block;
-    font-weight: 600;
-    font-size: 1rem;
+	display: block;
+	font-weight: 600;
+	font-size: 1rem;
 }
 
 .bid-date {
-    font-size: 0.85rem;
-    color: #999;
+	font-size: 0.85rem;
+	color: #999;
 }
 
 /* 업체 메뉴 드롭다운 */
 .pro-menu {
-    position: absolute;
-    top: 80%;
-    left: 10%;
-    min-width: 148px;
-    padding: 6px;
-    background: #fff;
-    border-radius: 14px;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-    opacity: 0;
-    transform: translateY(5px);
-    pointer-events: none;
-    transition: all 0.15s ease;
-    z-index: 100;
+	position: absolute;
+	top: 80%;
+	left: 10%;
+	min-width: 148px;
+	padding: 6px;
+	background: #fff;
+	border-radius: 14px;
+	box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+	opacity: 0;
+	transform: translateY(5px);
+	pointer-events: none;
+	transition: all 0.15s ease;
+	z-index: 100;
 }
 
 .pro-menu.show {
-    opacity: 1;
-    transform: translateY(0);
-    pointer-events: auto;
+	opacity: 1;
+	transform: translateY(0);
+	pointer-events: auto;
 }
 
 .menu-item {
-    display: block;
-    width: 100%;
-    padding: 10px 12px;
-    border-radius: 10px;
-    font-size: 14px;
-    font-weight: 500;
-    color: #333;
-    text-decoration: none;
-    cursor: pointer;
-    transition: all 0.2s ease;
+	display: block;
+	width: 100%;
+	padding: 10px 12px;
+	border-radius: 10px;
+	font-size: 14px;
+	font-weight: 500;
+	color: #333;
+	text-decoration: none;
+	cursor: pointer;
+	transition: all 0.2s ease;
 }
 
 .menu-item:hover {
-    background-color: rgb(189, 222, 255);
-    color: #3a7eff;
+	background-color: #f9eef5;
+	color: #ff79c6;
 }
 
 .menu-divider {
-    height: 1px;
-    margin: 6px 4px;
-    background: #f1f1f1;
-    pointer-events: none;
+	height: 1px;
+	margin: 6px 4px;
+	background: #f1f1f1;
+	pointer-events: none;
 }
 
 /* 본문 */
 .bid-content .description {
-    font-size: 0.95rem;
-    line-height: 1.6;
-    color: #444;
-    margin-bottom: 15px;
+	font-size: 0.95rem;
+	line-height: 1.6;
+	color: #444;
+	margin-bottom: 15px;
 }
 
 .bid-specs {
-    display: flex;
-    gap: 30px;
-    background: #f7f8fa;
-    padding: 12px 16px;
-    border-radius: 10px;
+	display: flex;
+	gap: 30px;
+	background: #f7f8fa;
+	padding: 12px 16px;
+	border-radius: 10px;
 }
 
 .spec-item {
-    font-size: 0.9rem;
+	font-size: 0.9rem;
 }
 
 .spec-item .label {
-    color: #777;
-    margin-right: 8px;
+	color: #777;
+	margin-right: 8px;
 }
 
 .spec-item .value {
-    font-weight: 500;
-    color: #333;
+	font-weight: 500;
+	color: #333;
 }
 
 /* 푸터 */
 .bid-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-top: 1px solid #f0f0f0;
-    padding-top: 15px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	border-top: 1px solid #f0f0f0;
+	padding-top: 15px;
 }
 
 .bid-price strong {
-    font-size: 24px;
-    font-weight: 700;
-    color: #2c3e50;
+	font-size: 24px;
+	font-weight: 700;
+	color: #2c3e50;
 }
 
 .bid-actions {
-    display: flex;
-    gap: 10px;
+	display: flex;
+	gap: 10px;
 }
 
 /* 상태 텍스트 */
 .selected-message {
-    font-size: 0.9rem;
-    color: #0071e3;
-    font-weight: 600;
+	display: inline-flex;
+	align-items: center;
+	padding: 6px 12px;
+	border-radius: 999px;
+	font-size: 13px;
+	font-weight: 700;
+	line-height: 1;
+	background-color: #f9eef5;
+	color: #ff79c6;
 }
 
 .bid-status-withdrawn {
-    display: inline-flex;
-    padding: 6px 14px;
-    background-color: #ffe2e0;
-    border-radius: 20px;
-    font-size: 13px;
-    font-weight: 600;
-    color: #e46962;
-    margin-bottom: 15px;
+	display: inline-flex;
+	align-items: center;
+	padding: 6px 12px;
+	border-radius: 999px;
+	font-size: 13px;
+	font-weight: 700;
+	line-height: 1;
+	background-color: #ffe2e0;
+	color: #e46962;
 }
 
 .bid-status-rejected {
-    display: inline-flex;
-    padding: 6px 14px;
-    background-color: #fff4e0;
-    border-radius: 20px;
-    font-size: 13px;
-    font-weight: 600;
-    color: #e4ab62;
-    margin-bottom: 15px;
+	display: inline-flex;
+	align-items: center;
+	padding: 6px 12px;
+	border-radius: 999px;
+	font-size: 13px;
+	font-weight: 700;
+	line-height: 1;
+	background-color: #fff4e0;
+	color: #e4ab62;
 }
 
 /* 버튼 */
 .btn-select-bid {
-    background-color: #4285f4;
-    color: white;
-    border: none;
-    padding: 8px 20px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: 600;
+	background-color: #6283e4;
+	color: #fff;
+	border: 1px solid #ddd;
+	padding: 8px 20px;
+	border-radius: 50px;
+	cursor: pointer;
+	font-weight: 600;
+	transition: all 0.2s;
 }
 
 .btn-select-bid:hover {
-    background-color: rgb(19, 125, 255);
+	background-color: #4e7bff;
 }
 
 .btn-reject-bid {
-    background-color: #e46962;
-    color: #fff;
-    border: 1px solid #ddd;
-    padding: 8px 20px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: all 0.2s;
+	background-color: #e46962;
+	color: #fff;
+	border: 1px solid #ddd;
+	padding: 8px 20px;
+	border-radius: 50px;
+	cursor: pointer;
+	font-weight: 600;
+	transition: all 0.2s;
 }
 
 .btn-reject-bid:hover {
-    background-color: #eb5c54;
-    border-color: #fff;
+	background-color: #eb5c54;
+	border-color: #fff;
 }
 
-.btn-clear-compare,
-.btn-compare {
-    display: inline-block;
-    background-color: rgb(192, 192, 192);
-    color: #fff !important;
-    padding: 8px 20px;
-    border-radius: 20px;
-    font-size: 14px;
-    font-weight: 600;
-    text-decoration: none !important;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    transition: all 0.3s ease;
-    white-space: nowrap;
-    border: none;
+.btn-clear-compare, .btn-compare {
+	display: inline-block;
+	background-color: rgb(192, 192, 192);
+	color: #fff !important;
+	padding: 8px 20px;
+	border-radius: 20px;
+	font-size: 14px;
+	font-weight: 600;
+	text-decoration: none !important;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+	transition: all 0.3s ease;
+	white-space: nowrap;
+	border: none;
 }
 
-.btn-clear-compare:hover,
-.btn-compare:hover {
-    background-color: #000;
-    transform: translateY(-2px);
+.btn-clear-compare:hover, .btn-compare:hover {
+	background-color: #000;
+	transform: translateY(-2px);
 }
 
 /* 빈 상태 */
 .bid-empty {
-    text-align: center;
-    padding: 50px 0;
-    color: #bbb;
+	text-align: center;
+	padding: 50px 0;
+	color: #bbb;
 }
 
 .empty-icon {
-    font-size: 3rem;
-    margin-bottom: 10px;
+	font-size: 3rem;
+	margin-bottom: 10px;
 }
 
 .d-none {
-    display: none;
+	display: none;
 }
 
 /* 비교 모달 */
 .compare-modal.hidden {
-    display: none;
+	display: none;
 }
 
 .compare-modal {
-    position: fixed;
-    inset: 0;
-    z-index: 2000;
+	position: fixed;
+	inset: 0;
+	z-index: 2000;
 }
 
 .compare-modal-backdrop {
-    position: absolute;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.45);
+	position: absolute;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.45);
 }
 
 .compare-modal-panel {
-    position: relative;
-    width: min(1100px, 92vw);
-    max-height: 85vh;
-    margin: 60px auto;
-    background: #fff;
-    border-radius: 18px;
-    overflow: hidden;
-    z-index: 1;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+	position: relative;
+	width: min(1100px, 92vw);
+	max-height: 85vh;
+	margin: 60px auto;
+	background: #fff;
+	border-radius: 18px;
+	overflow: hidden;
+	z-index: 1;
+	box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
 }
 
 .compare-modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px 24px;
-    border-bottom: 1px solid #eee;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 20px 24px;
+	border-bottom: 1px solid #eee;
 }
 
 .compare-close-btn {
-    border: none;
-    background: transparent;
-    font-size: 20px;
-    cursor: pointer;
+	border: none;
+	background: transparent;
+	font-size: 20px;
+	cursor: pointer;
 }
 
 .compare-modal-body {
-    padding: 24px;
-    overflow: auto;
-    max-height: calc(85vh - 70px);
+	padding: 24px;
+	overflow: auto;
+	max-height: calc(85vh - 70px);
 }
 
 .compare-grid {
-    display: grid;
-    gap: 16px;
+	display: grid;
+	gap: 16px;
 }
 
 .compare-grid-2 {
-    grid-template-columns: repeat(2, 1fr);
+	grid-template-columns: repeat(2, 1fr);
 }
 
 .compare-grid-3 {
-    grid-template-columns: repeat(3, 1fr);
+	grid-template-columns: repeat(3, 1fr);
 }
 
 .compare-column {
-    border: 1px solid #e8e8e8;
-    border-radius: 14px;
-    padding: 18px;
-    background: #fafafa;
+	border: 1px solid #e8e8e8;
+	border-radius: 14px;
+	padding: 18px;
+	background: #fafafa;
 }
 
 .compare-vendor-name {
-    font-size: 18px;
-    font-weight: 700;
-    margin-bottom: 16px;
-    color: #222;
+	font-size: 18px;
+	font-weight: 700;
+	margin-bottom: 16px;
+	color: #222;
 }
 
 .compare-item {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    padding: 12px 0;
-    border-bottom: 1px solid #ececec;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	padding: 12px 0;
+	border-bottom: 1px solid #ececec;
 }
 
 .compare-item:last-child {
-    border-bottom: none;
+	border-bottom: none;
 }
 
 .compare-label {
-    font-size: 13px;
-    color: #888;
+	font-size: 13px;
+	color: #888;
 }
 
 .compare-value {
-    font-size: 15px;
-    color: #222;
-    font-weight: 500;
-    word-break: break-word;
+	font-size: 15px;
+	color: #222;
+	font-weight: 500;
+	word-break: break-word;
 }
 
 .compare-item-description .compare-value {
-    line-height: 1.5;
+	line-height: 1.5;
 }
 
 body.modal-open {
-    overflow: hidden;
+	overflow: hidden;
 }
 
 /* 정렬 드롭다운 */
 .bid-sort-dropdown {
-    position: relative;
+	position: relative;
 }
 
 .bid-sort-button {
-    background-color: #fff !important;
-    border: 1px solid #eee !important;
-    border-radius: 20px !important;
-    padding: 8px 20px !important;
-    font-size: 14px !important;
-    font-weight: 600 !important;
-    color: #666 !important;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-    transition: all 0.3s ease;
+	background-color: #fff !important;
+	border: 1px solid #eee !important;
+	border-radius: 20px !important;
+	padding: 8px 20px !important;
+	font-size: 14px !important;
+	font-weight: 600 !important;
+	color: #666 !important;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+	transition: all 0.3s ease;
 }
 
 .bid-sort-button:hover {
-    border-color: #4285f4 !important;
-    color: #4285f4 !important;
+	border-color: #ff79c6 !important;
+	color: #ff79c6 !important;
 }
 
 .sort-arrow {
-    font-size: 11px;
-    color: #777;
-    transition: transform 0.2s ease;
+	font-size: 11px;
+	color: #777;
+	transition: transform 0.2s ease;
 }
 
 .bid-sort-dropdown.open .sort-arrow {
-    transform: rotate(180deg);
+	transform: rotate(180deg);
 }
 
 .bid-sort-menu {
-    position: absolute;
-    top: 48px;
-    left: 0;
-    min-width: 148px;
-    background: #fff;
-    border-radius: 14px;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-    padding: 6px;
-    opacity: 0;
-    transform: translateY(5px);
-    pointer-events: none;
-    transition: all 0.15s ease;
-    z-index: 200;
+	position: absolute;
+	top: 48px;
+	left: 0;
+	min-width: 148px;
+	background: #fff;
+	border-radius: 14px;
+	box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+	padding: 6px;
+	opacity: 0;
+	transform: translateY(5px);
+	pointer-events: none;
+	transition: all 0.15s ease;
+	z-index: 200;
 }
 
 .bid-sort-menu.show {
-    opacity: 1;
-    transform: translateY(0);
-    pointer-events: auto;
+	opacity: 1;
+	transform: translateY(0);
+	pointer-events: auto;
 }
 
 .sort-option {
 	display: block;
-    width: 100%;
-    padding: 5px 12px;
-    border-radius: 10px;
-    font-size: 14px;
-    color: #333;
-    cursor: pointer;
+	width: 100%;
+	padding: 5px 12px;
+	border-radius: 10px;
+	font-size: 14px;
+	color: #333;
+	cursor: pointer;
 }
 
 .sort-option:hover {
-    background-color: rgb(189, 222, 255);
-    color: #3a7eff;
+	background-color: #f9eef5;
+	color: #ff79c6;
 }
 
 .btn-delete-bid {
-    background: #fff;
-    color: #e74c3c;
-    border: 1px solid #f1c5c0;
-    padding: 8px 20px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: all 0.2s ease;
+	background: #fff;
+	color: #e74c3c;
+	border: 1px solid #f1c5c0;
+	padding: 8px 20px;
+	border-radius: 6px;
+	cursor: pointer;
+	font-weight: 600;
+	transition: all 0.2s ease;
 }
 
 .btn-delete-bid:hover {
-    background: #fff5f4;
-    border-color: #e39b93;
+	background: #fff5f4;
+	border-color: #e39b93;
 }
 
 /* 선정 모달 */
 .select-bid-modal.hidden {
-    display: none;
+	display: none;
 }
 
 .select-bid-modal {
-    position: fixed;
-    inset: 0;
-    z-index: 2100;
+	position: fixed;
+	inset: 0;
+	z-index: 2100;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 24px;
 }
 
 .select-bid-modal-backdrop {
-    position: absolute;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.45);
+	position: absolute;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.45);
+	z-index: 0;
 }
 
 .select-bid-modal-panel {
-    position: relative;
-    width: min(720px, 92vw);
-    max-height: 85vh;
-    margin: 60px auto;
-    background: #fff;
-    border-radius: 18px;
-    overflow: hidden;
-    z-index: 1;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+	position: relative;
+	width: min(720px, 100%);
+	max-height: min(85vh, 900px);
+	background: #fff;
+	border-radius: 18px;
+	z-index: 1;
+	box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
 }
 
 .select-bid-modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px 24px;
-    border-bottom: 1px solid #eee;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 20px 24px;
+	border-bottom: 1px solid #eee;
+	flex-shrink: 0;
 }
 
 .select-bid-close-btn {
-    border: none;
-    background: transparent;
-    font-size: 20px;
-    cursor: pointer;
+	border: none;
+	background: transparent;
+	font-size: 20px;
+	cursor: pointer;
 }
 
 .select-bid-modal-body {
-    padding: 24px;
-    overflow: auto;
-    max-height: calc(85vh - 70px);
+	padding: 24px;
+	overflow-y: auto;
+	flex: 1;
 }
 
-.select-summary-card {
-    border: 1px solid #ececec;
-    border-radius: 14px;
-    background: #fafafa;
-    padding: 18px;
-    margin-bottom: 20px;
-}
-
-.select-summary-row {
-    display: flex;
-    justify-content: space-between;
-    gap: 20px;
-    padding: 10px 0;
-    border-bottom: 1px solid #ececec;
-}
-
-.select-summary-row:last-child {
-    border-bottom: none;
-}
-
-.select-label {
-    font-size: 14px;
-    color: #777;
-}
-
-.select-value {
-    font-size: 15px;
-    font-weight: 600;
-    color: #222;
-    text-align: right;
-}
-
-.select-form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-bottom: 18px;
-}
-
-.select-form-group label {
-    font-weight: 600;
-    color: #333;
-}
-
-.select-textarea {
-    width: 100%;
-    min-height: 150px;
-    resize: vertical;
-    border: 1px solid #ddd;
-    border-radius: 12px;
-    padding: 14px;
-    font-size: 14px;
-    line-height: 1.5;
-    outline: none;
-}
-
-.select-textarea:focus {
-    border-color: #4285f4;
-}
-
-.select-agree-row {
-    margin-bottom: 24px;
-}
-
-.select-agree-label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 14px;
-    color: #333;
-    cursor: pointer;
-}
-
-.select-modal-actions {
-    display: flex;
-    justify-content: center;
+.step-actions {
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+	gap: 10px;
 }
 
 .btn-submit-select-bid {
-    background-color: #4285f4;
-    color: #fff;
-    border: none;
-    padding: 10px 28px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
+	margin-left: auto;
+}
+
+.select-summary-card {
+	border: 1px solid #ececec;
+	border-radius: 14px;
+	background: #fafafa;
+	padding: 18px;
+	margin-bottom: 20px;
+}
+
+.select-summary-row {
+	display: flex;
+	justify-content: space-between;
+	gap: 20px;
+	padding: 10px 0;
+	border-bottom: 1px solid #ececec;
+}
+
+.select-summary-row:last-child {
+	border-bottom: none;
+}
+
+.select-label {
+	font-size: 14px;
+	color: #777;
+}
+
+.select-value {
+	font-size: 15px;
+	font-weight: 600;
+	color: #222;
+	text-align: right;
+}
+
+.select-form-group {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	margin-bottom: 18px;
+}
+
+.select-form-group label {
+	font-weight: 600;
+	color: #333;
+}
+
+.select-textarea {
+	width: 100%;
+	min-height: 120px;
+	resize: vertical;
+	border: 1px solid #ddd;
+	border-radius: 12px;
+	padding: 14px;
+	font-size: 14px;
+	line-height: 1.5;
+	outline: none;
+}
+
+.select-textarea:focus {
+	border-color: #4285f4;
+}
+
+.select-agree-row {
+	margin-bottom: 24px;
+}
+
+.select-agree-label {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-size: 14px;
+	color: #333;
+	cursor: pointer;
+}
+
+.select-modal-actions {
+	display: flex;
+	justify-content: center;
+}
+
+.btn-submit-select-bid {
+	background-color: #4285f4;
+	color: #fff;
+	border: none;
+	padding: 10px 28px;
+	border-radius: 8px;
+	cursor: pointer;
+	font-weight: 600;
+	margin-left: auto;
 }
 
 .btn-submit-select-bid:hover {
-    background-color: rgb(19, 125, 255);
+	background-color: rgb(19, 125, 255);
 }
 
 .menu-item-disabled {
-    display: block;
-    width: 100%;
-    padding: 10px 12px;
-    border-radius: 10px;
-    font-size: 14px;
-    font-weight: 500;
-    color: #aaa;
-    background: #f7f7f7;
-    cursor: not-allowed;
+	display: block;
+	width: 100%;
+	padding: 10px 12px;
+	border-radius: 10px;
+	font-size: 14px;
+	font-weight: 500;
+	color: #aaa;
+	background: #f7f7f7;
+	cursor: not-allowed;
 }
 
 .menu-item-disabled:hover {
 	color: #aaa;
-    background: #f7f7f7;
+	background: #f7f7f7;
 }
 
 .menu-helper-text {
-    margin-top: 6px;
-    padding: 0 12px 8px;
-    font-size: 12px;
-    line-height: 1.45;
-    color: #888;
+	margin-top: 6px;
+	padding: 0 12px 8px;
+	font-size: 12px;
+	line-height: 1.45;
+	color: #888;
 }
 
 .select-stepper {
-    margin-bottom: 22px;
+	margin-bottom: 22px;
 }
 
 .select-step-indicator {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 10px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-bottom: 10px;
 }
 
 .step-dot {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    border: 1px solid #d8dce3;
-    background: #fff;
-    color: #888;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    font-weight: 700;
-    transition: all 0.2s ease;
+	width: 32px;
+	height: 32px;
+	border-radius: 50%;
+	border: 1px solid #d8dce3;
+	background: #fff;
+	color: #888;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 14px;
+	font-weight: 700;
+	transition: all 0.2s ease;
 }
 
 .step-dot.active {
-    background: #4285f4;
-    border-color: #4285f4;
-    color: #fff;
+	background: #4285f4;
+	border-color: #4285f4;
+	color: #fff;
 }
 
 .step-dot.done {
-    background: #eaf2ff;
-    border-color: #9fc2ff;
-    color: #4285f4;
+	background: #eaf2ff;
+	border-color: #9fc2ff;
+	color: #4285f4;
 }
 
 .step-line {
-    width: 56px;
-    height: 1px;
-    background: #dfe3ea;
-    margin: 0 8px;
+	width: 56px;
+	height: 1px;
+	background: #dfe3ea;
+	margin: 0 8px;
 }
 
 .select-step-titles {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
-    text-align: center;
-    margin-bottom: 8px;
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 8px;
+	text-align: center;
+	margin-bottom: 8px;
 }
 
 .step-title {
-    font-size: 13px;
-    color: #999;
-    font-weight: 500;
+	font-size: 12px;
+	color: #999;
+	font-weight: 500;
+	line-height: 1.4;
 }
 
 .step-title.active {
-    color: #222;
-    font-weight: 700;
+	color: #222;
+	font-weight: 700;
 }
 
 .select-step-panel {
-    display: none;
+	display: none;
 }
 
 .select-step-panel.active {
-    display: block;
+	display: block;
 }
 
 .select-confirm-box {
-    border: 1px solid #ececec;
-    border-radius: 14px;
-    background: #fafafa;
-    padding: 16px;
-    margin-bottom: 18px;
+	border: 1px solid #ececec;
+	border-radius: 14px;
+	background: #fafafa;
+	padding: 16px;
+	margin-bottom: 18px;
 }
 
 .select-confirm-row {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    padding: 14px 0;
-    border-bottom: 1px solid #ececec;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	padding: 14px 0;
+	border-bottom: 1px solid #ececec;
 }
 
 .select-confirm-row:last-child {
-    border-bottom: none;
+	border-bottom: none;
 }
 
 .confirm-label {
-    font-size: 13px;
-    font-weight: 600;
-    color: #777;
+	font-size: 13px;
+	font-weight: 600;
+	color: #777;
 }
 
 .confirm-value {
-    font-size: 14px;
-    line-height: 1.6;
-    color: #222;
-    white-space: pre-wrap;
-    word-break: break-word;
-}
-
-.step-actions {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 10px;
-}
-
-.btn-step-secondary,
-.btn-step-primary {
-    border: none;
-    padding: 10px 24px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
+	font-size: 14px;
+	line-height: 1.6;
+	color: #222;
+	white-space: pre-wrap;
+	word-break: break-word;
 }
 
 .btn-step-secondary {
-    background: #f1f3f5;
-    color: #444;
+	margin-right: auto;
+	background: #f1f3f5;
+	color: #444;
+	display: inline-flex;
+	align-items: center;
+	gap: 7px;
+	border: none;
+	padding: 11px 26px;
+	border-radius: 20px;
+	font-size: 14px;
+	font-weight: 700;
+	font-family: inherit;
+	cursor: pointer;
+	transition: all .2s;
 }
 
 .btn-step-secondary:hover {
-    background: #e5e7eb;
-}
-
-.btn-step-primary {
-    background: #4285f4;
-    color: #fff;
-    margin-left: auto;
-}
-
-.btn-step-primary:hover {
-    background-color: rgb(19, 125, 255);
+	transform: translateY(-1px);
+	background: #e5e7eb;
 }
 
 .bid-create-section {
-    margin-bottom: 24px;
+	margin-bottom: 24px;
 }
 
 .bid-create-card {
-    background: #fff;
-    border: 1px solid #eee;
-    border-radius: 16px;
-    padding: 22px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+	background: #fff;
+	border: 1px solid #eee;
+	border-radius: 16px;
+	padding: 22px;
+	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
 }
 
 .bid-create-header {
-    margin-bottom: 18px;
+	margin-bottom: 18px;
 }
 
 .bid-create-title {
-    font-size: 1.15rem;
-    font-weight: 700;
-    margin-bottom: 6px;
+	font-size: 1.15rem;
+	font-weight: 700;
+	margin-bottom: 6px;
 }
 
 .bid-create-subtitle {
-    font-size: 14px;
-    color: #777;
-    margin: 0;
+	font-size: 14px;
+	color: #777;
+	margin: 0;
 }
 
 .bid-create-form {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
 }
 
 .bid-create-form-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 14px;
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 14px;
 }
 
 .bid-create-form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
 }
 
 .bid-create-form-group.full {
-    width: 100%;
+	width: 100%;
 }
 
 .bid-create-form-group label {
-    font-size: 14px;
-    font-weight: 600;
-    color: #333;
+	font-size: 14px;
+	font-weight: 600;
+	color: #333;
 }
 
-.bid-create-input,
-.bid-create-select,
-.bid-create-textarea {
-    width: 100%;
-    border: 1px solid #ddd;
-    border-radius: 12px;
-    padding: 12px 14px;
-    font-size: 14px;
-    line-height: 1.5;
-    outline: none;
-    background: #fff;
+.bid-create-input, .bid-create-select, .bid-create-textarea {
+	width: 100%;
+	border: 1px solid #bbb;
+	border-radius: 12px;
+	padding: 12px 14px;
+	font-size: 14px;
+	line-height: 1.5;
+	outline: none;
+	background: #fff;
 }
 
-.bid-create-input:focus,
-.bid-create-select:focus,
-.bid-create-textarea:focus {
-    border-color: #4285f4;
+.bid-create-input:focus, .bid-create-select:focus, .bid-create-textarea:focus
+	{
+	border-color: #bbb;
 }
 
 .bid-create-textarea {
-    resize: vertical;
-    min-height: 120px;
+	resize: vertical;
+	min-height: 120px;
 }
 
 .bid-create-actions {
-    display: flex;
-    justify-content: flex-end;
+	display: flex;
+	justify-content: flex-end;
+}
+
+.bid-header-right {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	flex-wrap: wrap;
+}
+
+.bid-my-badge {
+	display: inline-flex;
+	align-items: center;
+	padding: 6px 12px;
+	background: #eef4ff;
+	color: #2f6fec;
+	border-radius: 999px;
+	font-size: 13px;
+	font-weight: 700;
+	line-height: 1;
+}
+
+.bid-create-guide {
+	margin-top: 8px;
+	margin-bottom: 0;
+	font-size: 13px;
+	line-height: 1.5;
+	color: #666;
+	background: #f7f8fa;
+	border-radius: 10px;
+	padding: 10px 12px;
+}
+
+/* ───── 스텝 위자드 ───── */
+
+/* 진행 바 */
+.progress-bar-wrap {
+	height: 3px;
+	background: #f0eaf8;
+}
+
+.progress-bar-fill {
+	height: 100%;
+	background: linear-gradient(90deg, #ff79c6, #c084fc);
+	transition: width .35s cubic-bezier(.4, 0, .2, 1);
+	border-radius: 0 3px 3px 0;
+}
+
+/* 스텝 인디케이터 */
+.step-indicator-wrap {
+	padding: 20px 26px 0;
+}
+
+.step-indicator {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-bottom: 10px;
+}
+
+.step-node {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 6px;
+	flex: 1;
+	position: relative;
+}
+
+.step-node:not(:last-child)::after {
+	content: '';
+	position: absolute;
+	top: 16px;
+	left: calc(50% + 16px);
+	width: calc(100% - 32px);
+	height: 2px;
+	background: #e8eaf0;
+	transition: background .3s;
+	z-index: 0;
+}
+
+.step-node.done::after {
+	background: linear-gradient(90deg, #ff79c6, #c084fc);
+}
+
+.step-dot {
+	width: 32px;
+	height: 32px;
+	border-radius: 50%;
+	border: 2px solid #e0e3ec;
+	background: #fff;
+	color: #bbb;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 13px;
+	font-weight: 700;
+	transition: all .25s ease;
+	position: relative;
+	z-index: 1;
+}
+
+.step-node.active .step-dot {
+	background: linear-gradient(135deg, #ff79c6, #c084fc);
+	border-color: transparent;
+	color: #fff;
+	box-shadow: 0 3px 10px rgba(255, 121, 198, .4);
+}
+
+.step-node.done .step-dot {
+	background: linear-gradient(135deg, #ff79c6, #c084fc);
+	border-color: transparent;
+	color: #fff;
+	font-size: 11px;
+}
+
+.step-label {
+	font-size: 11px;
+	font-weight: 600;
+	color: #ccc;
+	text-align: center;
+	line-height: 1.3;
+	transition: color .2s;
+}
+
+.step-node.active .step-label {
+	color: #c026d3;
+}
+
+.step-node.done	.step-label {
+	color: #a855f7;
+}
+
+/* 패널 */
+.bid-step-panels {
+	padding: 22px 26px 8px;
+}
+
+.bid-step-panel {
+	display: none;
+}
+
+.bid-step-panel.active {
+	display: block;
+	animation: bidFadeSlide .22s ease;
+}
+
+@
+keyframes bidFadeSlide {from { opacity:0;
+	transform: translateX(14px);
+}
+
+to {
+	opacity: 1;
+	transform: translateX(0);
+}
+
+}
+
+/* 힌트 텍스트 */
+.form-hint {
+	font-size: 12px;
+	color: #aaa;
+	margin-top: -4px;
+	margin-bottom: 4px;
+}
+
+/* 글자수 카운터 */
+.char-counter {
+	text-align: right;
+	font-size: 11.5px;
+	color: #ccc;
+	margin-top: 3px;
+}
+
+/* 가격 인풋 래퍼 */
+.input-wrapper {
+	position: relative;
+	display: flex;
+	align-items: center;
+}
+
+.input-prefix {
+	position: absolute;
+	left: 13px;
+	font-size: 14px;
+	font-weight: 700;
+	color: #999;
+	pointer-events: none;
+	z-index: 1;
+}
+
+.bid-create-input {
+	width: 100%;
+	border: 1.5px solid #e8eaf0;
+	border-radius: 12px;
+	padding: 12px 14px 12px 32px;
+	font-size: 15px;
+	font-weight: 600;
+	outline: none;
+	background: #fafbfd;
+	transition: border-color .2s, box-shadow .2s;
+	font-family: inherit;
+	color: #1a1a2e;
+}
+
+.bid-create-input.no-prefix {
+	padding-left: 14px;
+}
+
+.bid-create-input:focus {
+	border-color: #d580ff;
+	box-shadow: 0 0 0 3px rgba(213, 128, 255, .12);
+	background: #fff;
+}
+
+/* 프리셋 칩 */
+.price-presets {
+	display: flex;
+	gap: 7px;
+	flex-wrap: wrap;
+	margin-top: 8px;
+}
+
+.preset-chip {
+	padding: 5px 13px;
+	border-radius: 20px;
+	border: 1.5px solid #e8eaf0;
+	background: #f8f8fd;
+	font-size: 12.5px;
+	font-weight: 600;
+	color: #888;
+	cursor: pointer;
+	transition: all .15s;
+	font-family: inherit;
+}
+
+.preset-chip:hover {
+	border-color: #c084fc;
+	color: #9333ea;
+	background: #fdf4ff;
+}
+
+/* A/S 토글 */
+.toggle-group {
+	display: flex;
+	gap: 10px;
+	margin-top: 4px;
+}
+
+.toggle-btn {
+	flex: 1;
+	padding: 12px 8px;
+	border: 1.5px solid #e8eaf0;
+	border-radius: 12px;
+	background: #fafbfd;
+	font-size: 14px;
+	font-weight: 600;
+	color: #aaa;
+	cursor: pointer;
+	transition: all .18s ease;
+	text-align: center;
+	font-family: inherit;
+}
+
+.toggle-btn.active-yes {
+	background: #eafff1;
+	color: #16a34a;
+}
+
+#as-yes:hover {
+	border-color: #22c55e;
+	color: #16a34a;
+	background: #f0fdf4;
+}
+
+.toggle-btn.active-no {
+	background: #fff5f5;
+	color: #dc2626;
+}
+
+#as-no:hover {
+	border-color: #f87171;
+	background: #fff5f5;
+	color: #dc2626;
+}
+
+/* 확인 카드 */
+.confirm-card {
+	border: 1.5px solid #ede8f8;
+	border-radius: 14px;
+	background: #f7f8fa;
+	overflow: hidden;
+	margin-bottom: 12px;
+}
+
+.confirm-row {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	gap: 16px;
+	padding: 13px 16px;
+}
+
+.confirm-row:last-child {
+	border-bottom: none;
+}
+
+.confirm-row-inline {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	justify-content: flex-start;
+}
+
+.confirm-mini-card-full {
+	grid-column: 1 / -1;
+}
+
+.confirm-mini-value-desc {
+	font-size: 13px;
+	font-weight: 500;
+	line-height: 1.6;
+	word-break: break-word;
+	white-space: pre-wrap;
+}
+
+.confirm-label {
+	font-size: 13px;
+	color: #6d6d6d;
+	font-weight: 600;
+	flex-shrink: 0;
+	min-width: 60px;
+}
+
+.confirm-row-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 10px;
+	padding: 12px 16px;
+	border-bottom: 1px solid #e7e7e7;
+}
+
+.confirm-mini-card {
+	background: #f1f1f1;
+	border-radius: 10px;
+	padding: 10px 14px;
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+}
+
+.confirm-mini-label {
+	font-size: 11px;
+	font-weight: 600;
+	color: #6d6d6d;
+	text-transform: uppercase;
+	letter-spacing: 0.4px;
+}
+
+.confirm-mini-value {
+	font-size: 14px;
+	font-weight: 700;
+	color: #1a1a2e;
+}
+
+.confirm-value {
+	font-size: 14px;
+	color: #1a1a2e;
+	font-weight: 600;
+	text-align: right;
+	word-break: break-word;
+	white-space: pre-wrap;
+	line-height: 1.5;
+}
+
+.confirm-value.price-highlight {
+	color: #c026d3;
+	font-size: 17px;
+}
+
+/* 액션 버튼 영역 */
+.bid-create-actions {
+	display: flex;
+	align-items: center;
+	padding: 12px 26px 22px;
+	gap: 10px;
+}
+
+.btn-step-primary {
+	margin-left: auto;
+	display: inline-flex;
+	align-items: center;
+	gap: 7px;
+	background: linear-gradient(135deg, #ff79c6, #c084fc);
+	color: #fff;
+	border: none;
+	padding: 11px 26px;
+	border-radius: 20px;
+	font-size: 14px;
+	font-weight: 700;
+	font-family: inherit;
+	cursor: pointer;
+	transition: all .2s;
+}
+
+.btn-step-primary:hover {
+	transform: translateY(-1px);
 }
 
 .btn-submit-bid-create {
-    background-color: #4285f4;
-    color: #fff;
-    border: none;
-    padding: 10px 22px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
+	margin-left: auto;
+	background: #1a1a2e;
+	color: #fff;
+	border: none;
+	padding: 11px 26px;
+	border-radius: 20px;
+	font-size: 14px;
+	font-weight: 700;
+	font-family: inherit;
+	cursor: pointer;
+	box-shadow: 0 4px 14px rgba(0, 0, 0, .18);
+	transition: all .2s;
 }
 
 .btn-submit-bid-create:hover {
-    background-color: rgb(19, 125, 255);
+	background: #2d2d4e;
+	transform: translateY(-1px);
+}
+
+/* 모바일 */
+@media ( max-width : 480px) {
+	.step-indicator-wrap, .bid-step-panels, .bid-create-actions {
+		padding-left: 18px;
+		padding-right: 18px;
+	}
+	.step-label {
+		font-size: 10px;
+	}
+}
+
+/* 모바일 대응 반응형 스타일 (768px 이하) */
+@media(max-width:768px){
+	/* 1. 제안 등록 폼: 3단 그리드를 1단으로 변경 */
+	.bid-create-form-grid {
+		grid-template-columns: 1fr; /* 세로로 한 줄씩 */
+		gap: 12px;
+	}
+	
+	/* 2. 제안 리스트 헤더: 요소가 많으므로 줄바꿈 허용 */
+	.bid-header {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 12px;
+	}
+	
+	.bid-header-right {
+		align-self: flex-end; /* 상태 배지는 오른쪽 정렬 */
+	}
+	
+	/* 3. 제안 리스트 푸터: 가격과 버튼을 세로로 배치 */
+	.bid-footer {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 15px;
+	}
+	
+	.bid-actions {
+		width: 100%;
+		justify-content: flex-end;
+	}
+	
+	.bid-price strong {
+		font-size: 20px; /* 모바일에서는 폰트 크기 살짝 조절 */
+	}
+	
+	/* 4. 스펙 항목 (완료일, AS): 가로 폭이 좁으므로 간격 조정 */
+	.bid-specs {
+		flex-direction: column;
+		gap: 8px;
+	}
+	
+	/* 5. 비교하기/정렬 버튼 영역 */
+	.bid-section-header {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 15px;
+	}
+	
+	.bid-top-actions {
+		width: 100%;
+		justify-content: flex-end;
+		flex-wrap: wrap;
+	}
+	
+	/* 6. 비교 모달 그리드: 모바일에서는 무조건 1열로 */
+	.compare-grid-2, .compare-grid-3 {
+		grid-template-columns: 1fr;
+	}
+	
+	.compare-modal-panel {
+		width: 95vw;
+		margin: 20px auto;
+	}
+	
+	/* 7. 선정 모달 스텝 인디케이터 축소 */
+	.step-line {
+		width: 20px; /* 선 길이 줄임 */
+	}
+	
+	.step-title {
+		font-size: 10px;
+	}
+}
+
+/* 인라인 에러 메시지 */
+.field-error {
+	font-size: 12px;
+	color: #e53e3e;
+	margin-top: 5px;
+	visibility: hidden;
+	min-height: 18px;
+	animation: errorFadeIn .15s ease;
+}
+
+.field-error.visible {
+	visibility: visible;
+}
+
+@keyframes errorFadeIn {
+		from { opacity: 0; transform: translateY(-4px); }
+		to	 { opacity: 1; transform: translateY(0); }
+}
+
+.bid-create-input.error,
+.bid-create-textarea.error {
+		border-color: #fc8181;
+		box-shadow: 0 0 0 3px rgba(252,129,129,.12);
+}
+
+.form-hint-row {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 8px;
+}
+
+.bid-step3-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 16px;
+	align-items: start;
+}
+
+@media (max-width: 480px) {
+	.bid-step3-grid {
+		grid-template-columns: 1fr;
+	}
 }
