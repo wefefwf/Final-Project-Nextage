@@ -1,8 +1,15 @@
 @charset "UTF-8";
 
+/* [추가] 폰트 로드: Pretendard */
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
+/* [추가] 전체 기본 폰트 설정 */
+body {
+    font-family: 'Pretendard', sans-serif;
+}
+
 .main-header-container {
     width: 1200px;
-    /* 헤더 위쪽에 여유 공간을 줌 (기존 0에서 20px로 변경) */
     margin: 20px auto 0; 
     background-image: url('image_2.png');
     background-size: cover;
@@ -41,7 +48,7 @@
     gap: 40px;
     margin: 0;
     padding: 0;
-    align-items: center; /* 모든 메뉴 수평 정렬 */
+    align-items: center; 
 }
 
 .nav-list li a {
@@ -49,13 +56,14 @@
     color: #333;
     font-size: 16px;
     font-weight: 500;
+    font-family: 'Pretendard', sans-serif; /* [추가] */
 }
 
 .nav-list li a:hover {
     color: #4A90E2;
 }
 
-/* --- 드롭다운 버튼 스타일 초기화 (일반 텍스트화) --- */
+/* --- 드롭다운 버튼 스타일 초기화 --- */
 .header-nav .dropdown-toggle {
     background: none !important;
     border: none !important;
@@ -64,15 +72,14 @@
     color: #333 !important;
     font-size: 16px !important;
     font-weight: 500 !important;
+    font-family: 'Pretendard', sans-serif !important; /* [추가] */
     text-decoration: none;
 }
 
-/* 화살표 제거 */
 .header-nav .dropdown-toggle::after {
     display: none !important;
 }
 
-/* 드롭다운 호버 효과 */
 .header-nav .dropdown-toggle:hover,
 .header-nav .dropdown-toggle:active,
 .header-nav .dropdown-toggle:focus {
@@ -80,21 +87,20 @@
     background: none !important;
 }
 
-/* --- 로그인 버튼 (그라데이션 및 너비 수정) --- */
+/* --- 로그인 버튼 --- */
 .login-item {
     margin-left: 20px;
 }
 
 .login-btn {
     display: inline-block;
-    /* 너비를 넓히기 위해 좌우 패딩을 40px로 조정 */
     padding: 8px 40px !important; 
-    /* 요청하신 핑크-블루 그라데이션 적용 */
     background: #333 !important;
     color: #fff !important;
-    border-radius: 25px !important; /* 좀 더 둥글고 시원한 느낌 */
+    border-radius: 25px !important; 
     font-size: 15px !important;
     font-weight: bold !important;
+    font-family: 'Pretendard', sans-serif !important; /* [추가] */
     text-decoration: none !important;
     border: none !important;
     transition: opacity 0.3s;
@@ -102,20 +108,19 @@
 }
 
 .login-btn:hover {
-    /* 그라데이션 버튼은 배경색 대신 투명도로 호버 효과 */
     opacity: 0.8;
     color: #fff !important;
 }
+
 /* 드롭다운 메뉴 상자 스타일 조절 */
 .header-nav .dropdown-menu {
-    /* 메뉴 글자와 상자 사이의 간격을 벌립니다 */
     margin-top: 15px !important; 
 }
-/* 마우스가 메뉴 글자와 상자 사이의 빈 공간을 지나갈 때 메뉴가 닫히지 않게 보호막 생성 */
+
 .header-nav.dropdown-item:first-child::before {
     content: "";
     position: absolute;
-    top: -15px; /* 위에서 설정한 margin-top 값과 동일하게 */
+    top: -15px; 
     left: 0;
     width: 100%;
     height: 15px;

@@ -1,10 +1,122 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/business-layout}">
 <head>
-<meta charset="UTF-8">
-<title>Insert title here</title>
+    <meta charset="UTF-8">
+    <title>Nextage Portfolio</title>
+    <link rel="stylesheet" th:href="@{/css/portfolio/portfolio.css}" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css"/>
 </head>
 <body>
+<th:block layout:fragment="content">
+<div class="portfolio-content">
+    
+    <div class="top-row">
+    <div class="profile-section">
+        <h2 class="section-title">프로필</h2>
+        <div class="profile-image-container">
+            <img src="/images/default-profile.png" alt="프로필">
+        </div>
+        <div class="profile-btns">
+            <button type="button" class="btn-modify">프로필 수정</button>
+            <button type="button" class="btn-delete">프로필 삭제</button>
+        </div>
+    </div>
 
+    <div class="info-section">
+        <div class="location-group">
+            <h2 class="section-title">위치</h2>
+            <div class="info-box">
+                <span>서울특별시 강남구 테헤란로 (테스트 위치)</span>
+                <div class="box-actions">
+                    <button type="button" class="btn-box-edit">수정</button>
+                    <button type="button" class="btn-box-del">삭제</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="career-group">
+            <h2 class="section-title">경력</h2>
+            <div class="career-container">
+                <div class="info-box career-item">
+                    <span>테스트 경력사항 1번입니다.</span>
+                    <div class="box-actions">
+                        <button type="button" class="btn-box-edit">수정</button>
+                        <button type="button" class="btn-box-del">삭제</button>
+                    </div>
+                </div>
+                <div class="info-box career-item">
+                    <span>테스트 경력사항 1번입니다.</span>
+                    <div class="box-actions">
+                        <button type="button" class="btn-box-edit">수정</button>
+                        <button type="button" class="btn-box-del">삭제</button>
+                    </div>
+                </div>
+                <div class="info-box career-item">
+                    <span>테스트 경력사항 1번입니다.</span>
+                    <div class="box-actions">
+                        <button type="button" class="btn-box-edit">수정</button>
+                        <button type="button" class="btn-box-del">삭제</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="work-section">
+    <h2 class="section-title">작업 포트폴리오</h2>
+    
+    <div class="work-grid">
+        <div class="work-card">
+            <div class="card-img-holder">
+                <img src="/images/sample1.jpg" alt="작업물">
+            </div>
+            <div class="card-footer">
+                <div class="card-info-wrap">
+                    <p class="order-num">No. 20260312-001</p>
+                    <h3 class="card-text">린넨 셔츠 사이즈 수선 의뢰</h3>
+                    <p class="work-period">2026.03.12 ~ 2026.03.20</p>
+                </div>
+                <i class="arrow-icon">▶</i>
+            </div>
+        </div>
+
+        <div class="work-card">
+            <div class="card-img-holder">
+                <img src="/images/sample1.jpg" alt="작업물">
+            </div>
+            <div class="card-footer">
+                <div class="card-info-wrap">
+                    <p class="order-num">No. 20260312-002</p>
+                    <h3 class="card-text">겨울 코트 소매 길이 수선</h3>
+                    <p class="work-period">2026.03.13 ~ 2026.03.21</p>
+                </div>
+                <i class="arrow-icon">▶</i>
+            </div>
+        </div>
+
+        <div class="work-card">
+            <div class="card-img-holder">
+                <img src="/images/sample1.jpg" alt="작업물">
+            </div>
+            <div class="card-footer">
+                <div class="card-info-wrap">
+                    <p class="order-num">No. 20260312-003</p>
+                    <h3 class="card-text">정장 바지 허리 줄임 의뢰</h3>
+                    <p class="work-period">2026.03.14 ~ 2026.03.22</p>
+                </div>
+                <i class="arrow-icon">▶</i>
+            </div>
+        </div>
+    </div>
+
+    <div class="pagination-placeholder" style="margin-top: 100px; text-align: center;">
+        [ 1 2 3 4 5 ]
+    </div> 
+</div>
+</div>
+</th:block>
 </body>
 </html>
