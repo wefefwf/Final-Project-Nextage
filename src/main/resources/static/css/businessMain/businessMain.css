@@ -51,3 +51,165 @@ h3 { margin-bottom: 20px; font-size: 20px; font-family: sans-serif; }
 
 .link-wrapper { text-align: right; margin-top: 10px; } /* 박스와 링크 사이 10px (전체 20px 느낌 조절) */
 .view-all { color: #333; text-decoration: none; font-size: 12px; }
+
+/* ────────────────────────────────────
+   New Post Section — 애플 스타일
+──────────────────────────────────── */
+.section-post {
+    width: 100%;
+    font-family: -apple-system, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+}
+
+.post-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 16px;
+}
+
+.post-header h3 {
+    font-size: 22px !important;
+    font-weight: 700 !important;
+    color: #1d1d1f !important;
+    letter-spacing: -0.4px;
+    margin: 0 !important;
+    font-family: -apple-system, 'SF Pro Display', 'Helvetica Neue', sans-serif !important;
+}
+
+.post-view-all {
+    font-size: 13px;
+    color: #0071e3;
+    text-decoration: none;
+    font-weight: 500;
+    transition: opacity 0.15s;
+}
+
+.post-view-all:hover {
+    opacity: 0.7;
+}
+
+.section-post .post-nav {
+    display: inline-flex !important;
+    background: #e8e8ed;
+    border-radius: 10px;
+    padding: 3px;
+    gap: 2px !important;
+    margin-bottom: 20px;
+}
+
+.filter-btn {
+    border: none;
+    background: transparent;
+    padding: 6px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #6e6e73;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif;
+}
+
+.filter-btn.active {
+    background: #ffffff;
+    color: #1d1d1f;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.12), 0 0.5px 1px rgba(0,0,0,0.08);
+}
+
+.filter-btn:hover:not(.active) {
+    color: #1d1d1f;
+}
+
+.section-post .post-full {
+    background: #ffffff !important;
+    border-radius: 16px !important;
+    border: 1px solid rgba(0,0,0,0.08) !important;
+    overflow: hidden;
+    padding: 0 !important;
+    height: auto !important;
+    min-height: 0 !important;
+}
+
+.main-request-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.main-request-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 20px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    background: #ffffff;
+}
+
+.main-request-item:last-child {
+    border-bottom: none;
+}
+
+.main-request-item:hover {
+    background: #f5f5f7;
+}
+
+.item-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.mini-thumbnail {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    object-fit: cover;
+    background: #f0f0f0;
+    flex-shrink: 0;
+}
+
+.item-cat {
+    font-size: 11px;
+    font-weight: 600;
+    color: #0071e3;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 2px;
+}
+
+.item-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: #1d1d1f;
+    margin: 0;
+    letter-spacing: -0.1px;
+}
+
+.item-right {
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.item-price {
+    display: block;
+    font-size: 15px;
+    font-weight: 600;
+    color: #1d1d1f;
+    letter-spacing: -0.2px;
+}
+
+.item-date {
+    display: block;
+    font-size: 12px;
+    color: #6e6e73;
+    margin-top: 2px;
+}
+
+.empty-msg {
+    text-align: center;
+    padding: 48px 0;
+    color: #6e6e73;
+    font-size: 14px;
+}
