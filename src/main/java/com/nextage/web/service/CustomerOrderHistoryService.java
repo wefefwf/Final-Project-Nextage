@@ -23,12 +23,16 @@ public class CustomerOrderHistoryService {
 
     @Transactional(readOnly = true)
     public List<OrderHistoryDTO> getOrderHistory(Long customerId, int page) {
+
         int offset = (page - 1) * PAGE_SIZE;
+
         List<OrderHistoryDTO> orders =
             customerOrderHistoryMapper.selectOrdersByCustomerId(customerId, offset, PAGE_SIZE);
+
         orders.forEach(order ->
             order.setItems(customerOrderHistoryMapper.selectOrderItems(order.getOrderId()))
         );
+
         return orders;
     }
 

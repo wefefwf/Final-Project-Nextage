@@ -20,14 +20,25 @@ public class CustomerOrderHistoryController {
     private final CustomerOrderHistoryService customerOrderHistoryService;
     private static final Long TEMP_CUSTOMER_ID = 1L;
 
+    private static final int PAGE_SIZE = 5;
+    
     @GetMapping("/history")
-    public String historyPage(@RequestParam(name = "page", defaultValue = "1") int page, Model model) {
+    public String historyPage(
+            @RequestParam(name = "page", defaultValue = "1") int page,
+            Model model) {
+
         List<OrderHistoryDTO> orders =
-            customerOrderHistoryService.getOrderHistory(TEMP_CUSTOMER_ID, page);
-        int totalPages = customerOrderHistoryService.getTotalPages(TEMP_CUSTOMER_ID);
-        model.addAttribute("orders",      orders);
+            customerOrderHistoryService.getOrderHistory(
+                    TEMP_CUSTOMER_ID, page);
+
+        int totalPages =
+            customerOrderHistoryService.getTotalPages(
+                    TEMP_CUSTOMER_ID);
+
+        model.addAttribute("orders", orders);
         model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages",  totalPages);
+        model.addAttribute("totalPages", totalPages);
+
         return "views/orderhistory/customer-order-history";
     }
 
