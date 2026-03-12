@@ -16,15 +16,9 @@ import com.nextage.web.service.CustomerShopService;
 @Controller
 public class CustomerShopController {
 
-    private final CustomerMainController customerMainController;
-
 	@Autowired
 	public CustomerShopService shopService;
 
-    CustomerShopController(CustomerMainController customerMainController) {
-        this.customerMainController = customerMainController;
-    }
-	
 	 //샵 가기-페이지
 	//리스트 뽑아가기
     @GetMapping("/customer/shop")

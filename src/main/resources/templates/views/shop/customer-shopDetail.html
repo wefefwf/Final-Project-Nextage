@@ -127,19 +127,23 @@
     }
 
     function buyNow() {
-        const itemName  = /*[[${kit.name}]]*/ '\uC0C1\uD488\uBA85';   // ✅ Thymeleaf 인라인 치환
-        const itemPrice = /*[[${kit.price}]]*/ 0;                      // ✅ Thymeleaf 인라인 치환
+        const kitId     = /*[[${kit.kitId}]]*/ 0;
+        const itemName  = /*[[${kit.name}]]*/ '상품명';
+        const itemPrice = /*[[${kit.price}]]*/ 0;
 
         const item = {
+            kitId   : kitId,
             name    : itemName,
             price   : itemPrice,
             quantity: 1
         };
+
         const items        = [item];
         const productTotal = item.price * item.quantity;
 
         openPaymentModal(items, productTotal, []);
     }
+
     /*]]>*/
     </script>
 
