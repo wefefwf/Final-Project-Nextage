@@ -39,7 +39,7 @@
         WHERE o.order_id = #{orderId}
     </select>
 
-    <select id="selectOrderItems" resultType="com.nextage.web.domain.OrderItemDTO">
+    <select id="selectOrderItems" resultType="com.nextage.web.domain.OrderItemsDTO">
         SELECT
             oi.order_item_id,
             oi.order_id,
@@ -58,7 +58,7 @@
         WHERE oi.order_id = #{orderId}
     </select>
 
-    <insert id="insertOrderItem">
+    <insert id="insertOrderItems">
         INSERT INTO order_items (order_id, kit_id, quantity, price)
         VALUES (#{orderId}, #{kitId}, #{quantity}, #{price})
     </insert>

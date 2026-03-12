@@ -1,6 +1,6 @@
 package com.nextage.web.service;
 
-import com.nextage.web.domain.OrderItemDTO;
+import com.nextage.web.domain.OrderItemsDTO;
 import com.nextage.web.domain.PaymentDTO;
 import com.nextage.web.mapper.CustomerCartMapper;
 import com.nextage.web.mapper.CustomerOrderHistoryMapper;
@@ -58,7 +58,7 @@ public class CustomerPaymentService {
         // 4. order_items 저장
         if (dto.getOrderItems() != null && !dto.getOrderItems().isEmpty()) {
             Long orderId = orderMapper.selectOrderIdByOrderNo(dto.getOrderNo());
-            for (OrderItemDTO item : dto.getOrderItems()) {
+            for (OrderItemsDTO item : dto.getOrderItems()) {
                 item.setOrderId(orderId);
 
                 // kitId가 JS에서 문자열로 넘어올 수 있어서 null/빈값 처리
@@ -69,7 +69,7 @@ public class CustomerPaymentService {
                 log.info("order_item 저장 - orderId: {}, kitId: {}, qty: {}, price: {}",
                         orderId, item.getKitId(), item.getQuantity(), item.getPrice());
 
-                customerOrderHistoryMapper.insertOrderItem(item);
+                customerOrderHistoryMapper.insertOrderItems(item);
             }
         }
 

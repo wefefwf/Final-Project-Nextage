@@ -21,5 +21,5 @@ public class PaymentDTO {
     private Long         customerId;    // customer_id
     private List<String> cartItemIds;   // 결제한 cart_item_id 목록
     
-    private List<OrderItemDTO> orderItems;
+    private List<OrderItemsDTO> orderItems;
 }

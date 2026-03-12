@@ -1,9 +1,11 @@
 package com.nextage.web.domain;
 
+import java.time.LocalDateTime;
+
 import lombok.Data;
 
 @Data
-public class OrderItemDTO {
+public class OrderItemsDTO {
     private Long   orderItemId;
     private Long   orderId;
     private Long   kitId;
@@ -13,4 +15,5 @@ public class OrderItemDTO {
     private int    quantity;
     private int    price;
     private boolean reviewed;
+    private LocalDateTime createdAt;
 }

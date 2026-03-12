@@ -14,7 +14,7 @@ public class OrderHistoryDTO {
     private int           totalAmount;
     private String        paymentStatus;
     private LocalDateTime createdAt;
-    private List<OrderItemDTO> items;
+    private List<OrderItemsDTO> items;
 
     // bid_id가 있으면 개인 대 개인 거래
     public boolean isPersonalOrder() {

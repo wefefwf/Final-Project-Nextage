@@ -1,7 +1,7 @@
 package com.nextage.web.mapper;
 
 import com.nextage.web.domain.OrderHistoryDTO;
-import com.nextage.web.domain.OrderItemDTO;
+import com.nextage.web.domain.OrderItemsDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import java.util.List;
@@ -13,8 +13,8 @@ public interface CustomerOrderHistoryMapper {
                                                    @Param("limit")      int limit);
     int                   countOrdersByCustomerId(@Param("customerId") Long customerId);
     OrderHistoryDTO        selectOrderDetail(@Param("orderId") Long orderId);
-    List<OrderItemDTO>     selectOrderItems(@Param("orderId") Long orderId);
-    void                   insertOrderItem(OrderItemDTO dto);
+    List<OrderItemsDTO>     selectOrderItems(@Param("orderId") Long orderId);
+    void                   insertOrderItems(OrderItemsDTO dto);
 
     // 삭제 관련
     void deleteReviewsByOrderId(@Param("orderId") Long orderId);
