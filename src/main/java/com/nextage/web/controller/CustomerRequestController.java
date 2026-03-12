@@ -56,7 +56,24 @@ public class CustomerRequestController {
         
         return "views/request/customer-requestDetail"; 
     }
- // --- 아래 삭제 로직이 추가되었습니다 ---
+    
+ // ✅ 수정 폼 보여주기
+    @GetMapping("/edit/{id}")
+    public String editForm(@PathVariable("id") Long requestId, Model model) {
+        RequestDTO request = requestService.getRequestDetail(requestId);
+        model.addAttribute("request", request);
+        return "views/request/customer-requestEdit";
+    }
+
+    // ✅ 수정 처리
+    @PostMapping("/edit/{id}")
+    public String updateRequest(@PathVariable("id") Long requestId,
+                                RequestDTO dto,
+                                @RequestParam(value = "files", required = false) MultipartFile[] files) {
+        dto.setRequestId(requestId);
+        requestService.updateRequest(dto, files);
+        return "redirect:/customer/request/detail/" + requestId;
+    }
 
     /**
      * 의뢰 삭제 처리 (AJAX 대응)

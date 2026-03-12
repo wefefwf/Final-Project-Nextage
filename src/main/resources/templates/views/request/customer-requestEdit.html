@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/customer-layout}">
+<head>
+  <meta charset="UTF-8">
+  <title>Nextage | 의뢰 수정</title>
+  <style>
+    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+    :root {
+      --bg: #f5f5f7;
+      --border: rgba(0,0,0,0.08);
+      --text-primary: #1d1d1f;
+      --text-secondary: #6e6e73;
+      --text-tertiary: #aeaeb2;
+      --accent: #ff79c6;
+      --accent-soft: rgba(255,121,198,0.12);
+      --radius-xl: 22px;
+      --radius-lg: 16px;
+      --radius-pill: 999px;
+      --shadow-card: 0 2px 16px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
+      --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+      --ease-apple: cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); font-family: 'Pretendard', -apple-system, sans-serif; color: var(--text-primary); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+
+    .page { max-width: 680px; margin: 0 auto; padding: 48px 24px 160px; animation: fadeUp .5s var(--ease-apple) both; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+    .back { display: inline-flex; align-items: center; gap: 4px; font-size: .84rem; font-weight: 600; color: var(--text-tertiary); text-decoration: none; margin-bottom: 28px; transition: color .15s; }
+    .back:hover { color: var(--accent); }
+
+    .section-eyebrow { display: inline-block; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
+    .page-title { font-size: clamp(1.8rem, 5vw, 2.4rem); font-weight: 800; letter-spacing: -0.05em; line-height: 1.15; margin-bottom: 8px; }
+    .page-sub { font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 40px; }
+
+    .card { background: #fff; border-radius: var(--radius-xl); padding: 28px; margin-bottom: 16px; box-shadow: var(--shadow-card); }
+    .card-title { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 18px; }
+
+    /* 카테고리 */
+    .category-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .category-card { position: relative; height: 110px; border-radius: var(--radius-lg); overflow: hidden; cursor: pointer; border: 2px solid transparent; background: #e0e0e5; transition: transform 0.3s var(--spring), box-shadow 0.3s, border-color 0.25s; }
+    .category-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-card); }
+    .category-card.active { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+    .category-card.active::after { content: '✓'; position: absolute; top: 10px; right: 10px; width: 24px; height: 24px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 0.72rem; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+    .card-img { width: 100%; height: 100%; object-fit: cover; }
+    .card-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 60%); padding: 12px; display: flex; flex-direction: column; justify-content: flex-end; }
+    .card-label { color: #fff; font-size: 0.88rem; font-weight: 700; }
+
+    /* 태그 */
+    .tag-cloud { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+    .tag-chip { display: inline-flex; align-items: center; padding: 8px 16px; border-radius: var(--radius-pill); font-size: 0.85rem; font-weight: 600; cursor: pointer; border: 1.5px solid var(--border); background: #f5f5f7; color: var(--text-primary); transition: all 0.2s var(--spring); user-select: none; }
+    .tag-chip:hover { background: #fff; box-shadow: var(--shadow-card); }
+    .tag-chip.selected { background: var(--text-primary); color: #fff; border-color: transparent; }
+    .tag-input-row { display: flex; gap: 8px; }
+    .tag-input { flex: 1; padding: 13px 16px; border-radius: var(--radius-lg); border: 1.5px solid var(--border); background: #f5f5f7; font-size: 0.9rem; font-family: inherit; outline: none; transition: all 0.2s; }
+    .tag-input:focus { background: #fff; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+    .tag-add-btn { padding: 13px 20px; border-radius: var(--radius-lg); border: none; background: var(--text-primary); color: #fff; font-size: 0.88rem; font-weight: 700; font-family: inherit; cursor: pointer; transition: background 0.2s; white-space: nowrap; }
+    .tag-add-btn:hover { background: var(--accent); }
+    .selected-preview { margin-top: 14px; display: none; }
+    .selected-preview.visible { display: block; }
+    .selected-preview-label { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 10px; }
+    .selected-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .selected-chip { display: inline-flex; align-items: center; gap: 6px; padding: 7px 13px; border-radius: var(--radius-pill); background: var(--text-primary); color: #fff; font-size: 0.82rem; font-weight: 600; }
+    .selected-chip .x-btn { cursor: pointer; opacity: 0.6; font-size: 0.7rem; transition: opacity 0.2s; }
+    .selected-chip .x-btn:hover { opacity: 1; }
+
+    /* 폼 */
+    .form-group { display: flex; flex-direction: column; gap: 8px; }
+    .form-label { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-secondary); }
+    .apple-input { width: 100%; padding: 16px 18px; background: #f5f5f7; border: 1.5px solid var(--border); border-radius: var(--radius-lg); font-size: 0.95rem; font-family: inherit; color: var(--text-primary); outline: none; transition: all 0.2s; -webkit-appearance: none; }
+    .apple-input::placeholder { color: var(--text-tertiary); }
+    .apple-input:focus { background: #fff; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+    .apple-input.textarea { resize: none; line-height: 1.6; }
+    .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .input-col { display: flex; flex-direction: column; gap: 8px; }
+    .input-prefix-wrap { position: relative; }
+    .input-prefix { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 0.95rem; font-weight: 700; color: var(--text-secondary); pointer-events: none; }
+    .input-prefix-wrap .apple-input { padding-left: 30px; }
+    .apple-select { width: 100%; padding: 16px 40px 16px 18px; background: #f5f5f7; border: 1.5px solid var(--border); border-radius: var(--radius-lg); font-size: 0.95rem; font-family: inherit; color: var(--text-primary); outline: none; transition: all 0.2s; -webkit-appearance: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23aeaeb2' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; cursor: pointer; }
+    .apple-select:focus { background-color: #fff; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+    .file-label { display: flex; align-items: center; gap: 10px; padding: 16px 18px; border-radius: var(--radius-lg); background: #f5f5f7; border: 1.5px dashed var(--border); cursor: pointer; color: var(--text-secondary); font-size: 0.88rem; font-weight: 500; transition: all 0.2s; }
+    .file-label:hover { background: #fff; border-color: var(--accent); color: var(--accent); }
+    input[type="file"] { display: none; }
+    .current-img { width: 100%; border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 10px; }
+    .current-img img { width: 100%; max-height: 200px; object-fit: cover; display: block; }
+
+    /* 액션바 */
+    .action-bar { position: fixed; bottom: 0; left: 0; width: 100%; padding: 14px 24px 28px; background: rgba(245,245,247,0.88); backdrop-filter: saturate(180%) blur(24px); border-top: 1px solid var(--border); z-index: 100; }
+    .action-bar-inner { max-width: 400px; margin: 0 auto; display: flex; gap: 10px; }
+    .btn-cancel { flex: 1; padding: 16px; border-radius: var(--radius-lg); border: 1.5px solid var(--border); background: #fff; font-size: 0.95rem; font-weight: 700; font-family: inherit; cursor: pointer; color: var(--text-primary); transition: all 0.2s; text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center; }
+    .btn-cancel:hover { border-color: var(--text-primary); }
+    .btn-save { flex: 2; padding: 16px; border-radius: var(--radius-lg); border: none; background: var(--text-primary); color: #fff; font-size: 0.95rem; font-weight: 700; font-family: inherit; cursor: pointer; transition: all 0.3s var(--spring); }
+    .btn-save:hover { background: var(--accent); transform: scale(1.02); box-shadow: 0 8px 24px rgba(255,121,198,0.3); }
+    .btn-save:active { transform: scale(0.97); }
+    .btn-save:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+  </style>
+</head>
+<body>
+<th:block layout:fragment="content">
+
+<div class="page">
+
+  <a th:href="@{/customer/request/detail/{id}(id=${request.requestId})}" class="back">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg>
+    의뢰 상세로 돌아가기
+  </a>
+
+  <div class="section-eyebrow">의뢰 수정</div>
+  <div class="page-title">의뢰 내용을<br>수정해 주세요</div>
+  <p class="page-sub">변경하고 싶은 항목만 수정하면 돼요.</p>
+
+  <form th:action="@{/customer/request/edit/{id}(id=${request.requestId})}"
+        method="post"
+        enctype="multipart/form-data"
+        id="editForm">
+
+    <!-- 카테고리 -->
+    <div class="card">
+      <div class="card-title">카테고리</div>
+      <div class="category-grid">
+        <div class="category-card" th:classappend="${request.categoryId == 1 ? 'active' : ''}" onclick="selectCategory(this, 1)">
+          <img src="/2d1.jpg" class="card-img">
+          <div class="card-overlay"><div class="card-label">2D Clothes</div></div>
+        </div>
+        <div class="category-card" th:classappend="${request.categoryId == 2 ? 'active' : ''}" onclick="selectCategory(this, 2)">
+          <img src="/3d1.jpg" class="card-img">
+          <div class="card-overlay"><div class="card-label">3D Clothes</div></div>
+        </div>
+        <div class="category-card" th:classappend="${request.categoryId == 3 ? 'active' : ''}" onclick="selectCategory(this, 3)">
+          <img src="/object1.jpg" class="card-img">
+          <div class="card-overlay"><div class="card-label">3D Object</div></div>
+        </div>
+        <div class="category-card" th:classappend="${request.categoryId == 4 ? 'active' : ''}" onclick="selectCategory(this, 4)">
+          <img src="/metal.jpg" class="card-img">
+          <div class="card-overlay"><div class="card-label">Metal</div></div>
+        </div>
+      </div>
+      <input type="hidden" name="categoryId" id="categoryIdInput" th:value="${request.categoryId}">
+    </div>
+
+    <!-- 태그 -->
+    <div class="card">
+      <div class="card-title">스타일 태그</div>
+      <div class="tag-cloud" id="defaultTags">
+        <div class="tag-chip">#심플한</div>
+        <div class="tag-chip">#화려한</div>
+        <div class="tag-chip">#사이버펑크</div>
+        <div class="tag-chip">#빈티지</div>
+        <div class="tag-chip">#미니멀</div>
+        <div class="tag-chip">#아방가르드</div>
+        <div class="tag-chip">#Y2K</div>
+        <div class="tag-chip">#트렌디한</div>
+        <div class="tag-chip">#스트릿</div>
+        <div class="tag-chip">#로맨틱</div>
+        <div class="tag-chip">#고스</div>
+        <div class="tag-chip">#캐주얼</div>
+      </div>
+      <div class="tag-input-row">
+        <input class="tag-input" id="customTagInput" placeholder="직접 태그 입력 후 추가" onkeydown="if(event.key==='Enter'){event.preventDefault();addCustomTag();}">
+        <button type="button" class="tag-add-btn" onclick="addCustomTag()">추가</button>
+      </div>
+      <div class="selected-preview" id="selectedPreview">
+        <div class="selected-preview-label">선택된 태그</div>
+        <div class="selected-chips" id="selectedChips"></div>
+      </div>
+      <input type="hidden" name="tags" id="tagsInput">
+    </div>
+
+    <!-- 기본 정보 -->
+    <div class="card">
+      <div class="card-title">의뢰 기본 정보</div>
+      <div class="form-group">
+        <div class="form-label">의뢰 제목</div>
+        <input type="text" name="title" class="apple-input" th:value="${request.title}" placeholder="예: 빈티지 자수 리폼">
+
+        <div class="form-label" style="margin-top:8px;">요청사항</div>
+        <textarea name="description" class="apple-input textarea" rows="5"
+                  placeholder="작업자에게 전달할 내용을 자유롭게 적어주세요."
+                  th:text="${request.description}"></textarea>
+
+        <div class="input-row" style="margin-top:8px;">
+          <div class="input-col">
+            <div class="form-label">희망 가격</div>
+            <div class="input-prefix-wrap">
+              <span class="input-prefix">₩</span>
+              <input type="number" name="hopePrice" class="apple-input"
+                     th:value="${request.hopePrice}" placeholder="50,000" min="0" step="1000">
+            </div>
+          </div>
+          <div class="input-col">
+            <div class="form-label">희망 기간</div>
+            <input type="date" name="requestedDueDate" class="apple-input"
+                   th:value="${request.requestedDueDate}">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 이미지 -->
+    <div class="card">
+      <div class="card-title">참고 이미지</div>
+      <div class="current-img" th:if="${request.thumbnailPath != null and !#strings.isEmpty(request.thumbnailPath)}">
+        <img th:src="${request.thumbnailPath}" alt="현재 이미지">
+      </div>
+      <label class="file-label" for="fileInput">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <span id="fileText">새 이미지로 교체 (선택)</span>
+      </label>
+      <input type="file" id="fileInput" name="files" onchange="updateFileName(this)">
+    </div>
+
+  </form>
+</div>
+
+<!-- 액션바 -->
+<div class="action-bar">
+  <div class="action-bar-inner">
+    <a th:href="@{/customer/request/detail/{id}(id=${request.requestId})}" class="btn-cancel">취소</a>
+    <button class="btn-save" id="saveBtn" onclick="submitEdit()">수정 완료</button>
+  </div>
+</div>
+
+<script th:inline="javascript">
+/*<![CDATA[*/
+  var selectedCategory = /*[[${request.categoryId}]]*/ null;
+  var initialTags = /*[[${request.tags}]]*/ '';
+  const selectedTags = new Set();
+
+  // 기존 태그 복원
+  if (initialTags) {
+    initialTags.split(',').forEach(t => {
+      const tag = '#' + t.trim();
+      if (tag !== '#') selectedTags.add(tag);
+    });
+  }
+
+  // 카테고리 선택
+  function selectCategory(el, val) {
+    document.querySelectorAll('.category-card').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    selectedCategory = val;
+    document.getElementById('categoryIdInput').value = val;
+  }
+
+  // 커스텀 태그 추가
+  function addCustomTag() {
+    const input = document.getElementById('customTagInput');
+    const raw = input.value.trim();
+    if (!raw) return;
+    const tag = raw.startsWith('#') ? raw : '#' + raw;
+    selectedTags.add(tag);
+    input.value = '';
+    renderSelectedPreview();
+  }
+
+  // 태그 제거
+  function removeTag(tag) {
+    selectedTags.delete(tag);
+    document.querySelectorAll('.tag-chip').forEach(el => {
+      if (el.dataset.tag === tag) el.classList.remove('selected');
+    });
+    renderSelectedPreview();
+  }
+
+  // 선택된 태그 렌더링
+  function renderSelectedPreview() {
+    const preview = document.getElementById('selectedPreview');
+    const container = document.getElementById('selectedChips');
+    if (selectedTags.size === 0) { preview.classList.remove('visible'); return; }
+    preview.classList.add('visible');
+    container.innerHTML = '';
+    [...selectedTags].forEach(tag => {
+      const chip = document.createElement('div');
+      chip.className = 'selected-chip';
+      chip.innerHTML = `${tag} <span class="x-btn" onclick="removeTag('${tag}')">✕</span>`;
+      container.appendChild(chip);
+    });
+    document.getElementById('tagsInput').value = [...selectedTags].map(t => t.replace('#', '')).join(',');
+  }
+
+  // 파일명 표시
+  function updateFileName(input) {
+    document.getElementById('fileText').innerText = input.files[0]?.name || '새 이미지로 교체 (선택)';
+  }
+
+  // 폼 제출
+  function submitEdit() {
+    document.getElementById('tagsInput').value = [...selectedTags].map(t => t.replace('#', '')).join(',');
+    const btn = document.getElementById('saveBtn');
+    btn.innerText = '저장 중…';
+    btn.disabled = true;
+    document.getElementById('editForm').submit();
+  }
+
+  // DOM 로드 후 기본 태그 selected 상태 복원 + 클릭 이벤트 등록
+  document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('#defaultTags .tag-chip').forEach(el => {
+      const tag = el.textContent.trim();
+      el.dataset.tag = tag;
+      if (selectedTags.has(tag)) el.classList.add('selected');
+      el.onclick = () => {
+        if (selectedTags.has(tag)) { selectedTags.delete(tag); el.classList.remove('selected'); }
+        else { selectedTags.add(tag); el.classList.add('selected'); }
+        renderSelectedPreview();
+      };
+    });
+    renderSelectedPreview();
+  });
+/*]]>*/
+</script>
+
+</th:block>
+</body>
+</html>

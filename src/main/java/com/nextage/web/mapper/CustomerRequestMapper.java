@@ -30,6 +30,9 @@ public interface CustomerRequestMapper {
     // [추가] 자식 테이블인 태그를 먼저 삭제하기 위해 필요한 메서드입니다.
     void deleteTagsByRequestId(Long requestId); 
     
+    //업데이트
+    void updateRequest(RequestDTO dto);
+    
     void deleteAttachmentsByRequestId(Long requestId); // 첨부파일 먼저 삭제
     void deleteRequest(Long requestId); // 의뢰글 삭제
     

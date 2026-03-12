@@ -76,6 +76,16 @@
     <delete id="deleteTagsByRequestId">
         DELETE FROM request_tag WHERE request_id = #{requestId}
     </delete>
+    
+    <update id="updateRequest">
+	    UPDATE request
+	    SET title            = #{title},
+	        description      = #{description},
+	        category_id      = #{categoryId},
+	        hope_price       = #{hopePrice},
+	        requested_due_date = #{requestedDueDate}
+	    WHERE request_id = #{requestId}
+	</update>
 
     <select id="selectUrgentRequests" resultType="com.nextage.web.domain.RequestDTO">
         SELECT r.*, c.name AS categoryName
