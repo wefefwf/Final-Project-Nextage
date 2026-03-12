@@ -122,8 +122,8 @@
             font-size: 13px; color: #bbb;
         }
         .btn-delete-order {
-		    padding: 8px 18px;
-		    font-size: 12px; font-weight: 700; color: #ff6b6b;
+		    padding: 9px 20px;
+		    font-size: 13px; font-weight: 700; color: #ff6b6b;
 		    background: #fff5f5;
 		    border: 1.5px solid #ffc2c2;
 		    border-radius: 20px; cursor: pointer;
@@ -243,7 +243,7 @@
                 </div>
 
                 <!-- 후기 버튼: 개인거래(bid_id 있음)일 때만 표시 -->
-                <th:block th:if="${order.personalOrder}">
+                <th:block th:if="${order.bidId != null}">
                     <button class="btn-reviewed" th:if="${item.reviewed}">후기 완료</button>
                     <button class="btn-review"
                             th:if="${!item.reviewed}"

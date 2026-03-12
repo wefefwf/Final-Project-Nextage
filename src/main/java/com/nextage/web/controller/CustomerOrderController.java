@@ -75,7 +75,7 @@ public class CustomerOrderController {
 
         model.addAttribute("orderNo",     orderNo);
         model.addAttribute("totalAmount", totalAmount != null ? totalAmount : 0);
-        model.addAttribute("redirectUrl", "/customer/shop");
+        model.addAttribute("redirectUrl", "/order/history");
         return "views/shop/customer-payment-complete";
     }
 }

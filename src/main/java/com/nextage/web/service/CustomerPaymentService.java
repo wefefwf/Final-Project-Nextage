@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -24,23 +23,18 @@ public class CustomerPaymentService {
     private final CustomerCartMapper         customerCartMapper;
     private final CustomerOrderHistoryMapper customerOrderHistoryMapper;
 
-    /**
-     * 주문번호(order_no) 생성 + orders 테이블에 READY 상태로 선저장
-     */
     @Transactional
     public String createOrder(Long customerId, int totalAmount) {
         String orderNo = "ORDER_"
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"))
                 + "_" + (int)(Math.random() * 9000 + 1000);
-        orderMapper.insertOrder(orderNo, customerId, totalAmount);
+        Long businessId = 1L;
+        orderMapper.insertOrder(orderNo, customerId, businessId, totalAmount);
         log.info("주문 생성 - orderNo: {}, customerId: {}, totalAmount: {}",
                 orderNo, customerId, totalAmount);
         return orderNo;
     }
 
-    /**
-     * 결제 완료 후 서버 검증 + payment_status 업데이트
-     */
     @Transactional
     public boolean verifyAndComplete(PaymentDTO dto) {
         // 1. DB에서 사전 저장된 total_amount 조회
@@ -58,20 +52,28 @@ public class CustomerPaymentService {
             return false;
         }
 
-        // 3. 결제 성공 처리 → payment_status = PAID
-        // TODO: 운영 전환 시 포트원 REST API로 imp_uid 실조회 후 이중 검증 추가
+        // 3. 결제 성공 처리
         orderMapper.updatePaymentStatus(dto.getOrderNo(), dto.getImpUid(), "PAID");
 
-        // 4. ✅ order_items 저장
+        // 4. order_items 저장
         if (dto.getOrderItems() != null && !dto.getOrderItems().isEmpty()) {
             Long orderId = orderMapper.selectOrderIdByOrderNo(dto.getOrderNo());
             for (OrderItemDTO item : dto.getOrderItems()) {
                 item.setOrderId(orderId);
+
+                // kitId가 JS에서 문자열로 넘어올 수 있어서 null/빈값 처리
+                if (item.getKitId() == null) {
+                    log.warn("kitId가 null입니다. productName: {}", item.getProductName());
+                }
+
+                log.info("order_item 저장 - orderId: {}, kitId: {}, qty: {}, price: {}",
+                        orderId, item.getKitId(), item.getQuantity(), item.getPrice());
+
                 customerOrderHistoryMapper.insertOrderItem(item);
             }
         }
 
-        // 5. 결제한 장바구니 아이템 삭제
+        // 5. 장바구니 아이템 삭제
         if (dto.getCartItemIds() != null && !dto.getCartItemIds().isEmpty()) {
             List<Long> ids = dto.getCartItemIds().stream()
                     .map(Long::parseLong)
@@ -84,9 +86,6 @@ public class CustomerPaymentService {
         return true;
     }
 
-    /**
-     * 결제 완료 페이지용 total_amount 조회
-     */
     @Transactional(readOnly = true)
     public Integer getTotalAmountByOrderNo(String orderNo) {
         return orderMapper.selectTotalAmountByOrderNo(orderNo);
