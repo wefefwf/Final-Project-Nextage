@@ -1,7 +1,7 @@
 package com.nextage.web.controller;
 
-import com.nextage.web.domain.KitReviewDTO;
 import com.nextage.web.domain.OrderHistoryDTO;
+import com.nextage.web.domain.ReviewDTO;
 import com.nextage.web.service.CustomerOrderHistoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
-@RequestMapping("/order")
+@RequestMapping("/order")  // /order → /order/detail 로 변경
 @RequiredArgsConstructor
 public class CustomerOrderHistoryController {
 
@@ -21,10 +21,13 @@ public class CustomerOrderHistoryController {
     private static final Long TEMP_CUSTOMER_ID = 1L;
 
     @GetMapping("/history")
-    public String historyPage(Model model) {
+    public String historyPage(@RequestParam(name = "page", defaultValue = "1") int page, Model model) {
         List<OrderHistoryDTO> orders =
-            customerOrderHistoryService.getOrderHistory(TEMP_CUSTOMER_ID);
-        model.addAttribute("orders", orders);
+            customerOrderHistoryService.getOrderHistory(TEMP_CUSTOMER_ID, page);
+        int totalPages = customerOrderHistoryService.getTotalPages(TEMP_CUSTOMER_ID);
+        model.addAttribute("orders",      orders);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages",  totalPages);
         return "views/orderhistory/customer-order-history";
     }
 
@@ -37,17 +40,31 @@ public class CustomerOrderHistoryController {
 
     @PostMapping("/review")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> writeReview(@RequestBody KitReviewDTO dto) {
+    public ResponseEntity<Map<String, Object>> writeReview(@RequestBody ReviewDTO dto) {
         dto.setCustomerId(TEMP_CUSTOMER_ID);
+        if (dto.getBusinessId() == null) {
+            return ResponseEntity.badRequest().body(Map.of(
+                "success", false, "message", "잘못된 요청입니다."));
+        }
         boolean success = customerOrderHistoryService.writeReview(dto);
         if (success) {
-            return ResponseEntity.ok(Map.of(
-                "success", true,
-                "message", "\uD6C4\uAE30\uAC00 \uB4F1\uB85D\uB418\uC5C8\uC2B5\uB2C8\uB2E4."));
+            return ResponseEntity.ok(Map.of("success", true, "message", "후기가 등록되었습니다."));
         } else {
             return ResponseEntity.badRequest().body(Map.of(
-                "success", false,
-                "message", "\uC774\uBBF8 \uC791\uC131\uD55C \uD6C4\uAE30\uC785\uB2C8\uB2E4."));
+                "success", false, "message", "이미 작성한 후기입니다."));
+        }
+    }
+
+    @DeleteMapping("/delete/{orderId}")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> deleteOrder(
+            @PathVariable("orderId") Long orderId) {
+        try {
+            customerOrderHistoryService.deleteOrder(orderId, TEMP_CUSTOMER_ID);
+            return ResponseEntity.ok(Map.of("success", true));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                "success", false, "message", e.getMessage()));
         }
     }
 }

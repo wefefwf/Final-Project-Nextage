@@ -51,7 +51,6 @@
         .info-value { font-weight: 600; color: #333; }
         .info-value.paid { color: #bd93f9; font-weight: 700; }
 
-        /* 상품 목록 */
         .order-item-row {
             display: flex; align-items: center;
             gap: 16px; padding: 18px 0;
@@ -96,7 +95,6 @@
             cursor: default; flex-shrink: 0; white-space: nowrap;
         }
 
-        /* 합계 */
         .total-row {
             display: flex; justify-content: space-between;
             align-items: center; padding-top: 20px;
@@ -110,7 +108,33 @@
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
 
-        /* 후기 모달 */
+        /* 삭제 영역 */
+        .delete-area {
+            background: #f5f5f5;
+            border: 1px solid #ebebeb;
+            border-radius: 16px;
+            padding: 16px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .delete-area-text {
+            font-size: 13px; color: #bbb;
+        }
+        .btn-delete-order {
+		    padding: 8px 18px;
+		    font-size: 12px; font-weight: 700; color: #ff6b6b;
+		    background: #fff5f5;
+		    border: 1.5px solid #ffc2c2;
+		    border-radius: 20px; cursor: pointer;
+		    transition: all 0.2s; white-space: nowrap;
+		}
+		.btn-delete-order:hover {
+		    background: #ff6b6b; color: #fff;
+		    border-color: #ff6b6b;
+		}
+
+        /* 모달 */
         .modal-overlay {
             display: none; position: fixed; inset: 0;
             background: rgba(0,0,0,0.45); backdrop-filter: blur(4px);
@@ -139,14 +163,6 @@
             background: #f8f5ff; border-radius: 10px;
             padding: 10px 14px; margin-bottom: 20px;
         }
-        .star-label { font-size: 13px; color: #aaa; margin-bottom: 8px; }
-        .star-row { display: flex; gap: 4px; margin-bottom: 20px; }
-        .star {
-            font-size: 30px; cursor: pointer;
-            color: #e0e0e0; transition: color 0.15s, transform 0.1s;
-        }
-        .star:hover { transform: scale(1.15); }
-        .star.active { color: #ffd700; }
         .review-label { font-size: 13px; color: #aaa; margin-bottom: 8px; }
         .review-textarea {
             width: 100%; height: 110px;
@@ -211,37 +227,35 @@
             <div class="info-card-title">주문 상품</div>
 
             <div th:each="item : ${order.items}" class="order-item-row">
-                <!-- 이미지 -->
                 <div class="item-placeholder" th:if="${item.imageUrl == null}">🛍️</div>
                 <img class="item-img"
                      th:if="${item.imageUrl != null}"
                      th:src="${item.imageUrl}"
                      th:alt="${item.productName}">
 
-                <!-- 상품 정보 -->
                 <div class="item-info">
                     <div class="item-name" th:text="${item.productName}">상품명</div>
                     <div class="item-qty" th:text="${item.quantity} + '개'">1개</div>
                 </div>
 
-                <!-- 가격 -->
                 <div class="item-price"
                      th:text="${#numbers.formatInteger(item.price * item.quantity, 3, 'COMMA') + '원'}">
                 </div>
 
-                <!-- ✅ 후기 버튼 -->
-                <button class="btn-reviewed" th:if="${item.reviewed}">후기 완료</button>
-                <button class="btn-review"
-				        th:if="${!item.reviewed}"
-				        th:data-order-item-id="${item.orderItemId}"
-				        th:data-kit-id="${item.kitId}"
-				        th:data-product-name="${item.productName}"
-				        onclick="openReviewModalFromBtn(this)">
-				    후기 작성
-				</button>
+                <!-- 후기 버튼: 개인거래(bid_id 있음)일 때만 표시 -->
+                <th:block th:if="${order.personalOrder}">
+                    <button class="btn-reviewed" th:if="${item.reviewed}">후기 완료</button>
+                    <button class="btn-review"
+                            th:if="${!item.reviewed}"
+                            th:data-order-item-id="${item.orderItemId}"
+                            th:data-business-id="${item.businessId}"
+                            th:data-product-name="${item.productName}"
+                            onclick="openReviewModalFromBtn(this)">
+                        후기 작성
+                    </button>
+                </th:block>
             </div>
 
-            <!-- 합계 -->
             <div class="total-row">
                 <span class="total-label">총 결제 금액</span>
                 <span class="total-value"
@@ -249,31 +263,28 @@
             </div>
         </div>
 
+        <!-- 구매내역 삭제 영역 -->
+        <div class="delete-area">
+            <span class="delete-area-text">해당 주문 내역을 삭제할 수 있습니다.</span>
+            <button class="btn-delete-order"
+                    th:data-order-id="${order.orderId}"
+                    onclick="confirmDelete(this)">
+                구매내역 삭제
+            </button>
+        </div>
+
     </div>
 
-    <!-- ✅ 후기 작성 모달 -->
+    <!-- 후기 작성 모달 -->
     <div class="modal-overlay" id="reviewModalOverlay">
         <div class="modal-box">
             <button class="modal-close" onclick="closeReviewModal()">✕</button>
-
             <div class="modal-title">후기 작성</div>
-            <div class="modal-subtitle">상품은 어떠셨나요?</div>
-
+            <div class="modal-subtitle">서비스는 어떠셨나요?</div>
             <div class="modal-product-name" id="reviewProductName"></div>
-
-            <div class="star-label">별점</div>
-            <div class="star-row">
-                <span class="star" data-val="1" onclick="setRating(1)">★</span>
-                <span class="star" data-val="2" onclick="setRating(2)">★</span>
-                <span class="star" data-val="3" onclick="setRating(3)">★</span>
-                <span class="star" data-val="4" onclick="setRating(4)">★</span>
-                <span class="star" data-val="5" onclick="setRating(5)">★</span>
-            </div>
-
             <div class="review-label">후기 내용</div>
             <textarea class="review-textarea" id="reviewContent"
-                      placeholder="구매하신 상품에 대한 솔직한 후기를 남겨주세요."></textarea>
-
+                      placeholder="서비스에 대한 솔직한 후기를 남겨주세요."></textarea>
             <button class="btn-submit-review" onclick="submitReview()">후기 등록</button>
             <div class="review-msg" id="reviewMsg"></div>
         </div>
@@ -282,24 +293,21 @@
     <script th:inline="javascript">
     /*<![CDATA[*/
         var _orderItemId = null;
-        var _kitId       = null;
-        var _rating      = 5;
+        var _businessId  = null;
 
         document.addEventListener('DOMContentLoaded', function() {
-            setRating(5);
             document.getElementById('reviewModalOverlay')
                 .addEventListener('click', function(e) {
                     if (e.target === this) closeReviewModal();
                 });
         });
 
-        function openReviewModal(orderItemId, kitId, productName) {
-            _orderItemId = orderItemId;
-            _kitId       = kitId;
-            document.getElementById('reviewProductName').textContent = productName;
+        function openReviewModalFromBtn(btn) {
+            _orderItemId = btn.dataset.orderItemId;
+            _businessId  = btn.dataset.businessId;
+            document.getElementById('reviewProductName').textContent = btn.dataset.productName;
             document.getElementById('reviewContent').value           = '';
             document.getElementById('reviewMsg').textContent         = '';
-            setRating(5);
             document.getElementById('reviewModalOverlay').classList.add('show');
         }
 
@@ -307,26 +315,28 @@
             document.getElementById('reviewModalOverlay').classList.remove('show');
         }
 
-        function setRating(val) {
-            _rating = val;
-            document.querySelectorAll('.star').forEach(function(s) {
-                s.classList.toggle('active', parseInt(s.dataset.val) <= val);
-            });
-        }
-        
-        function openReviewModalFromBtn(btn) {
-            openReviewModal(
-                btn.dataset.orderItemId,
-                btn.dataset.kitId,
-                btn.dataset.productName
-            );
+        function confirmDelete(btn) {
+            if (!confirm('이 주문 내역을 삭제하시겠습니까?\n삭제된 내역은 복구되지 않습니다.')) return;
+
+            var orderId = btn.dataset.orderId;
+
+            fetch('/order/delete/' + orderId, { method: 'DELETE' })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    location.href = '/order/history';
+                } else {
+                    alert(data.message || '삭제에 실패했습니다.');
+                }
+            })
+            .catch(function() { alert('오류가 발생했습니다.'); });
         }
 
         function submitReview() {
             var content = document.getElementById('reviewContent').value.trim();
             if (!content) {
                 document.getElementById('reviewMsg').innerHTML =
-                    '<span style="color:#ff6b6b;">\uD6C4\uAE30 \uB0B4\uC6A9\uC744 \uC785\uB825\uD574\uC8FC\uC138\uC694.<\/span>';
+                    '<span style="color:#ff6b6b;">후기 내용을 입력해주세요.</span>';
                 return;
             }
 
@@ -335,8 +345,7 @@
                 headers: { 'Content-Type': 'application/json' },
                 body   : JSON.stringify({
                     orderItemId: _orderItemId,
-                    kitId      : _kitId,
-                    rating     : _rating,
+                    businessId : _businessId,
                     content    : content
                 })
             })
@@ -344,19 +353,19 @@
             .then(function(data) {
                 if (data.success) {
                     document.getElementById('reviewMsg').innerHTML =
-                        '<span style="color:#6dca8a; font-weight:700;">\uD6C4\uAE30\uAC00 \uB4F1\uB85D\uB418\uC5C8\uC2B5\uB2C8\uB2E4!<\/span>';
+                        '<span style="color:#6dca8a; font-weight:700;">후기가 등록되었습니다!</span>';
                     setTimeout(function() {
                         closeReviewModal();
                         location.reload();
                     }, 1200);
                 } else {
                     document.getElementById('reviewMsg').innerHTML =
-                        '<span style="color:#ff6b6b;">' + data.message + '<\/span>';
+                        '<span style="color:#ff6b6b;">' + data.message + '</span>';
                 }
             })
             .catch(function() {
                 document.getElementById('reviewMsg').innerHTML =
-                    '<span style="color:#ff6b6b;">\uC624\uB958\uAC00 \uBC1C\uC0DD\uD588\uC2B5\uB2C8\uB2E4.<\/span>';
+                    '<span style="color:#ff6b6b;">오류가 발생했습니다.</span>';
             });
         }
     /*]]>*/

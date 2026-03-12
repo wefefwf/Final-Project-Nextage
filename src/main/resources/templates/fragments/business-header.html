@@ -15,12 +15,12 @@
                     <li>
                     	<div class="dropdown">
 							<button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-							  결제 / 배송
+							  결제/배송
 							</button>
 							<ul class="dropdown-menu">
 							  <li><a class="dropdown-item" href="#">수익/정산</a></li>
-							  <li><a class="dropdown-item" href="#">주문 내역</a></li>
-							  <li><a class="dropdown-item" href="#">배송 상태</a></li>
+							  <li><a class="dropdown-item" href="#">주문내역</a></li>
+							  <li><a class="dropdown-item" href="#">배송상태</a></li>
 							</ul>
 						</div>
 					</li>
@@ -30,15 +30,15 @@
 							  마이 페이지
 							</button>
 							<ul class="dropdown-menu">
-							  <li><a class="dropdown-item" href="#">정보 수정</a></li>
+							  <li><a class="dropdown-item" href="#">정보수정</a></li>
 							  <li><a class="dropdown-item" href="#">내 제안</a></li>
 							  <li><a class="dropdown-item" href="#">내 일정</a></li>
-							  <li><a class="dropdown-item" href="#">내 포트폴리오</a></li>
+							  <li><a class="dropdown-item" th:href="@{/business/portfolio/(id=${comment.businessId})}">내 포트폴리오</a></li>
 							</ul>
 						</div>
 					</li>
 					<li class="login-item">
-			            <a href="#" class="login-btn">Log in</a>
+			            <a th:href="@{/auth/business/loginProc}" class="login-btn">Login</a>
 			        </li>
                 </ul>
             </nav>

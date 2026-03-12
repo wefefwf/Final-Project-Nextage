@@ -22,12 +22,13 @@
         }
         .page-subtitle { font-size: 14px; color: #aaa; margin-bottom: 36px; }
 
+        .order-card-wrapper { margin-bottom: 16px; }
+
         .order-card {
             background: #fff;
             border: 1px solid #ebebeb;
             border-radius: 16px;
             padding: 24px 28px;
-            margin-bottom: 16px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.04);
             transition: all 0.3s;
             cursor: pointer;
@@ -48,10 +49,12 @@
             margin-bottom: 16px;
         }
 
+        .order-product-name {
+            font-size: 15px; font-weight: 700; color: #222; margin-bottom: 6px;
+        }
         .order-no {
             font-family: 'Montserrat', sans-serif;
-            font-size: 13px; font-weight: 700; color: #bd93f9;
-            margin-bottom: 4px;
+            font-size: 13px; font-weight: 700; color: #bd93f9; margin-bottom: 4px;
         }
         .order-date { font-size: 12px; color: #bbb; }
 
@@ -63,78 +66,74 @@
         }
 
         .order-items-preview {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 16px;
-            flex-wrap: wrap;
+            display: flex; gap: 10px;
+            margin-bottom: 16px; flex-wrap: wrap;
         }
 
         .preview-img {
             width: 64px; height: 64px;
-            object-fit: cover; border-radius: 10px;
-            border: 1px solid #eee;
+            object-fit: cover; border-radius: 10px; border: 1px solid #eee;
         }
         .preview-placeholder {
-            width: 64px; height: 64px;
-            border-radius: 10px;
+            width: 64px; height: 64px; border-radius: 10px;
             background: linear-gradient(135deg, #f5f0ff, #ede9fe);
             display: flex; align-items: center;
             justify-content: center; font-size: 24px;
         }
         .preview-more {
-            width: 64px; height: 64px;
-            border-radius: 10px;
+            width: 64px; height: 64px; border-radius: 10px;
             background: #f5f5f5;
-            display: flex; align-items: center;
-            justify-content: center;
+            display: flex; align-items: center; justify-content: center;
             font-size: 13px; font-weight: 700; color: #aaa;
         }
 
         .order-card-footer {
-            display: flex;
-            justify-content: space-between;
+            display: flex; justify-content: space-between;
             align-items: center;
-            border-top: 1px solid #f5f5f5;
-            padding-top: 14px;
+            border-top: 1px solid #f5f5f5; padding-top: 14px;
         }
 
         .order-item-count { font-size: 13px; color: #999; }
-
         .order-total {
             font-family: 'Montserrat', sans-serif;
             font-size: 20px; font-weight: 900;
             background: linear-gradient(to right, #a78bfa, #a6c1ee);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
+        .detail-arrow { font-size: 13px; color: #bd93f9; font-weight: 600; }
 
-        .detail-arrow {
-            font-size: 13px; color: #bd93f9;
-            font-weight: 600;
-        }
-
-        .empty-state {
-            text-align: center; padding: 80px 0; color: #bbb;
-        }
+        .empty-state { text-align: center; padding: 80px 0; color: #bbb; }
         .empty-icon { font-size: 60px; margin-bottom: 20px; }
         .empty-text { font-size: 16px; font-weight: 500; margin-bottom: 20px; }
         .btn-shop {
-            display: inline-block;
-            padding: 14px 32px;
+            display: inline-block; padding: 14px 32px;
             font-size: 14px; font-weight: 700; color: #fff;
             background: linear-gradient(135deg, #bd93f9, #a6c1ee);
             border-radius: 50px; text-decoration: none;
-            box-shadow: 0 4px 16px rgba(189,147,249,0.35);
-            transition: all 0.3s;
+            box-shadow: 0 4px 16px rgba(189,147,249,0.35); transition: all 0.3s;
         }
         .btn-shop:hover { transform: translateY(-2px); }
-        
-        .order-product-name {
-		    font-size: 15px;
-		    font-weight: 700;
-		    color: #222;
-		    margin-bottom: 6px;
-		}
+
+        .pagination {
+            display: flex; justify-content: center;
+            align-items: center; gap: 6px;
+            margin-top: 36px;
+        }
+        .page-btn {
+            width: 38px; height: 38px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 50%; font-size: 14px; font-weight: 600;
+            text-decoration: none; color: #aaa;
+            border: 1.5px solid #eee; background: #fff;
+            transition: all 0.2s;
+        }
+        .page-btn:hover { border-color: #bd93f9; color: #bd93f9; }
+        .page-btn.active {
+            background: linear-gradient(135deg, #bd93f9, #a6c1ee);
+            color: #fff; border-color: transparent;
+            box-shadow: 0 2px 10px rgba(189,147,249,0.35);
+        }
+        .page-btn.disabled { opacity: 0.35; pointer-events: none; }
     </style>
 </head>
 <body>
@@ -146,64 +145,78 @@
 
         <!-- 빈 상태 -->
         <div class="empty-state" th:if="${#lists.isEmpty(orders)}">
-            <div class="empty-icon">🛍️</div>
             <div class="empty-text">구매 내역이 없어요.</div>
             <a href="/customer/shop" class="btn-shop">쇼핑하러 가기</a>
         </div>
 
         <!-- 주문 목록 -->
-        <a th:each="order : ${orders}"
-           class="order-card"
-           th:href="@{/order/detail/{orderId}(orderId=${order.orderId})}">
+        <div th:each="order : ${orders}" class="order-card-wrapper">
+            <a class="order-card"
+               th:href="@{/order/detail/{orderId}(orderId=${order.orderId})}">
 
-            <div class="order-card-header">
-			    <div>
-			        <!-- 상품명 먼저 -->
-			        <div class="order-product-name">
-			            <th:block th:if="${not #lists.isEmpty(order.items)}">
-			                <span th:text="${order.items[0].productName}">상품명</span>
-			                <span th:if="${#lists.size(order.items) > 1}"
-			                      th:text="' 외 ' + (${#lists.size(order.items)} - 1) + '건'"></span>
-			            </th:block>
-			            <span th:if="${#lists.isEmpty(order.items)}"
-			                  style="color:#ccc;">상품 정보 없음</span>
-			        </div>
-			        <!-- 주문번호 아래 -->
-			        <div class="order-no" th:text="${order.orderNo}">ORDER_...</div>
-			        <div class="order-date"
-			             th:text="${#temporals.format(order.createdAt, 'yyyy-MM-dd HH:mm')}">
-			        </div>
-			    </div>
-			    <span class="order-status">결제완료</span>
-			</div>
-
-            <!-- 상품 이미지 미리보기 (최대 4개) -->
-            <div class="order-items-preview">
-                <th:block th:each="item, iter : ${order.items}" th:if="${iter.index < 4}">
-                    <div class="preview-placeholder" th:if="${item.imageUrl == null}">🛍️</div>
-                    <img class="preview-img"
-                         th:if="${item.imageUrl != null}"
-                         th:src="${item.imageUrl}"
-                         th:alt="${item.productName}">
-                </th:block>
-                <!-- 4개 초과 시 +N 표시 -->
-                <div class="preview-more"
-                     th:if="${#lists.size(order.items) > 4}"
-                     th:text="'+' + (${#lists.size(order.items)} - 4)">+2</div>
-            </div>
-
-            <div class="order-card-footer">
-                <span class="order-item-count"
-                      th:text="${#lists.size(order.items)} + '개 상품'">1개 상품</span>
-                <div style="display:flex; align-items:center; gap:16px;">
-                    <span class="order-total"
-                          th:text="${#numbers.formatInteger(order.totalAmount, 3, 'COMMA') + '원'}">
-                        0원
-                    </span>
-                    <span class="detail-arrow">상세 보러가기 →</span>
+                <div class="order-card-header">
+                    <div>
+                        <div class="order-product-name">
+                            <th:block th:if="${not #lists.isEmpty(order.items)}">
+                                <span th:text="${order.items[0].productName}">상품명</span>
+                                <span th:if="${#lists.size(order.items) > 1}"
+                                      th:text="' 외 ' + (${#lists.size(order.items)} - 1) + '건'"></span>
+                            </th:block>
+                            <span th:if="${#lists.isEmpty(order.items)}"
+                                  style="color:#ccc;">상품 정보 없음</span>
+                        </div>
+                        <div class="order-no" th:text="${order.orderNo}">ORDER_...</div>
+                        <div class="order-date"
+                             th:text="${#temporals.format(order.createdAt, 'yyyy-MM-dd HH:mm')}"></div>
+                    </div>
+                    <span class="order-status">결제완료</span>
                 </div>
-            </div>
-        </a>
+
+                <div class="order-items-preview">
+                    <th:block th:each="item, iter : ${order.items}" th:if="${iter.index < 4}">
+                        <div class="preview-placeholder" th:if="${item.imageUrl == null}">🛍️</div>
+                        <img class="preview-img"
+                             th:if="${item.imageUrl != null}"
+                             th:src="${item.imageUrl}"
+                             th:alt="${item.productName}">
+                    </th:block>
+                    <div class="preview-more"
+                         th:if="${#lists.size(order.items) > 4}"
+                         th:text="'+' + (${#lists.size(order.items)} - 4)">+2</div>
+                </div>
+
+                <div class="order-card-footer">
+                    <span class="order-item-count"
+                          th:text="${#lists.size(order.items)} + '개 상품'">1개 상품</span>
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <span class="order-total"
+                              th:text="${#numbers.formatInteger(order.totalAmount, 3, 'COMMA') + '원'}">
+                            0원
+                        </span>
+                        <span class="detail-arrow">상세 보러가기 →</span>
+                    </div>
+                </div>
+
+            </a>
+        </div>
+
+        <!-- 페이징 -->
+        <div class="pagination" th:if="${totalPages > 1}">
+            <a class="page-btn"
+               th:classappend="${currentPage == 1} ? 'disabled'"
+               th:href="@{/order/history(page=${currentPage - 1})}">‹</a>
+
+            <th:block th:each="i : ${#numbers.sequence(1, totalPages)}">
+                <a class="page-btn"
+                   th:classappend="${i == currentPage} ? 'active'"
+                   th:href="@{/order/history(page=${i})}"
+                   th:text="${i}">1</a>
+            </th:block>
+
+            <a class="page-btn"
+               th:classappend="${currentPage == totalPages} ? 'disabled'"
+               th:href="@{/order/history(page=${currentPage + 1})}">›</a>
+        </div>
 
     </div>
 </th:block>
