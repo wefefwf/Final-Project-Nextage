@@ -4,44 +4,47 @@
 <mapper namespace="com.nextage.web.mapper.CustomerOrderHistoryMapper">
 
     <select id="selectOrdersByCustomerId" resultType="com.nextage.web.domain.OrderHistoryDTO">
-        SELECT
-            o.order_id,
-            o.order_no,
-            o.business_id,
-            o.bid_id,
-            o.total_amount,
-            o.payment_status,
-            o.accept_status,
-            o.delivery_status,
-            o.created_at
-        FROM orders o
-        WHERE o.customer_id   = #{customerId}
-          AND o.payment_status = 'PAID'
-        ORDER BY o.created_at DESC
-        LIMIT #{limit} OFFSET #{offset}
-    </select>
-
-    <select id="countOrdersByCustomerId" resultType="int">
-        SELECT COUNT(*)
-        FROM orders
-        WHERE customer_id   = #{customerId}
-          AND payment_status = 'PAID'
-    </select>
-
-    <select id="selectOrderDetail" resultType="com.nextage.web.domain.OrderHistoryDTO">
-        SELECT
-            o.order_id,
-            o.order_no,
-            o.business_id,
-            o.bid_id,
-            o.total_amount,
-            o.payment_status,
-            o.accept_status,
-            o.delivery_status,
-            o.created_at
-        FROM orders o
-        WHERE o.order_id = #{orderId}
-    </select>
+	    SELECT
+	        o.order_id,
+	        o.order_no,
+	        o.business_id,
+	        o.bid_id,
+	        o.total_amount,
+	        o.payment_status,
+	        o.accept_status,
+	        o.delivery_status,
+	        o.created_at
+	    FROM orders o
+	    WHERE o.customer_id    = #{customerId}
+	      AND o.payment_status = 'PAID'
+	      AND o.customer_deleted = 0
+	    ORDER BY o.created_at DESC
+	    LIMIT #{limit} OFFSET #{offset}
+	</select>
+	
+	<select id="countOrdersByCustomerId" resultType="int">
+	    SELECT COUNT(*)
+	    FROM orders
+	    WHERE customer_id      = #{customerId}
+	      AND payment_status   = 'PAID'
+	      AND customer_deleted = 0
+	</select>
+	
+	<select id="selectOrderDetail" resultType="com.nextage.web.domain.OrderHistoryDTO">
+	    SELECT
+	        o.order_id,
+	        o.order_no,
+	        o.business_id,
+	        o.bid_id,
+	        o.total_amount,
+	        o.payment_status,
+	        o.accept_status,
+	        o.delivery_status,
+	        o.created_at
+	    FROM orders o
+	    WHERE o.order_id       = #{orderId}
+	      AND o.customer_deleted = 0
+	</select>
 
     <select id="selectOrderItems" resultType="com.nextage.web.domain.OrderItemsDTO">
         SELECT
@@ -78,9 +81,11 @@
         DELETE FROM order_items WHERE order_id = #{orderId}
     </delete>
 
-    <delete id="deleteOrderByOrderId">
-        DELETE FROM orders WHERE order_id = #{orderId}
-    </delete>
+    <update id="deleteOrderByOrderId">
+	    UPDATE orders
+	    SET customer_deleted = 1
+	    WHERE order_id = #{orderId}
+	</update>
 
     <delete id="deleteSettlementsByOrderId">
         DELETE FROM business_settlement WHERE order_id = #{orderId}

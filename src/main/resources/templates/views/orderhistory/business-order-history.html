@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layouts/customer-layout}">
+      layout:decorate="~{layouts/business-layout}">
 <head>
     <meta charset="UTF-8">
     <title>주문 관리 - Nextage</title>
@@ -19,7 +19,7 @@
             font-size: 22px; font-weight: 900; color: #222;
         }
         .top-bar-right { font-size: 13px; color: #aaa; }
-        .top-bar-right strong { color: #bd93f9; }
+        .top-bar-right strong { color: #333; }
 
         .top-section {
             display: grid;
@@ -28,17 +28,17 @@
         }
 
         .panel {
-            background: #fff; border: 1px solid #ebebeb;
+            background: #fff; border: 1px solid #e0e0e0;
             border-radius: 14px; overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
         .panel-header {
             padding: 14px 20px; font-size: 13px; font-weight: 700; color: #fff;
-            background: linear-gradient(135deg, #bd93f9, #a6c1ee);
+            background: linear-gradient(135deg, #3a3a3a, #5a5a5a);
             display: flex; justify-content: space-between; align-items: center;
         }
         .panel-badge {
-            background: rgba(255,255,255,0.3); color: #fff;
+            background: rgba(255,255,255,0.2); color: #fff;
             font-size: 11px; font-weight: 700;
             padding: 2px 8px; border-radius: 10px;
         }
@@ -50,19 +50,22 @@
             cursor: pointer; transition: background 0.15s;
             display: flex; align-items: center; gap: 12px;
         }
-        .pending-item:hover  { background: #f8f5ff; }
-        .pending-item.active { background: #f0e8ff; border-left: 3px solid #bd93f9; }
+        .pending-item:hover { background: #f7f7f7; }
+        .pending-item.active {
+            background: #f0f0f0;
+            border-left: 4px solid #555;
+        }
         .pending-item:last-child { border-bottom: none; }
 
         .pending-thumb {
             width: 42px; height: 42px; border-radius: 8px; flex-shrink: 0;
-            background: linear-gradient(135deg, #f5f0ff, #ede9fe);
+            background: linear-gradient(135deg, #f2f6fa, #e8edf3);
             display: flex; align-items: center; justify-content: center;
             overflow: hidden;
         }
         .pending-thumb img { width: 100%; height: 100%; object-fit: cover; }
         .pending-thumb-placeholder {
-            width: 100%; height: 100%; background: linear-gradient(135deg, #ede9fe, #ddd6fe);
+            width: 100%; height: 100%; background: linear-gradient(135deg, #f2f6fa, #e8edf3);
             border-radius: 8px;
         }
 
@@ -74,7 +77,7 @@
         .pending-sub { font-size: 11px; color: #aaa; margin-top: 2px; }
         .pending-price {
             font-family: 'Montserrat', sans-serif;
-            font-size: 13px; font-weight: 800; color: #bd93f9; flex-shrink: 0;
+            font-size: 13px; font-weight: 800; color: #333; flex-shrink: 0;
         }
 
         .list-empty {
@@ -82,9 +85,9 @@
         }
 
         .detail-panel {
-            background: #fff; border: 1px solid #ebebeb;
+            background: #fff; border: 1px solid #e0e0e0;
             border-radius: 14px; overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
         .detail-empty-msg {
             padding: 80px 24px; text-align: center; color: #ccc; font-size: 14px;
@@ -93,7 +96,7 @@
 
         .detail-img {
             width: 100%; height: 180px;
-            background: linear-gradient(135deg, #f5f0ff, #ede9fe);
+            background: linear-gradient(135deg, #f2f6fa, #e8edf3);
             border-radius: 12px; margin-bottom: 20px; overflow: hidden;
         }
         .detail-img img { width: 100%; height: 100%; object-fit: cover; }
@@ -107,16 +110,15 @@
         .detail-value { font-weight: 600; color: #333; }
 
         .detail-footer {
-		    padding: 16px 26px; background: #f9f9f9;
-		    border-top: 1px solid #f0f0f0;
-		}
+            padding: 16px 26px; background: #f9f9f9;
+            border-top: 1px solid #f0f0f0;
+        }
         .detail-amount {
-		    font-family: 'Montserrat', sans-serif;
-		    font-size: 24px; font-weight: 900; margin-bottom: 14px;
-		    color: #bd93f9;
-		    text-align: right;
-		    -webkit-text-fill-color: #bd93f9;
-		}
+            font-family: 'Montserrat', sans-serif;
+            font-size: 24px; font-weight: 900; margin-bottom: 14px;
+            color: #222;
+            text-align: right;
+        }
         .detail-btns { display: flex; gap: 10px; justify-content: flex-end; }
 
         .section-header {
@@ -129,18 +131,18 @@
         .section-sub { font-size: 13px; color: #aaa; }
 
         .order-row {
-		    background: #fff; border: 1px solid #ebebeb;
-		    border-radius: 12px; padding: 22px 20px;
-		    display: flex; align-items: center; gap: 14px;
-		    margin-bottom: 10px;
-		    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-		    transition: box-shadow 0.2s;
-		}
-        .order-row:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+            background: #fff; border: 1px solid #e8e8e8;
+            border-radius: 12px; padding: 22px 20px;
+            display: flex; align-items: center; gap: 14px;
+            margin-bottom: 10px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+            transition: box-shadow 0.2s;
+        }
+        .order-row:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.09); }
 
         .order-thumb {
             width: 50px; height: 50px; border-radius: 10px; flex-shrink: 0;
-            background: linear-gradient(135deg, #f5f0ff, #ede9fe);
+            background: linear-gradient(135deg, #f2f6fa, #e8edf3);
             overflow: hidden;
         }
         .order-thumb img { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; }
@@ -158,7 +160,6 @@
             flex-shrink: 0; min-width: 80px; text-align: right;
         }
 
-        /* 유저 페이지와 동일한 배송 상태 뱃지 */
         .status-badge {
             font-size: 13px; font-weight: 700;
             padding: 7px 18px; border-radius: 20px;
@@ -179,31 +180,44 @@
             transition: all 0.2s; white-space: nowrap;
             text-decoration: none; display: inline-flex; align-items: center; gap: 4px;
         }
-        .btn-purple {
-		    color: #fff; background: linear-gradient(135deg, #818cf8, #60a5fa);
-		    box-shadow: 0 2px 8px rgba(129,140,248,0.3);
-		    padding: 10px 24px; font-size: 14px;
-		}
-		.btn-purple:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(129,140,248,0.4); color: #fff; background: linear-gradient(135deg, #6366f1, #3b82f6); }
 
+        /* 수락 버튼 - 원래대로 */
+        .btn-purple {
+            color: #fff; background: linear-gradient(135deg, #818cf8, #60a5fa);
+            box-shadow: 0 2px 8px rgba(129,140,248,0.3);
+            padding: 10px 24px; font-size: 14px;
+        }
+        .btn-purple:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(129,140,248,0.4); color: #fff; background: linear-gradient(135deg, #6366f1, #3b82f6); }
+
+        /* 채팅 보기 버튼 - 원래대로 */
         .btn-green {
-		    color: #fff; background: linear-gradient(135deg, #6dca8a, #a8e6cf);
-		    box-shadow: 0 2px 8px rgba(109,202,138,0.3);
-		}
-		.btn-green:hover { transform: translateY(-1px); color: #fff; }
+            color: #fff; background: linear-gradient(135deg, #6dca8a, #a8e6cf);
+            box-shadow: 0 2px 8px rgba(109,202,138,0.3);
+        }
+        .btn-green:hover { transform: translateY(-1px); color: #fff; }
+
+        /* 거절 버튼 - 레드 유지 */
         .btn-red {
-		    color: #fff; background: #f43f6e;
-		    box-shadow: 0 2px 8px rgba(244,63,110,0.3);
-		    border: none !important;
-		    padding: 10px 24px; font-size: 14px;
-		}
-		.btn-red:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(244,63,110,0.4); color: #fff; background: #e11d48; }
+            color: #fff; background: #f43f6e;
+            box-shadow: 0 2px 8px rgba(244,63,110,0.3);
+            border: none !important;
+            padding: 10px 24px; font-size: 14px;
+        }
+        .btn-red:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(244,63,110,0.4); color: #fff; background: #e11d48; }
+
+        /* 배송 관리 버튼 - 원래대로 */
         .btn-blue {
-		    color: #fff; background: linear-gradient(135deg, #a78bfa, #818cf8);
-		    box-shadow: 0 2px 8px rgba(167,139,250,0.3);
+		    color: #fff;
+		    background: linear-gradient(135deg, #7c8cfb, #5aa9ff);
+		    box-shadow: 0 2px 8px rgba(124,140,251,0.35);
 		    border: none !important;
 		}
-		.btn-blue:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(167,139,250,0.4); color: #fff; }
+		
+		.btn-blue:hover {
+		    transform: translateY(-1px);
+		    background: linear-gradient(135deg, #6d7df5, #4895ff);
+		    box-shadow: 0 4px 14px rgba(124,140,251,0.45);
+		}
 
         .pagination { display: flex; justify-content: center; gap: 8px; margin-top: 24px; }
         .page-btn {
@@ -213,9 +227,9 @@
             cursor: pointer; transition: all 0.2s;
             display: flex; align-items: center; justify-content: center;
         }
-        .page-btn:hover  { border-color: #bd93f9; color: #bd93f9; }
+        .page-btn:hover  { border-color: #555; color: #333; }
         .page-btn.active {
-            background: linear-gradient(135deg, #bd93f9, #a6c1ee);
+            background: linear-gradient(135deg, #333, #666);
             border-color: transparent; color: #fff;
         }
         .page-btn.disabled { opacity: 0.35; pointer-events: none; }
@@ -223,14 +237,14 @@
         /* 배송 관리 모달 */
         .modal-overlay {
             display: none; position: fixed; inset: 0;
-            background: rgba(0,0,0,0.45); backdrop-filter: blur(4px);
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
             z-index: 10000; align-items: center; justify-content: center;
         }
         .modal-overlay.show { display: flex; }
         .modal-box {
             background: #fff; border-radius: 24px; padding: 36px 32px;
             width: 420px; max-width: 95vw;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.22);
             position: relative; animation: slideUp 0.3s ease;
         }
         .modal-close {
@@ -238,7 +252,7 @@
             border: none; background: none;
             font-size: 22px; color: #ccc; cursor: pointer; transition: color 0.2s;
         }
-        .modal-close:hover { color: #888; }
+        .modal-close:hover { color: #555; }
         .modal-title {
             font-family: 'Montserrat', sans-serif;
             font-size: 20px; font-weight: 900; color: #222; margin-bottom: 4px;
@@ -251,18 +265,18 @@
         .delivery-option {
             display: flex; align-items: center; gap: 14px;
             padding: 14px 18px; border-radius: 12px;
-            border: 2px solid #ebebeb; cursor: pointer;
+            border: 2px solid #e8e8e8; cursor: pointer;
             transition: all 0.2s; background: #fff;
         }
-        .delivery-option:hover { border-color: #bd93f9; background: #f8f5ff; }
-        .delivery-option.selected { border-color: #bd93f9; background: #f0e8ff; }
+        .delivery-option:hover { border-color: #555; background: #f7f7f7; }
+        .delivery-option.selected { border-color: #333; background: #f2f2f2; }
 
         .delivery-option-dot {
             width: 14px; height: 14px; border-radius: 50%;
             border: 2px solid #e0e0e0; flex-shrink: 0; transition: all 0.2s;
         }
         .delivery-option.selected .delivery-option-dot {
-            border-color: #bd93f9; background: #bd93f9;
+            border-color: #333; background: #333;
         }
         .delivery-option-label { font-size: 14px; font-weight: 700; flex: 1; }
         .delivery-option-badge {
@@ -279,11 +293,11 @@
         .btn-confirm {
             width: 100%; padding: 16px;
             font-size: 15px; font-weight: 800; color: #fff;
-            background: linear-gradient(135deg, #bd93f9, #a6c1ee);
+            background: linear-gradient(135deg, #2c2c2c, #555);
             border: none; border-radius: 14px; cursor: pointer;
-            transition: all 0.3s; box-shadow: 0 4px 16px rgba(189,147,249,0.35);
+            transition: all 0.3s; box-shadow: 0 4px 16px rgba(0,0,0,0.18);
         }
-        .btn-confirm:hover { transform: translateY(-2px); }
+        .btn-confirm:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.25); }
 
         @keyframes slideUp {
             from { opacity: 0; transform: translateY(30px); }
@@ -446,21 +460,21 @@
 
     <!-- 페이징 -->
     <div class="pagination" th:if="${totalPages > 1}">
-	    <button class="page-btn"
-	            th:classappend="${currentPage == 1} ? 'disabled'"
-	            th:onclick="'location.href=\'/business/order/history?page=\' + ' + ${currentPage - 1}">&lsaquo;</button>
-	
-	    <button class="page-btn"
-	            th:each="i : ${#numbers.sequence(1, totalPages)}"
-	            th:text="${i}"
-	            th:classappend="${i == currentPage} ? ' active' : ''"
-	            th:onclick="'location.href=\'/business/order/history?page=\' + ' + ${i}">
-	    </button>
-	
-	    <button class="page-btn"
-	            th:classappend="${currentPage == totalPages} ? 'disabled'"
-	            th:onclick="'location.href=\'/business/order/history?page=\' + ' + ${currentPage + 1}">&rsaquo;</button>
-	</div>
+        <button class="page-btn"
+                th:classappend="${currentPage == 1} ? 'disabled'"
+                th:onclick="'location.href=\'/business/order/history?page=\' + ' + ${currentPage - 1}">&lsaquo;</button>
+
+        <button class="page-btn"
+                th:each="i : ${#numbers.sequence(1, totalPages)}"
+                th:text="${i}"
+                th:classappend="${i == currentPage} ? ' active' : ''"
+                th:onclick="'location.href=\'/business/order/history?page=\' + ' + ${i}">
+        </button>
+
+        <button class="page-btn"
+                th:classappend="${currentPage == totalPages} ? 'disabled'"
+                th:onclick="'location.href=\'/business/order/history?page=\' + ' + ${currentPage + 1}">&rsaquo;</button>
+    </div>
 
 </div>
 
@@ -472,27 +486,27 @@
         <div class="modal-subtitle">변경할 배송 상태를 선택하세요.</div>
 
         <div class="delivery-options">
-		    <div class="delivery-option opt-checking" data-value="1" onclick="selectDeliveryOption(this)">
-		        <div class="delivery-option-dot"></div>
-		        <span class="delivery-option-label">결제확인중</span>
-		        <span class="delivery-option-badge">결제확인중</span>
-		    </div>
-		    <div class="delivery-option opt-ready" data-value="2" onclick="selectDeliveryOption(this)">
-		        <div class="delivery-option-dot"></div>
-		        <span class="delivery-option-label">배송준비</span>
-		        <span class="delivery-option-badge">배송준비</span>
-		    </div>
-		    <div class="delivery-option opt-ing" data-value="3" onclick="selectDeliveryOption(this)">
-		        <div class="delivery-option-dot"></div>
-		        <span class="delivery-option-label">배송중</span>
-		        <span class="delivery-option-badge">배송중</span>
-		    </div>
-		    <div class="delivery-option opt-done" data-value="4" onclick="selectDeliveryOption(this)">
-		        <div class="delivery-option-dot"></div>
-		        <span class="delivery-option-label">배송완료</span>
-		        <span class="delivery-option-badge">배송완료</span>
-		    </div>
-		</div>
+            <div class="delivery-option opt-checking" data-value="1" onclick="selectDeliveryOption(this)">
+                <div class="delivery-option-dot"></div>
+                <span class="delivery-option-label">결제확인중</span>
+                <span class="delivery-option-badge">결제확인중</span>
+            </div>
+            <div class="delivery-option opt-ready" data-value="2" onclick="selectDeliveryOption(this)">
+                <div class="delivery-option-dot"></div>
+                <span class="delivery-option-label">배송준비</span>
+                <span class="delivery-option-badge">배송준비</span>
+            </div>
+            <div class="delivery-option opt-ing" data-value="3" onclick="selectDeliveryOption(this)">
+                <div class="delivery-option-dot"></div>
+                <span class="delivery-option-label">배송중</span>
+                <span class="delivery-option-badge">배송중</span>
+            </div>
+            <div class="delivery-option opt-done" data-value="4" onclick="selectDeliveryOption(this)">
+                <div class="delivery-option-dot"></div>
+                <span class="delivery-option-label">배송완료</span>
+                <span class="delivery-option-badge">배송완료</span>
+            </div>
+        </div>
 
         <button class="btn-confirm" onclick="confirmDelivery()">변경 저장</button>
     </div>
@@ -551,7 +565,6 @@
         _deliveryOrderId = btn.dataset.orderId;
         _selectedStatus  = parseInt(btn.dataset.deliveryStatus);
 
-        // 현재 상태 선택 표시
         document.querySelectorAll('.delivery-option').forEach(function(el) {
             el.classList.toggle('selected', parseInt(el.dataset.value) === _selectedStatus);
         });
