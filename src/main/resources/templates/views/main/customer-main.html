@@ -23,109 +23,118 @@
         <div class="bottom-list-section">
             
             <div class="column-item">
-    <div class="title-row">
-        <h3 class="box-title">실시간 리폼 트렌드</h3>
-        <div class="link-wrapper">
-            <a th:href="@{/customer/request/list}" class="view-all">전체 보러가기 →</a>
-        </div>
-    </div>
-    
-    <div class="gray-display-box">
-        
-        <div class="content-group">
-            <h4 class="group-label">URGENT</h4>
-            <a th:each="request : ${urgentRequests}" 
-               th:href="@{/customer/request/detail/{id}(id=${request.requestId})}" 
-               class="trending-item-card">
-               <div class="rank-tag">
-			    <span th:if="${request.requestedDueDate != null}" 
-			          th:text="'D-' + ${T(java.time.temporal.ChronoUnit).DAYS.between(T(java.time.LocalDate).now(), T(java.time.LocalDate).parse(request.requestedDueDate))}">
-			    </span>
-			    <span th:if="${request.requestedDueDate == null}">HOT</span>
-			</div>
-                <div class="item-info-group">
-                    <div class="item-title" th:text="${request.title}">제목</div>
+                <div class="title-row">
+                    <h3 class="box-title">실시간 리폼 트렌드</h3>
+                    <div class="link-wrapper">
+                        <a th:href="@{/customer/request/list}" class="view-all">전체 보러가기 →</a>
+                    </div>
                 </div>
-                <div class="item-price-group" style="margin-left: auto; text-align: right;">
-                    <span class="item-price-value" style="font-size: 19px; font-weight: 900; color: #ff79c6;" 
-                          th:text="|₩${#numbers.formatInteger(request.hopePrice, 0, 'COMMA')}|">₩0</span>
+                
+                <div class="gray-display-box">
+                    <div class="content-group">
+                        <h4 class="group-label">URGENT</h4>
+                        <a th:each="request : ${urgentRequests}" 
+                           th:href="@{/customer/request/detail/{id}(id=${request.requestId})}" 
+                           class="trending-item-card">
+                           <div class="rank-tag">
+                                <span th:if="${request.requestedDueDate != null}" 
+                                      th:text="'D-' + ${T(java.time.temporal.ChronoUnit).DAYS.between(T(java.time.LocalDate).now(), T(java.time.LocalDate).parse(request.requestedDueDate))}"></span>
+                                <span th:if="${request.requestedDueDate == null}">HOT</span>
+                            </div>
+                            <div class="item-info-group">
+                                <div class="item-title" th:text="${request.title}">제목</div>
+                            </div>
+                            <div class="item-price-group" style="margin-left: auto; text-align: right;">
+                                <span class="item-price-value" style="font-size: 19px; font-weight: 900; color: #ff79c6;" 
+                                     th:text="|₩${#numbers.formatInteger(request.hopePrice, 0, 'COMMA')}~|"></span>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="content-group">
+                        <h4 class="group-label">NEW ARRIVALS</h4>
+                        <a th:each="request : ${newRequests}" 
+                           th:href="@{/customer/request/detail/{id}(id=${request.requestId})}" 
+                           class="trending-item-card">
+                            <div class="rank-tag" style="font-size: 16px;">NEW</div>
+                            <div class="item-info-group">
+                                <div class="item-title" th:text="${request.title}">제목</div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="content-group">
+                        <h4 class="group-label">BEST REVIEWS</h4>
+                        <a th:each="review : ${bestReviews}" href="#" class="trending-item-card">
+                            <div class="rank-tag" style="font-size: 24px; color: #ffcc00;">★</div>
+                            <div class="item-info-group">
+                                <div class="item-title" th:text="${review.content}">후기 내용</div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div th:if="${#lists.isEmpty(urgentRequests) and #lists.isEmpty(newRequests)}" class="empty-state-msg" style="text-align: center; padding: 100px 0; color: #bbb;">
+                        <i class="bi bi-fire" style="font-size: 3rem; margin-bottom: 20px; display: block; color: #ff79c6;"></i>
+                        <p style="font-weight: 600;">데이터를 분석 중입니다.</p>
+                    </div>
                 </div>
-            </a>
-        </div>
-
-        <div class="content-group">
-            <h4 class="group-label">NEW ARRIVALS</h4>
-            <a th:each="request : ${newRequests}" 
-               th:href="@{/customer/request/detail/{id}(id=${request.requestId})}" 
-               class="trending-item-card">
-                <div class="rank-tag" style="font-size: 16px;">NEW</div>
-                <div class="item-info-group">
-                    <div class="item-title" th:text="${request.title}">제목</div>
-                </div>
-            </a>
-        </div>
-
-        <div class="content-group">
-            <h4 class="group-label">BEST REVIEWS</h4>
-            <a th:each="review : ${bestReviews}" href="#" class="trending-item-card">
-                <div class="rank-tag" style="font-size: 24px; color: #ffcc00;">★</div>
-                <div class="item-info-group">
-                    <div class="item-title" th:text="${review.content}">후기 내용</div>
-                </div>
-            </a>
-        </div>
-
-        <div th:if="${#lists.isEmpty(urgentRequests) and #lists.isEmpty(newRequests)}" class="empty-state-msg" style="text-align: center; padding: 100px 0; color: #bbb;">
-            <i class="bi bi-fire" style="font-size: 3rem; margin-bottom: 20px; display: block; color: #ff79c6;"></i>
-            <p style="font-weight: 600;">데이터를 분석 중입니다.</p>
-        </div>
-
-    </div> </div>
+            </div>
             
             <div class="column-item">
-    <div class="title-row">
-        <h3 class="box-title">내 의뢰 목록</h3>
-        <span class="count-info">총 <span th:text="${#lists.size(myRequests)}">0</span>건</span>
-    </div>
-    
-    <div class="gray-display-box">
-        <div class="content-group">
-            <a th:each="my : ${myRequests}" 
-               th:href="@{/customer/request/detail/{id}(id=${my.requestId})}" 
-               class="trending-item-card" 
-               style="display: block; padding: 18px; border-radius: 20px; background: #fff; margin-bottom: 12px; text-decoration: none; border: 1px solid rgba(0,0,0,0.05);">
-               
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                    <span class="rank-tag" th:text="${my.status}" 
-                          style="font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 800; background: #fdf2f8; color: #ff79c6; border: 1px solid #ff79c6;">
-                        OPEN
-                    </span>
-                    <span style="font-size: 17px; font-weight: 900; color: #ff79c6;" 
-                          th:text="|₩${#numbers.formatInteger(my.hopePrice, 0, 'COMMA')}|">₩0</span>
+                <div class="title-row">
+                    <h3 class="box-title">내 의뢰 목록</h3>
+                    <span class="count-info" th:text="|총 ${#lists.size(myRequests)}건|">0</span>
                 </div>
+                
+                <div class="gray-display-box" style="background: #ffffff; overflow-y: auto; height: 800px; padding: 20px; box-sizing: border-box;">
+                    <div class="content-group" style="margin: 0; padding: 0;">
 
-                <div style="font-size: 0.7rem; font-weight: 700; color: #aeaeb2; margin-bottom: 2px;" th:text="${my.categoryName}">2D Clothes</div>
-                <div class="item-title" th:text="${my.title}" style="font-size: 1.05rem; font-weight: 700; color: #1d1d1f; margin-bottom: 8px;">의뢰 제목</div>
+                        <a th:each="my : ${myRequests}" 
+                           th:href="@{/customer/request/detail/{id}(id=${my.requestId})}" 
+                           class="trending-item-card"
+                           style="display: block; padding: 20px 22px; border-radius: 18px; background: #fafafa; margin-bottom: 14px; text-decoration: none; border: 1.5px solid #f0ecf5; transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);">
 
-                <div class="tag-wrapper" style="display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px;">
-                    <span th:each="tag : ${#strings.arraySplit(my.tags, ',')}" 
-                          th:text="${tag.startsWith('#') ? tag : '#' + tag}" 
-                          style="font-size: 0.72rem; background: #f5f5f7; color: #555; padding: 3px 8px; border-radius: 6px; font-weight: 600;">
-                        #태그
-                    </span>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <span th:text="${my.status}"
+                                      style="font-size: 10px; padding: 4px 12px; border-radius: 20px; font-weight: 800; background: #fdf2f8; color: #ff79c6; border: 1px solid #ffb8e0; letter-spacing: 0.8px;">
+                                    OPEN
+                                </span>
+                                <span style="font-size: 17px; font-weight: 900; color: #ff79c6;" 
+                                      th:text="|₩${#numbers.formatInteger(my.hopePrice, 0, 'COMMA')}|">₩0</span>
+                            </div>
+
+                            <div style="font-size: 0.68rem; font-weight: 700; color: #c9c2d1; margin-bottom: 4px; letter-spacing: 0.3px;" 
+                                 th:text="${my.categoryName}">2D Clothes</div>
+
+                            <div th:text="${my.title}" 
+                                 style="font-size: 1.05rem; font-weight: 700; color: #1d1d1f; margin-bottom: 12px; line-height: 1.3;">
+                                의뢰 제목
+                            </div>
+
+                            <div style="display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 12px;">
+                                <span th:each="tag : ${#strings.arraySplit(my.tags, ',')}" 
+                                      th:text="${tag.startsWith('#') ? tag : '#' + tag}" 
+                                      style="font-size: 0.68rem; background: #fdf2f8; color: #ff79c6; padding: 3px 9px; border-radius: 8px; font-weight: 600; border: 1px solid #ffe0f3;">
+                                    #태그
+                                </span>
+                            </div>
+
+                            <p th:text="${my.description}" 
+                               style="font-size: 0.82rem; color: #aaa; margin: 0; padding-top: 12px; border-top: 1px solid #f0ecf5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.5;">
+                            </p>
+                        </a>
+
+                        <div th:if="${#lists.isEmpty(myRequests)}" 
+                             style="text-align: center; padding: 120px 0; color: #ccc;">
+                            <i class="bi bi-patch-question" style="font-size: 3rem; display: block; margin-bottom: 14px; color: #ffb8e0;"></i>
+                            <p style="font-weight: 600; font-size: 0.95rem; line-height: 1.8;">작성하신 의뢰가 없습니다.<br>첫 의뢰를 작성해보세요!</p>
+                        </div>
+                    </div>
                 </div>
-
-                <p th:text="${my.description}" 
-                   style="font-size: 0.85rem; color: #666; margin: 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4;">
-                </p>
-            </a>
-
-            <div th:if="${#lists.isEmpty(myRequests)}" 
-                 style="text-align: center; padding: 80px 0; color: #bbb;">
-                <i class="bi bi-patch-question" style="font-size: 2.5rem; display: block; margin-bottom: 10px;"></i>
-                <p>작성하신 의뢰가 없습니다.<br>첫 의뢰를 작성해보세요!</p>
             </div>
+
         </div>
     </div>
-</div>
 </th:block>
+</body>
+</html>

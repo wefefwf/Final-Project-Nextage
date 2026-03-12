@@ -65,11 +65,10 @@ body {
 .bottom-list-section {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: stretch;    /* stretch로 변경! 양쪽 박스 길이를 똑같이 늘려줍니다. */
     gap: 40px;
     width: 100%;
 }
-
 .column-item {
     flex: 1;
     display: flex;
@@ -104,7 +103,7 @@ body {
 
 /* 전체보러가기 버튼 우측 정렬 */
 .link-wrapper {
-    margin-left: auto; /* 왼쪽 여백 자동으로 채워 우측 정렬 */
+    margin-left: auto;
 }
 
 .link-wrapper a {
@@ -115,42 +114,59 @@ body {
 
 /* [1] 공통 스타일 */
 .gray-display-box {
-    height: 800px; /* 고정 높이 유지 */
+    height: 800px;
     border-radius: 15px;
     border: 1px solid #ddd;
     width: 100%;
     box-sizing: border-box;
-    overflow: hidden; /* 자식 요소가 튀어나오지 않게 함 */
+    overflow: hidden;
 }
 
-/* [2] 왼쪽 박스 스크롤 및 섹션 레이아웃 (수정됨) */
+/* [2] 왼쪽 박스 스크롤 및 섹션 레이아웃 */
 .column-item:first-child .gray-display-box {
     background-color: #f5f5f7 !important;
     display: flex;
     flex-direction: column;
     padding: 25px;
-    gap: 35px;         /* 각 섹션(URGENT, NEW 등) 사이의 큰 간격 */
-    overflow-y: auto;  /* 내부에서만 스크롤 발생 */
+    gap: 35px;
+    overflow-y: auto;
+}
+
+/* [2-1] 오른쪽 박스 스크롤 및 레이아웃 수정 */
+.column-item:last-child .gray-display-box {
+    height: 800px !important;    /* 높이 강제 고정 */
+    overflow-y: auto !important;  /* 내용 넘치면 스크롤 생성 */
+    padding: 25px;
+    background-color: #ffffff;
+    display: block;               /* flex 대신 block 사용 (스크롤 안정성) */
+    box-sizing: border-box;
+}
+
+/* 오른쪽 박스 내부 카드들이 찌그러지지 않게 방지 */
+.column-item:last-child .trending-item-card {
+    display: block;              /* 세로로 한 줄씩 차지 */
+    flex-shrink: 0;
+    margin-bottom: 14px;         /* 카드 간 간격 */
 }
 
 /* 섹션별 그룹 및 라벨 스타일 */
 .content-group {
     display: flex;
     flex-direction: column;
-    gap: 12px;         /* 카드와 카드 사이의 간격 */
+    gap: 12px;
 }
 
 .group-label {
     font-family: 'Montserrat', sans-serif;
     font-size: 11px;
     font-weight: 900;
-    color: #bbb;       /* 세련된 연회색 라벨 */
+    color: #bbb;
     letter-spacing: 2px;
     margin-bottom: 5px;
     padding-left: 5px;
 }
 
-/* [3] 왼쪽 박스 카드 스타일 (지수님 원본 100% 유지) */
+/* [3] 왼쪽 박스 카드 스타일 */
 .column-item:first-child .trending-item-card {
     display: flex;
     align-items: center;
@@ -160,7 +176,7 @@ body {
     text-decoration: none;
     transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
     border: 1px solid transparent;
-    flex-shrink: 0;    /* 스크롤 시 카드가 찌그러지지 않게 방지 */
+    flex-shrink: 0;
 }
 
 .column-item:first-child .trending-item-card:hover {
@@ -169,34 +185,44 @@ body {
     box-shadow: 0 10px 30px rgba(189, 147, 249, 0.1);
 }
 
-/* ========================================== */
-/* [수정] 랭킹/D-Day 및 제목 스타일 (안 구리게!) */
-/* ========================================== */
+/* [4] 오른쪽 박스 카드 호버 효과 */
+.column-item:last-child .trending-item-card {
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    border: 1px solid transparent;
+}
 
-/* 1. 숫자(D-Day) 스타일: 크기를 줄이고 세련되게 */
+.column-item:last-child .trending-item-card:hover {
+    transform: translateX(12px);
+    border-color: #bd93f9;
+    box-shadow: 0 10px 30px rgba(189, 147, 249, 0.1);
+}
+
+.column-item:last-child .trending-item-card:hover .rank-tag {
+    color: #ff79c6;
+}
+
+/* 랭킹/D-Day 및 제목 스타일 */
 .rank-tag {
     font-family: 'Montserrat', sans-serif;
-    font-size: 14px;      /* 26px에서 14px로 줄여서 여백 확보 */
+    font-size: 14px;
     font-weight: 800; 
-    color: #d2d2d7;      /* 기본은 단정한 연회색 */
-    min-width: 55px;     /* 숫자와 제목 사이 간격 유지 */
+    color: #d2d2d7;
+    min-width: 55px;
     text-align: left;
     transition: 0.3s ease;
     letter-spacing: -0.5px;
 }
 
-/* 2. 카드에 마우스 올렸을 때 숫자가 핑크로 슥- 변함 */
 .trending-item-card:hover .rank-tag { 
-    color: #ff79c6;      /* 지수님이 원한 포인트 컬러 */
+    color: #ff79c6;
 }
 
-/* 3. 제목 스타일: 애플 특유의 깔끔한 폰트 느낌 */
 .item-title {
     font-size: 15px;
     font-weight: 600;
-    color: #1d1d1f;      /* 애플 공식 다크 그레이 */
+    color: #1d1d1f;
     margin-left: 5px;
-    flex: 1;             /* 제목이 길어져도 가격이랑 안 겹치게 */
+    flex: 1;
 }
 
 /* 스크롤바 커스텀 (애플 스타일) */
@@ -204,6 +230,14 @@ body {
     width: 5px;
 }
 .column-item:first-child .gray-display-box::-webkit-scrollbar-thumb {
+    background: #d2d2d7;
+    border-radius: 10px;
+}
+
+.column-item:last-child .gray-display-box::-webkit-scrollbar {
+    width: 5px;
+}
+.column-item:last-child .gray-display-box::-webkit-scrollbar-thumb {
     background: #d2d2d7;
     border-radius: 10px;
 }
