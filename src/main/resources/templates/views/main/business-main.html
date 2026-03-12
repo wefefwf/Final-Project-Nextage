@@ -50,20 +50,44 @@
 	    <h3>My PortFolio</h3>
 	    <div class="box-gray portfolio-full"></div>
 	  </section>
-	
-	  <section class="section-post">
-	    <h3>New Post</h3>
-	    <div class="post-nav">
-	      <div class="box-gray btn-mock"></div>
-	      <div class="box-gray btn-mock"></div>
-	      <div class="box-gray btn-mock"></div>
-	      <div class="box-gray btn-mock"></div>
-	    </div>
-	    <div class="link-wrapper">
-	      <a href="#" class="view-all">전체 보러가기 →</a>
-	    </div>
-	    <div class="box-gray post-full"></div>
-	  </section>
+	<section class="section-post">
+  <div class="post-header">
+    <h3>New Post</h3>
+    <a th:href="@{/customer/request/list}" class="view-all">전체 보러가기 <span>→</span></a>
+  </div>
+
+  <div class="post-nav">
+    <button class="filter-btn active" data-category="all">전체</button>
+    <button class="filter-btn" data-category="2D Clothes">2D</button>
+    <button class="filter-btn" data-category="3D Clothes">3D</button>
+    <button class="filter-btn" data-category="Object">Object</button>
+    <button class="filter-btn" data-category="Metal">Metal</button>
+  </div>
+
+  <div class="post-full">
+    <div class="main-request-list">
+      <div th:if="${#lists.isEmpty(newPostList)}" class="empty-msg">
+        <p>새로운 의뢰가 없습니다.</p>
+      </div>
+
+      <div class="main-request-item" th:each="post : ${newPostList}"
+           th:data-category="${post.categoryName}"
+           th:onclick="|location.href='/customer/request/detail/' + ${post.requestId}|">
+        <div class="item-left">
+          <img th:src="${post.thumbnailPath ?: '/image/no-image.png'}" class="mini-thumbnail">
+          <div class="item-text">
+            <span class="item-cat" th:text="${post.categoryName}">Category</span>
+            <h4 class="item-title" th:text="${post.title}">의뢰 제목</h4>
+          </div>
+        </div>
+        <div class="item-right">
+          <span class="item-price">₩<span th:text="${#numbers.formatInteger(post.hopePrice, 0, 'COMMA')}">0</span></span>
+          <span class="item-date" th:text="${#strings.substring(post.createdAt, 0, 10)}">2026-03-12</span>
+        </div>
+      </div>
+    </div>
+  </div> 
+</section>
 	</main>
 </th:block>
 </body>
