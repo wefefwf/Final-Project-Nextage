@@ -25,7 +25,7 @@ public class BusinessPortfolioController {
 	//portfolio페이지 가기
 	//business는 세션에서 id값빼고 user은 글에서 가져옴
 	//@GetMapping("/business/portfolio/{id}")
-	@GetMapping("/business/portfolio")
+	@GetMapping("/business/my-portfolio")
 			public String goPortfolio(){
 				return "views/portfolio/portfolio";
 			}
