@@ -55,7 +55,7 @@ public class CustomerRequestService {
                         AttachmentDTO attach = new AttachmentDTO();
                         attach.setRefType("REQ");
                         attach.setRefId(dto.getRequestId());
-                        attach.setImageUrl("/upload/" + savedName);
+                        attach.setImageUrl("/images/" + savedName);
                         attach.setOriginName(originalName);
                         attach.setThumbnail(i == 0); 
                         
