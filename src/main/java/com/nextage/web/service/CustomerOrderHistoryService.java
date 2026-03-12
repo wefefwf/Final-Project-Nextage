@@ -67,11 +67,7 @@ public class CustomerOrderHistoryService {
         if (order == null) {
             throw new IllegalArgumentException("존재하지 않는 주문입니다.");
         }
-        // FK 순서 준수: review → order_items → business_settlement → orders
-        customerOrderHistoryMapper.deleteReviewsByOrderId(orderId);
-        customerOrderHistoryMapper.deleteOrderItemsByOrderId(orderId);
-        customerOrderHistoryMapper.deleteSettlementsByOrderId(orderId);  // 추가
         customerOrderHistoryMapper.deleteOrderByOrderId(orderId);
-        log.info("주문 삭제 - orderId: {}, customerId: {}", orderId, customerId);
+        log.info("주문 삭제(숨김) - orderId: {}, customerId: {}", orderId, customerId);
     }
 }
