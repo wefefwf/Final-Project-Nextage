@@ -6,9 +6,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.nextage.web.UserDetails.BusinessUserDetails;
 import com.nextage.web.domain.BusinessDTO;
 import com.nextage.web.mapper.BusinessMapper;
+import com.nextage.web.userDetails.BusinessUserDetails;
 
 @Service
 @RequiredArgsConstructor

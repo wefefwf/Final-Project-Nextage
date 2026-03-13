@@ -1,4 +1,4 @@
-package com.nextage.web.UserDetails;
+package com.nextage.web.userDetails;
 
 import java.util.Collection;
 import java.util.List;

@@ -82,11 +82,11 @@ public WebSecurityCustomizer webSecurityCustomizer() {
         http
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/login", "/auth/loginProc", "/auth/join","/customer/main","/customer/shop","/customer/shop/detail","/customer/request/detail/**","/customer/request","/customer/cart").permitAll()//로그인안해도 접속가능한링크
+                .requestMatchers("/customer/login", "/auth/customer/loginProc", "/auth/join","/customer/main","/customer/shop","/customer/shop/detail","/customer/request/detail/**","/customer/request","/customer/cart").permitAll()//로그인안해도 접속가능한링크
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
-                .loginPage("/login")
+                .loginPage("/customer/login")
                 .loginProcessingUrl("/auth/loginProc")
                 .usernameParameter("loginId")
                 .passwordParameter("password")
@@ -95,7 +95,7 @@ public WebSecurityCustomizer webSecurityCustomizer() {
             )
             .userDetailsService(customerUserDetailsService) 
             .logout(logout -> logout
-                .logoutUrl("/auth/logoutAction")
+                .logoutUrl("/auth/customer/logoutAction")
                 .logoutSuccessUrl("/customer/main")
             );
         return http.build();

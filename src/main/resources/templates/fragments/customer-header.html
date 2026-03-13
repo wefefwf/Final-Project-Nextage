@@ -37,8 +37,8 @@
 						</div>
 					</li>
 					<li class="login-item">
-			            <a sec:authorize="isAnonymous()"    th:href="@{/login}"    class="login-btn">Login</a>
-			            <a sec:authorize="isAuthenticated()"   th:href="@{/auth/logoutAction}"  class="login-btn">Logout</a>
+			            <a sec:authorize="isAnonymous()"    th:href="@{/customer/login}"    class="login-btn">Login</a>
+			            <a sec:authorize="isAuthenticated()"   th:href="@{/auth/customer/logoutAction}"  class="login-btn">Logout</a>
 			        </li>
                 </ul>
             </nav>

@@ -5,9 +5,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.nextage.web.UserDetails.CustomerUserDetails;
 import com.nextage.web.domain.CustomerDTO;
 import com.nextage.web.mapper.CustomerMapper;
+import com.nextage.web.userDetails.CustomerUserDetails;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
