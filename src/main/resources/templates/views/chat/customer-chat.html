@@ -25,16 +25,17 @@
     <div class="chat-page-container shadow-sm">
         <div class="chat-sidebar">
             <div class="sidebar-header">나의 대화</div>
-            <div class="chat-list">
+            <div class="chat-list" id="chatListContainer">
                 <div th:each="room : ${myRooms}" 
                      class="chat-item" 
+                     th:id="'room-item-' + ${room.roomId}"
                      th:classappend="${currentRoomId != null && room.roomId == currentRoomId ? 'active' : ''}"
                      th:onclick="|location.href='/chat?roomId=' + ${room.roomId}|">
                     <div class="d-flex justify-content-between">
-                        <span class="fw-bold" th:text="${room.partnerName}">업체명</span>
-                        <small th:text="${room.lastMessageTime}">시간</small>
+                        <span class="fw-bold" th:text="${room.partnerName}"></span>
+                        <small th:id="'room-time-' + ${room.roomId}" th:text="${room.lastMessageTime}"></small>
                     </div>
-                    <div class="text-muted small text-truncate mt-1" th:text="${room.lastMessage}">마지막 메시지 내용</div>
+                    <div class="text-muted small text-truncate mt-1" th:id="'room-msg-' + ${room.roomId}" th:text="${room.lastMessage}"></div>
                 </div>
             </div>
         </div>
@@ -44,8 +45,8 @@
                 <div th:each="msg : ${messages}" 
                      class="msg-bubble" 
                      th:classappend="${msg.senderType == 'CUSTOMER' ? 'msg-right' : 'msg-left'}">
-                    <span th:text="${msg.content}">대화 내용</span>
-                    <span class="msg-time" th:text="${msg.sendAt}">시간</span>
+                    <span th:text="${msg.content}"></span>
+                    <span class="msg-time" th:text="${msg.sendAt}"></span>
                 </div>
                 
                 <div th:if="${currentRoomId == null}" class="m-auto text-muted">
@@ -62,14 +63,106 @@
         </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
     <script th:inline="javascript">
-        
         const chatBody = document.getElementById('chatBody');
         if(chatBody) chatBody.scrollTop = chatBody.scrollHeight;
 
-        function sendMessage() {
-            alert('WebSocket 연동 전입니다!');
+        let stompClient = null;
+        const currentRoomId = [[${currentRoomId}]]; 
+        const myId = [[${myId}]]; 
+
+        function connect() {
+            if (!currentRoomId) return; 
+            
+            const socket = new SockJS('/ws-chat');
+            stompClient = Stomp.over(socket);
+            
+            stompClient.connect({}, function (frame) {
+                stompClient.subscribe('/sub/chat/room/' + currentRoomId, function (message) {
+                    const receivedMessage = JSON.parse(message.body);
+                    appendMessageToScreen(receivedMessage);
+                });
+            });
         }
+
+        function sendMessage() {
+            const inputElement = document.getElementById('messageInput');
+            if(!inputElement) return;
+            const content = inputElement.value;
+            
+            if(content && stompClient) {
+                const chatMessageDTO = {
+                    roomId: currentRoomId,
+                    senderId: myId,
+                    senderType: 'CUSTOMER',
+                    content: content
+                };
+                
+                stompClient.send("/pub/chat/send", {}, JSON.stringify(chatMessageDTO));
+                inputElement.value = ''; 
+            }
+        }
+
+        function appendMessageToScreen(message) {
+            const box = document.getElementById('chatBody');
+            if(!box) return;
+
+            const wrapper = document.createElement('div');
+            wrapper.classList.add('msg-bubble');
+            
+            if(message.senderId === myId && message.senderType === 'CUSTOMER') {
+                wrapper.classList.add('msg-right');
+            } else {
+                wrapper.classList.add('msg-left');
+            }
+            
+            const contentSpan = document.createElement('span');
+            contentSpan.innerText = message.content;
+            
+            const timeSpan = document.createElement('span');
+            timeSpan.classList.add('msg-time');
+            
+            const now = new Date();
+            const h = String(now.getHours()).padStart(2, '0');
+            const m = String(now.getMinutes()).padStart(2, '0');
+            const timeString = h + ':' + m;
+            timeSpan.innerText = timeString;
+            
+            wrapper.appendChild(contentSpan);
+            wrapper.appendChild(timeSpan);
+            box.appendChild(wrapper);
+            
+            box.scrollTop = box.scrollHeight;
+
+            updateSidebar(message.roomId, message.content, timeString);
+        }
+
+        function updateSidebar(roomId, content, timeString) {
+            const roomItem = document.getElementById('room-item-' + roomId);
+            if(roomItem) {
+                const msgSpan = document.getElementById('room-msg-' + roomId);
+                const timeSpan = document.getElementById('room-time-' + roomId);
+                
+                if(msgSpan) msgSpan.innerText = content;
+                if(timeSpan) timeSpan.innerText = timeString;
+
+                const chatListContainer = document.getElementById('chatListContainer');
+                if(chatListContainer) {
+                    chatListContainer.prepend(roomItem);
+                }
+            }
+        }
+
+        window.onload = function() {
+            connect();
+            document.getElementById('messageInput')?.addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+        };
     </script>
 </div>
 </html>
