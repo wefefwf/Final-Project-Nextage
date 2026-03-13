@@ -1,28 +1,103 @@
 package com.nextage.web.config;
 
+import com.nextage.web.service.BusinessUserDetailsService;
+import com.nextage.web.service.CustomerUserDetailsService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-            .csrf(csrf -> csrf.disable()) // 1. CSRF 보안 해제 (개발 시 필수)
-            .authorizeHttpRequests(auth -> auth
-                // 2. 모든 요청(/**)을 무조건 허용! (로그인 창 안 뜨게 함)
-                .requestMatchers("/**").permitAll() 
-                .anyRequest().permitAll()
-            )
-            // 3. 시큐리티 기본 로그인 폼 기능을 아예 꺼버림
-            .formLogin(form -> form.disable())
-            .httpBasic(basic -> basic.disable());
+    private final CustomerUserDetailsService customerUserDetailsService;
+    private final BusinessUserDetailsService businessUserDetailsService;
 
+    // @Bean
+    // public BCryptPasswordEncoder passwordEncoder() {
+    //     return new BCryptPasswordEncoder();
+    // }
+
+    @Bean
+public PasswordEncoder passwordEncoder() {
+    return org.springframework.security.crypto.password.NoOpPasswordEncoder.getInstance();
+}
+
+    @Bean
+public WebSecurityCustomizer webSecurityCustomizer() {
+    return (web) -> web.ignoring().requestMatchers(
+        "/css/**", 
+        "/js/**", 
+        "/image/**",     
+        "/img/**",        
+        "/bootstrap/**",  
+        "/images/**",     
+        "/favicon.ico", 
+        "/error"          
+    );
+}
+
+    // 기업 보안 설정
+    @Bean
+    @Order(1)
+    public SecurityFilterChain businessFilterChain(HttpSecurity http) throws Exception {
+        http
+            .securityMatcher("/business/**", "/auth/business/**") // 기업 경로만 담당
+            .csrf(AbstractHttpConfigurer::disable)
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/business/login", "/auth/business/loginProc","/business/main","/business/request").permitAll()
+                .anyRequest().authenticated()
+            )
+            .formLogin(form -> form
+                .loginPage("/business/login")
+                .loginProcessingUrl("/auth/business/loginProc")
+                .usernameParameter("loginId")
+                .passwordParameter("password")
+                .defaultSuccessUrl("/business/main", true)
+                .permitAll()
+            )
+            .userDetailsService(businessUserDetailsService)
+            .logout(logout -> logout
+                .logoutUrl("/auth/business/logoutAction")
+                .logoutSuccessUrl("/business/main")
+            );
+        return http.build();
+    }
+
+    //  고객 보안 설정
+    @Bean
+    @Order(2)
+    public SecurityFilterChain customerFilterChain(HttpSecurity http) throws Exception {
+        http
+            .csrf(AbstractHttpConfigurer::disable)
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/login", "/auth/loginProc", "/auth/join","/customer/main","/customer/shop","/customer/shop/detail","/customer/request/detail/**","/customer/request","/customer/cart").permitAll()//로그인안해도 접속가능한링크
+                .anyRequest().authenticated()
+            )
+            .formLogin(form -> form
+                .loginPage("/login")
+                .loginProcessingUrl("/auth/loginProc")
+                .usernameParameter("loginId")
+                .passwordParameter("password")
+                .defaultSuccessUrl("/customer/main", true)
+                .permitAll()
+            )
+            .userDetailsService(customerUserDetailsService) 
+            .logout(logout -> logout
+                .logoutUrl("/auth/logoutAction")
+                .logoutSuccessUrl("/customer/main")
+            );
         return http.build();
     }
 }

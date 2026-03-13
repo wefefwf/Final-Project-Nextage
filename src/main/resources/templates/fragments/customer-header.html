@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" 
+			xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
     <header th:fragment="header" class="main-header-container">
         <div class="header-inner">
             <div class="header-logo">
@@ -36,7 +37,8 @@
 						</div>
 					</li>
 					<li class="login-item">
-			            <a th:href="@{/auth/loginProc}" class="login-btn">Login</a>
+			            <a sec:authorize="isAnonymous()"    th:href="@{/login}"    class="login-btn">Login</a>
+			            <a sec:authorize="isAuthenticated()"   th:href="@{/auth/logoutAction}"  class="login-btn">Logout</a>
 			        </li>
                 </ul>
             </nav>
