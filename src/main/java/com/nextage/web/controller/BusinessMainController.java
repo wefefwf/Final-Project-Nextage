@@ -25,3 +25,4 @@ public class BusinessMainController {
         return "views/main/business-main";
     }
 }
+
