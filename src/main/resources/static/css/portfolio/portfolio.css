@@ -14,12 +14,13 @@ body {
     color: #333;
 }
 
-/* [1] 상단 레이아웃 - 높이 일치의 핵심 */
+/* [1] 상단 레이아웃 - 높이 일치 및 정렬 */
 .top-row {
     display: flex;
     gap: 40px;
     margin-bottom: 80px;
-    align-items: stretch; /* 왼쪽과 오른쪽 전체 높이를 강제로 동일하게 stretch */
+    align-items: stretch; /* 왼쪽(프로필)과 오른쪽(정보) 높이를 강제로 통일 */
+    width: 1200px;
 }
 
 /* 왼쪽 프로필 섹션 */
@@ -29,20 +30,21 @@ body {
     flex-direction: column; 
 }
 
-/* 프로필 버튼들을 맨 아래로 밀어내기 위해 h2 다음에 마진 조절 */
+/* 프로필 버튼을 이미지 하단 바닥에 고정 */
 .profile-section .profile-btns {
-    margin-top: auto; /* 이미지 컨테이너가 차지하고 남은 공간을 밀어내어 버튼을 바닥에 고정 */
+    margin-top: auto; 
     display: flex;
     gap: 10px;
     padding-top: 15px;
 }
 
-/* 오른쪽 정보 섹션 */
+/* 오른쪽 정보 섹션 - 위에서부터 차곡차곡 쌓임 */
 .info-section { 
     flex: 9; 
     display: flex; 
     flex-direction: column; 
-    justify-content: space-between; /* 위치 그룹과 경력 그룹 사이 간격을 벌려 전체 높이 맞춤 */
+    justify-content: flex-start; 
+    gap: 0; 
 }
 
 .section-title {
@@ -50,7 +52,7 @@ body {
     margin-bottom: 20px; padding-left: 5px;
 }
 
-/* [2] 프로필 & 버튼 */
+/* [2] 프로필 이미지 & 공통 버튼 */
 .profile-image-container {
     width: 100%; aspect-ratio: 1/1; background: #fff;
     border-radius: 25px; border: 1px solid #f0f0f2;
@@ -58,25 +60,34 @@ body {
 }
 .profile-image-container img { width: 100%; height: 100%; object-fit: cover; }
 
-.btn-modify {
+.btn-modify, .btn-delete {
     flex: 1; padding: 13px 0; border-radius: 12px; font-weight: 500; font-size: 14px;
-    border: 1px solid #ddd !important; background: #fff !important; color: #333 !important;
     transition: all 0.2s ease; cursor: pointer;
+}
+
+.btn-modify {
+    border: 1px solid #ddd !important; background: #fff !important; color: #333 !important;
 }
 .btn-modify:hover { border-color: #333 !important; background: #f8f9fa !important; }
 
 .btn-delete {
-    flex: 1; padding: 13px 0; border-radius: 12px; font-weight: 500; font-size: 14px;
     background: #333 !important; color: #fff !important; border: none !important;
-    transition: all 0.2s ease; cursor: pointer;
 }
 .btn-delete:hover { background: #000 !important; }
 
-/* [3] 정보 박스 - 높이 균형 */
+/* [3] 정보 박스 (위치 & 경력) */
+.location-group {
+    margin-bottom: 40px; /* 위치와 경력 사이 고정 간격 */
+}
+
+.career-group {
+    width: 100%;
+}
+
 .career-container {
     display: flex;
     flex-direction: column;
-    gap: 10px; /* 박스 사이 간격 고정 */
+    gap: 10px;
 }
 
 .info-box {
@@ -84,42 +95,87 @@ body {
     padding: 18px 30px; display: flex;
     justify-content: space-between; align-items: center;
     transition: all 0.3s ease;
-    min-height: 70px; /* 박스 자체의 최소 높이 확보 */
+    min-height: 70px;
 }
-.location-group .info-box { margin-bottom: 30px; } /* 위치와 경력 사이 여백 */
-
 .info-box:hover { transform: translateX(5px); box-shadow: 0 10px 25px rgba(0,0,0,0.05); border-color: #d1d1d6; }
 .info-box span { font-size: 16px; font-weight: 500; }
 
+/* 위치/경력 수정 및 삭제 버튼 */
+.box-actions {
+    display: flex;
+    gap: 10px;
+}
 .box-actions button {
     background: none; border: none; font-size: 13px; font-weight: 500;
     color: #bbb; text-decoration: underline; cursor: pointer; transition: color 0.2s;
 }
 .box-actions button:hover { color: #333; }
 
-/* [4] 작업 카드 및 [5] 모달 스타일은 기존 유지 (생략) */
-/* ... (보내주신 스타일과 동일) ... */
+/* 경력 추가 버튼 (우측 상단 정렬용) */
+.btn-add-career {
+    font-size: 13px; font-weight: 500; color: #bbb;
+    text-decoration: underline; cursor: pointer;
+    background: none; border: none; padding: 0;
+    margin-right: 5px; /* 1200px 라인 안쪽으로 정렬 */
+    transition: color 0.2s;
+}
+.btn-add-career:hover { color: #333; }
 
+/* [4] 작업 포트폴리오 카드 그리드 */
 .work-section { margin-top: 50px; border-top: 1px solid #eee; padding-top: 50px; }
-.work-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
-/* ... (이하 생략) ... */
+
+.work-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 30px;
+    align-items: start;
+}
+
 .work-card {
     background: #fff; border-radius: 30px; border: 1px solid #f0f0f2;
     overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.04);
     transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); cursor: pointer;
+    display: flex; flex-direction: column;
 }
 .work-card:hover { transform: translateY(-12px); box-shadow: 0 20px 45px rgba(0,0,0,0.1); }
 
-.card-img-holder { width: 100%; aspect-ratio: 1.1/1; overflow: hidden; border-bottom: 1px solid #f0f0f2; }
+.card-img-holder { 
+    width: 100%; aspect-ratio: 1.1/1; overflow: hidden; border-bottom: 1px solid #f0f0f2; 
+    flex-shrink: 0;
+}
 .card-img-holder img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
 .work-card:hover .card-img-holder img { transform: scale(1.1); }
 
-.card-footer { padding: 30px; display: flex; justify-content: space-between; align-items: flex-end; }
-.card-text { font-size: 18px; font-weight: 500; color: #333; margin: 0; line-height: 1.4; }
-.order-num { font-size: 12px; color: #999; margin-bottom: 5px; }
-.work-period { font-size: 14px; color: #666; }
+/* 카드 푸터 정렬 (주문번호/제목 왼쪽, 날짜 오른쪽) */
+.card-footer { 
+    padding: 25px; 
+    display: flex; 
+    flex-direction: column; 
+    flex-grow: 1;
+}
 
-/* [5] 모달 (정렬 & 숨기기 버튼 Hover 포함) */
+.footer-top { 
+    display: flex; 
+    flex-direction: column; 
+    align-items: flex-start; /* 왼쪽 정렬 */
+    text-align: left;
+}
+
+.footer-bottom { 
+    display: flex; 
+    justify-content: flex-end; /* 날짜 우측 정렬 */
+    width: 100%; 
+    margin-top: 15px; 
+}
+
+.card-text { 
+    font-size: 18px; font-weight: 600; color: #333; margin: 5px 0 0 0; line-height: 1.4; 
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.order-num { font-size: 12px; color: #999; margin: 0; }
+.work-period { font-size: 13px; color: #888; }
+
+/* [5] 모달 스타일 */
 .modal-content { 
     border-radius: 35px !important; border: none !important; 
     box-shadow: 0 20px 50px rgba(0,0,0,0.15) !important; overflow: hidden; 
@@ -142,10 +198,6 @@ body {
 .modal-header .btn-close:hover { opacity: 1; }
 
 .modal-body { padding: 0 40px 40px !important; }
-.square-img { 
-    width: 100% !important; aspect-ratio: 1/1 !important; 
-    object-fit: cover !important; border-radius: 20px !important; 
-}
 
 /* 모달 오른쪽 영역 정렬 */
 .col-md-6.d-flex.flex-column { min-height: 100%; justify-content: space-between !important; }
@@ -153,7 +205,6 @@ body {
 .detail-label { font-size: 15px; font-weight: 600; color: #333; margin-top: 15px; margin-bottom: 8px; }
 .detail-text { font-size: 15px; color: #555; line-height: 1.6; background: #f9f9f9; padding: 15px; border-radius: 12px; }
 
-/* 숨기기 버튼 우측 하단 고정 */
 .modal-actions { margin-top: 30px; display: flex !important; justify-content: flex-end !important; width: 100%; }
 
 .btn-hide {
