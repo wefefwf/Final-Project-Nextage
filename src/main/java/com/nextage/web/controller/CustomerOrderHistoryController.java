@@ -1,81 +1,126 @@
 package com.nextage.web.controller;
 
 import com.nextage.web.domain.OrderHistoryDTO;
-import com.nextage.web.domain.ReviewDTO;
+import com.nextage.web.domain.OrderSearchDTO;
 import com.nextage.web.service.CustomerOrderHistoryService;
+import com.nextage.web.userDetails.CustomerUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
 @Controller
-@RequestMapping("/customer/order")  // /order → /order/detail 로 변경
+@RequestMapping("/customer/order")
 @RequiredArgsConstructor
 public class CustomerOrderHistoryController {
 
-    private final CustomerOrderHistoryService customerOrderHistoryService;
-    private static final Long TEMP_CUSTOMER_ID = 1L;
+    private final CustomerOrderHistoryService service;
 
-    private static final int PAGE_SIZE = 5;
-    
+    /* ─────────────────────────────────────────
+       구매내역 목록 (CUSER + CADMIN 공통)
+       ───────────────────────────────────────── */
     @GetMapping("/history")
     public String historyPage(
             @RequestParam(name = "page", defaultValue = "1") int page,
+            @ModelAttribute OrderSearchDTO search,
+            @AuthenticationPrincipal CustomerUserDetails userDetails,
             Model model) {
 
-        List<OrderHistoryDTO> orders =
-            customerOrderHistoryService.getOrderHistory(
-                    TEMP_CUSTOMER_ID, page);
+        if (userDetails == null) return "redirect:/login";
 
-        int totalPages =
-            customerOrderHistoryService.getTotalPages(
-                    TEMP_CUSTOMER_ID);
+        // 빠른 기간 선택 처리
+        if (search.getPeriod() != null && !search.getPeriod().isEmpty()) {
+            LocalDate end   = LocalDate.now();
+            LocalDate start = switch (search.getPeriod()) {
+                case "1w" -> end.minusWeeks(1);
+                case "1m" -> end.minusMonths(1);
+                case "3m" -> end.minusMonths(3);
+                default   -> null;
+            };
+            if (start != null) {
+                search.setStartDate(start.toString());
+                search.setEndDate(end.toString());
+            }
+        }
 
-        model.addAttribute("orders", orders);
+        String role       = userDetails.getRole();
+        Long   customerId = userDetails.getCustomerId();
+
+        List<OrderHistoryDTO> orders = service.getOrderHistory(customerId, role, search, page);
+        int totalPages = service.getTotalPages(customerId, role, search);
+
+        model.addAttribute("orders",      orders);
         model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("totalPages",  totalPages);
+        model.addAttribute("search",      search);
+        model.addAttribute("isAdmin",     "CADMIN".equals(role));
 
         return "views/orderhistory/customer-order-history";
     }
 
+    /* ─────────────────────────────────────────
+       주문 상세 (CUSER + CADMIN 공통)
+       ───────────────────────────────────────── */
     @GetMapping("/detail/{orderId}")
-    public String detailPage(@PathVariable("orderId") Long orderId, Model model) {
-        OrderHistoryDTO order = customerOrderHistoryService.getOrderDetail(orderId);
+    public String detailPage(
+            @PathVariable("orderId") Long orderId,
+            @AuthenticationPrincipal CustomerUserDetails userDetails,
+            Model model) {
+
+        if (userDetails == null) return "redirect:/login";
+
+        String role       = userDetails.getRole();
+        Long   customerId = userDetails.getCustomerId();
+
+        OrderHistoryDTO order = service.getOrderDetail(orderId, customerId, role);
+        if (order == null) return "redirect:/customer/order/history";
+
         model.addAttribute("order", order);
         return "views/orderhistory/customer-order-detail";
     }
 
+    /* ─────────────────────────────────────────
+       후기 작성
+       ───────────────────────────────────────── */
     @PostMapping("/review")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> writeReview(@RequestBody ReviewDTO dto) {
-        dto.setCustomerId(TEMP_CUSTOMER_ID);
-        if (dto.getBusinessId() == null) {
-            return ResponseEntity.badRequest().body(Map.of(
-                "success", false, "message", "잘못된 요청입니다."));
-        }
-        boolean success = customerOrderHistoryService.writeReview(dto);
-        if (success) {
-            return ResponseEntity.ok(Map.of("success", true, "message", "후기가 등록되었습니다."));
-        } else {
-            return ResponseEntity.badRequest().body(Map.of(
-                "success", false, "message", "이미 작성한 후기입니다."));
-        }
+    public ResponseEntity<Map<String, Object>> writeReview(
+            @RequestBody com.nextage.web.domain.ReviewDTO dto,
+            @AuthenticationPrincipal CustomerUserDetails userDetails) {
+
+        if (userDetails == null)
+            return ResponseEntity.status(401).body(Map.of("success", false, "message", "로그인 필요"));
+
+        dto.setCustomerId(userDetails.getCustomerId());
+        boolean ok = service.writeReview(dto);
+        if (ok) return ResponseEntity.ok(Map.of("success", true));
+        return ResponseEntity.badRequest().body(Map.of("success", false, "message", "이미 작성한 후기입니다."));
     }
 
+    /* ─────────────────────────────────────────
+       구매내역 삭제
+       ───────────────────────────────────────── */
     @DeleteMapping("/delete/{orderId}")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> deleteOrder(
-            @PathVariable("orderId") Long orderId) {
+            @PathVariable("orderId") Long orderId,
+            @AuthenticationPrincipal CustomerUserDetails userDetails) {
+
+        if (userDetails == null)
+            return ResponseEntity.status(401).body(Map.of("success", false, "message", "로그인 필요"));
+
         try {
-            customerOrderHistoryService.deleteOrder(orderId, TEMP_CUSTOMER_ID);
+            service.deleteOrder(orderId, userDetails.getCustomerId());
             return ResponseEntity.ok(Map.of("success", true));
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of(
-                "success", false, "message", e.getMessage()));
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
         }
     }
 }

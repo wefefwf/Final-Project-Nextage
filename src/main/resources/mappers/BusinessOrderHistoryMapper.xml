@@ -3,76 +3,149 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.nextage.web.mapper.BusinessOrderHistoryMapper">
 
-    <select id="selectOrdersByBusinessId"
-            resultType="com.nextage.web.domain.OrderHistoryDTO">
+    <!-- =============================================
+         BUSER: 본인에게 온 개인거래(bid) 주문 목록
+         (ACCEPTED 상태만 하단 리스트에 표시)
+         ============================================= -->
+    <select id="selectAcceptedOrders" resultType="com.nextage.web.domain.OrderHistoryDTO">
         SELECT
             o.order_id, o.order_no, o.business_id, o.bid_id,
             o.total_amount, o.payment_status, o.delivery_status,
-            o.due_date, o.created_at,
-            o.customer_id,
-            c.nickname    AS customer_nickname,
-            cr.room_id
+            o.accept_status, o.due_date, o.created_at, o.customer_id,
+            c.nickname AS customer_nickname, cr.room_id
         FROM orders o
         JOIN customer c ON c.customer_id = o.customer_id
         LEFT JOIN chat_room cr ON cr.bid_id      = o.bid_id
                                AND cr.business_id = o.business_id
                                AND cr.customer_id = o.customer_id
-        WHERE o.business_id   = #{businessId}
+        WHERE o.business_id    = #{businessId}
           AND o.payment_status = 'PAID'
+          AND o.accept_status  = 'ACCEPTED'
+          AND o.bid_id IS NOT NULL
+        <if test="search != null and search.keyword != null and search.keyword != ''">
+            AND (
+                c.nickname LIKE CONCAT('%', #{search.keyword}, '%')
+                OR o.order_no LIKE CONCAT('%', #{search.keyword}, '%')
+                OR EXISTS (
+                    SELECT 1 FROM bids b
+                    JOIN request r ON r.request_id = b.request_id
+                    WHERE b.bid_id = o.bid_id
+                      AND r.title LIKE CONCAT('%', #{search.keyword}, '%')
+                )
+            )
+        </if>
+        <if test="search != null and search.startDate != null and search.startDate != ''">
+            AND o.created_at >= #{search.startDate}
+        </if>
+        <if test="search != null and search.endDate != null and search.endDate != ''">
+            AND o.created_at &lt; DATE_ADD(#{search.endDate}, INTERVAL 1 DAY)
+        </if>
         ORDER BY o.created_at DESC
         LIMIT #{limit} OFFSET #{offset}
     </select>
 
-    <select id="countOrdersByBusinessId" resultType="int">
+    <select id="countAcceptedOrders" resultType="int">
         SELECT COUNT(*)
-        FROM orders
-        WHERE business_id   = #{businessId}
-          AND payment_status = 'PAID'
+        FROM orders o
+        JOIN customer c ON c.customer_id = o.customer_id
+        WHERE o.business_id    = #{businessId}
+          AND o.payment_status = 'PAID'
+          AND o.accept_status  = 'ACCEPTED'
+          AND o.bid_id IS NOT NULL
+        <if test="search != null and search.keyword != null and search.keyword != ''">
+            AND (
+                c.nickname LIKE CONCAT('%', #{search.keyword}, '%')
+                OR o.order_no LIKE CONCAT('%', #{search.keyword}, '%')
+                OR EXISTS (
+                    SELECT 1 FROM bids b
+                    JOIN request r ON r.request_id = b.request_id
+                    WHERE b.bid_id = o.bid_id
+                      AND r.title LIKE CONCAT('%', #{search.keyword}, '%')
+                )
+            )
+        </if>
+        <if test="search != null and search.startDate != null and search.startDate != ''">
+            AND o.created_at >= #{search.startDate}
+        </if>
+        <if test="search != null and search.endDate != null and search.endDate != ''">
+            AND o.created_at &lt; DATE_ADD(#{search.endDate}, INTERVAL 1 DAY)
+        </if>
     </select>
 
-    <select id="selectOrderDetail"
-            resultType="com.nextage.web.domain.OrderHistoryDTO">
+    <!-- =============================================
+         BADMIN: 모든 개인거래(bid) 주문 전체 상태 조회
+         (PENDING, ACCEPTED, REJECTED 모두 포함)
+         ============================================= -->
+    <select id="selectAllOrdersForAdmin" resultType="com.nextage.web.domain.OrderHistoryDTO">
         SELECT
             o.order_id, o.order_no, o.business_id, o.bid_id,
             o.total_amount, o.payment_status, o.delivery_status,
-            o.due_date, o.created_at,
-            o.customer_id,
-            c.nickname    AS customer_nickname,
-            cr.room_id
+            o.accept_status, o.due_date, o.created_at, o.customer_id,
+            c.nickname AS customer_nickname, cr.room_id
         FROM orders o
         JOIN customer c ON c.customer_id = o.customer_id
         LEFT JOIN chat_room cr ON cr.bid_id      = o.bid_id
                                AND cr.business_id = o.business_id
                                AND cr.customer_id = o.customer_id
-        WHERE o.order_id = #{orderId}
+        WHERE o.payment_status = 'PAID'
+          AND o.bid_id IS NOT NULL
+        <if test="search != null and search.keyword != null and search.keyword != ''">
+            AND (
+                c.nickname LIKE CONCAT('%', #{search.keyword}, '%')
+                OR o.order_no LIKE CONCAT('%', #{search.keyword}, '%')
+                OR EXISTS (
+                    SELECT 1 FROM bids b
+                    JOIN request r ON r.request_id = b.request_id
+                    WHERE b.bid_id = o.bid_id
+                      AND r.title LIKE CONCAT('%', #{search.keyword}, '%')
+                )
+            )
+        </if>
+        <if test="search != null and search.startDate != null and search.startDate != ''">
+            AND o.created_at >= #{search.startDate}
+        </if>
+        <if test="search != null and search.endDate != null and search.endDate != ''">
+            AND o.created_at &lt; DATE_ADD(#{search.endDate}, INTERVAL 1 DAY)
+        </if>
+        ORDER BY o.created_at DESC
+        LIMIT #{limit} OFFSET #{offset}
     </select>
 
-    <select id="selectOrderItems"
-            resultType="com.nextage.web.domain.OrderItemsDTO">
-        SELECT
-            oi.order_item_id, oi.kit_id, oi.quantity, oi.price,
-            COALESCE(k.name, '개인거래 상품') AS product_name,
-            k.main_image1 AS image_url
-        FROM order_items oi
-        LEFT JOIN kit k ON k.kit_id = oi.kit_id
-        WHERE oi.order_id = #{orderId}
+    <select id="countAllOrdersForAdmin" resultType="int">
+        SELECT COUNT(*)
+        FROM orders o
+        JOIN customer c ON c.customer_id = o.customer_id
+        WHERE o.payment_status = 'PAID'
+          AND o.bid_id IS NOT NULL
+        <if test="search != null and search.keyword != null and search.keyword != ''">
+            AND (
+                c.nickname LIKE CONCAT('%', #{search.keyword}, '%')
+                OR o.order_no LIKE CONCAT('%', #{search.keyword}, '%')
+                OR EXISTS (
+                    SELECT 1 FROM bids b
+                    JOIN request r ON r.request_id = b.request_id
+                    WHERE b.bid_id = o.bid_id
+                      AND r.title LIKE CONCAT('%', #{search.keyword}, '%')
+                )
+            )
+        </if>
+        <if test="search != null and search.startDate != null and search.startDate != ''">
+            AND o.created_at >= #{search.startDate}
+        </if>
+        <if test="search != null and search.endDate != null and search.endDate != ''">
+            AND o.created_at &lt; DATE_ADD(#{search.endDate}, INTERVAL 1 DAY)
+        </if>
     </select>
 
-    <update id="updateDeliveryStatus">
-        UPDATE orders
-        SET delivery_status = #{deliveryStatus}
-        WHERE order_id = #{orderId}
-    </update>
-
-    <select id="selectPendingOrders"
-            resultType="com.nextage.web.domain.OrderHistoryDTO">
+    <!-- =============================================
+         PENDING 주문 (상단 패널용)
+         ============================================= -->
+    <select id="selectPendingOrders" resultType="com.nextage.web.domain.OrderHistoryDTO">
         SELECT
             o.order_id, o.order_no, o.business_id, o.bid_id,
             o.total_amount, o.payment_status, o.delivery_status,
-            o.accept_status, o.due_date, o.created_at,
-            o.customer_id,
-            c.nickname    AS customer_nickname,
-            cr.room_id
+            o.accept_status, o.due_date, o.created_at, o.customer_id,
+            c.nickname AS customer_nickname, cr.room_id
         FROM orders o
         JOIN customer c ON c.customer_id = o.customer_id
         LEFT JOIN chat_room cr ON cr.bid_id      = o.bid_id
@@ -85,15 +158,63 @@
         ORDER BY o.created_at DESC
     </select>
 
-    <select id="selectAcceptedOrders"
-            resultType="com.nextage.web.domain.OrderHistoryDTO">
+    <select id="selectPendingOrdersAll" resultType="com.nextage.web.domain.OrderHistoryDTO">
         SELECT
             o.order_id, o.order_no, o.business_id, o.bid_id,
             o.total_amount, o.payment_status, o.delivery_status,
-            o.accept_status, o.due_date, o.created_at,
-            o.customer_id,
-            c.nickname    AS customer_nickname,
-            cr.room_id
+            o.accept_status, o.due_date, o.created_at, o.customer_id,
+            c.nickname AS customer_nickname, cr.room_id
+        FROM orders o
+        JOIN customer c ON c.customer_id = o.customer_id
+        LEFT JOIN chat_room cr ON cr.bid_id      = o.bid_id
+                               AND cr.business_id = o.business_id
+                               AND cr.customer_id = o.customer_id
+        WHERE o.payment_status = 'PAID'
+          AND o.accept_status  = 'PENDING'
+          AND o.bid_id IS NOT NULL
+        ORDER BY o.created_at DESC
+    </select>
+
+    <!-- =============================================
+         공통
+         ============================================= -->
+    <select id="selectOrderDetail" resultType="com.nextage.web.domain.OrderHistoryDTO">
+        SELECT
+            o.order_id, o.order_no, o.business_id, o.bid_id,
+            o.total_amount, o.payment_status, o.delivery_status,
+            o.accept_status, o.due_date, o.created_at, o.customer_id,
+            c.nickname AS customer_nickname, cr.room_id
+        FROM orders o
+        JOIN customer c ON c.customer_id = o.customer_id
+        LEFT JOIN chat_room cr ON cr.bid_id      = o.bid_id
+                               AND cr.business_id = o.business_id
+                               AND cr.customer_id = o.customer_id
+        WHERE o.order_id = #{orderId}
+    </select>
+
+    <select id="selectOrderItems" resultType="com.nextage.web.domain.OrderItemsDTO">
+        SELECT
+            oi.order_item_id,
+            oi.kit_id,
+            oi.quantity,
+            oi.price,
+            COALESCE(k.name, r.title, '개인거래 상품') AS product_name,
+            COALESCE(k.main_image1, NULL)              AS image_url
+        FROM order_items oi
+        LEFT JOIN kit k     ON k.kit_id     = oi.kit_id
+        LEFT JOIN orders o  ON o.order_id   = oi.order_id
+        LEFT JOIN bids b    ON b.bid_id     = o.bid_id
+        LEFT JOIN request r ON r.request_id = b.request_id
+        WHERE oi.order_id = #{orderId}
+    </select>
+
+    <!-- Mapper 인터페이스 선언 유지용 -->
+    <select id="selectOrdersByBusinessId" resultType="com.nextage.web.domain.OrderHistoryDTO">
+        SELECT
+            o.order_id, o.order_no, o.business_id, o.bid_id,
+            o.total_amount, o.payment_status, o.delivery_status,
+            o.accept_status, o.due_date, o.created_at, o.customer_id,
+            c.nickname AS customer_nickname, cr.room_id
         FROM orders o
         JOIN customer c ON c.customer_id = o.customer_id
         LEFT JOIN chat_room cr ON cr.bid_id      = o.bid_id
@@ -101,24 +222,51 @@
                                AND cr.customer_id = o.customer_id
         WHERE o.business_id    = #{businessId}
           AND o.payment_status = 'PAID'
-          AND o.accept_status  = 'ACCEPTED'
           AND o.bid_id IS NOT NULL
         ORDER BY o.created_at DESC
         LIMIT #{limit} OFFSET #{offset}
     </select>
 
-    <select id="countAcceptedOrders" resultType="int">
+    <select id="countOrdersByBusinessId" resultType="int">
         SELECT COUNT(*)
-        FROM orders
-        WHERE business_id    = #{businessId}
-          AND payment_status = 'PAID'
-          AND accept_status  = 'ACCEPTED'
-          AND bid_id IS NOT NULL
+        FROM orders o
+        WHERE o.business_id    = #{businessId}
+          AND o.payment_status = 'PAID'
+          AND o.bid_id IS NOT NULL
     </select>
 
+    <!-- =============================================
+         채팅방 생성 (주문 수락 시)
+         ============================================= -->
+    <insert id="insertChatRoom">
+        INSERT INTO chat_room (bid_id, customer_id, business_id)
+        VALUES (#{bidId}, #{customerId}, #{businessId})
+    </insert>
+
+    <select id="selectRoomIdByBidId" resultType="java.lang.Long">
+        SELECT room_id
+        FROM chat_room
+        WHERE bid_id      = #{bidId}
+          AND customer_id = #{customerId}
+          AND business_id = #{businessId}
+        LIMIT 1
+    </select>
+
+    <insert id="insertChatFunction">
+        INSERT INTO chat_function (room_id, business_id, customer_id)
+        VALUES (#{roomId}, #{businessId}, #{customerId})
+    </insert>
+
+    <!-- =============================================
+         상태 변경
+         ============================================= -->
+    <update id="updateDeliveryStatus">
+        UPDATE orders SET delivery_status = #{deliveryStatus}
+        WHERE order_id = #{orderId}
+    </update>
+
     <update id="updateAcceptStatus">
-        UPDATE orders
-        SET accept_status = #{acceptStatus}
+        UPDATE orders SET accept_status = #{acceptStatus}
         WHERE order_id = #{orderId}
     </update>
 

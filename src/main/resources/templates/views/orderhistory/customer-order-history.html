@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       layout:decorate="~{layouts/customer-layout}">
 <head>
     <meta charset="UTF-8">
@@ -21,6 +22,75 @@
             color: #222; margin-bottom: 6px;
         }
         .page-subtitle { font-size: 14px; color: #aaa; margin-bottom: 36px; }
+
+        /* 검색 영역 */
+        .search-box {
+            background: #fff;
+            border: 1px solid #ebebeb;
+            border-radius: 16px;
+            padding: 20px 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .search-row {
+            display: flex; gap: 10px; align-items: center;
+            margin-bottom: 12px; flex-wrap: wrap;
+        }
+        .search-row:last-child { margin-bottom: 0; }
+
+        .search-select {
+            padding: 10px 12px;
+            border: 1.5px solid #ebebeb; border-radius: 10px;
+            font-size: 13px; color: #555; background: #fff;
+            outline: none; cursor: pointer;
+        }
+        .search-select:focus { border-color: #bd93f9; }
+
+        .search-input {
+            flex: 1; min-width: 160px;
+            padding: 10px 14px;
+            border: 1.5px solid #ebebeb; border-radius: 10px;
+            font-size: 13px; color: #333; outline: none;
+        }
+        .search-input:focus { border-color: #bd93f9; }
+
+        .period-btn {
+            padding: 8px 16px;
+            border: 1.5px solid #ebebeb; border-radius: 20px;
+            background: #fff; color: #777;
+            font-size: 13px; font-weight: 600;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .period-btn:hover { border-color: #bd93f9; color: #bd93f9; }
+        .period-btn.active {
+            background: linear-gradient(135deg, #bd93f9, #a6c1ee);
+            color: #fff; border-color: transparent;
+        }
+
+        .date-input {
+            padding: 10px 12px;
+            border: 1.5px solid #ebebeb; border-radius: 10px;
+            font-size: 13px; color: #555; outline: none;
+        }
+        .date-input:focus { border-color: #bd93f9; }
+
+        .btn-search {
+            padding: 10px 24px;
+            background: linear-gradient(135deg, #bd93f9, #a6c1ee);
+            color: #fff; border: none; border-radius: 10px;
+            font-size: 13px; font-weight: 700; cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-search:hover { transform: translateY(-1px); }
+
+        .btn-reset {
+            padding: 10px 18px;
+            border: 1.5px solid #ebebeb; border-radius: 10px;
+            background: #fff; color: #aaa;
+            font-size: 13px; text-decoration: none;
+            transition: all 0.2s;
+        }
+        .btn-reset:hover { border-color: #bd93f9; color: #bd93f9; }
 
         .order-card-wrapper { margin-bottom: 16px; }
 
@@ -62,15 +132,12 @@
             display: flex; flex-direction: column; align-items: flex-end; gap: 8px;
         }
 
-        /* 결제 상태 뱃지 */
-		.order-status {
-		    font-size: 16px; font-weight: 700;
-		    color: #bd93f9; white-space: nowrap;
-		    display: inline-block;
-		    margin-right: 10px;
-		}
+        .order-status {
+            font-size: 16px; font-weight: 700;
+            color: #bd93f9; white-space: nowrap;
+            display: inline-block; margin-right: 10px;
+        }
 
-        /* 수락 상태 뱃지 */
         .accept-badge {
             font-size: 13px; font-weight: 700;
             padding: 7px 18px; border-radius: 20px;
@@ -80,7 +147,6 @@
         .accept-accepted { background: #eefbf3; color: #2ecc71; border: 1px solid #a7f3d0; }
         .accept-rejected { background: #fff5f5; color: #ff6b6b; border: 1px solid #ffc2c2; }
 
-        /* 배송 상태 뱃지 */
         .delivery-badge {
             font-size: 13px; font-weight: 700;
             padding: 7px 18px; border-radius: 20px;
@@ -167,6 +233,62 @@
         <h2 class="page-title">구매내역</h2>
         <p class="page-subtitle">결제가 완료된 주문 내역을 확인하세요.</p>
 
+        <!-- ✅ 검색 영역 -->
+        <div class="search-box">
+		    <form th:action="@{/customer/order/history}" method="get">
+		
+		        <!-- CADMIN 키워드 검색 -->
+		        <div class="search-row" th:if="${isAdmin}">  <!-- ✅ 변경 -->
+				    <select name="searchType" class="search-select">
+				        <option value="loginId"
+				                th:selected="${search.searchType == 'loginId'}">아이디</option>
+				        <option value="nickname"
+				                th:selected="${search.searchType == 'nickname'}">닉네임</option>
+				        <option value="phone"
+				                th:selected="${search.searchType == 'phone'}">전화번호</option>
+				        <option value="orderId"
+				                th:selected="${search.searchType == 'orderId'}">주문번호</option>
+				    </select>
+				    <input type="text" name="keyword" class="search-input"
+				           th:value="${search.keyword}"
+				           placeholder="검색어를 입력하세요">
+				    <button type="submit" class="btn-search">검색</button>
+				</div>
+				
+				<!-- CUSER 상품명 검색 -->
+				<div class="search-row" th:if="${!isAdmin}">  <!-- ✅ 변경 -->
+				    <input type="text" name="keyword" class="search-input"
+				           th:value="${search.keyword}"
+				           placeholder="상품명으로 검색">
+				    <button type="submit" class="btn-search">검색</button>
+				</div>
+		
+		        <!-- 빠른 기간 선택 (공통) -->
+		        <div class="search-row">
+		            <span style="font-size:13px; color:#aaa; font-weight:600;">빠른 선택</span>
+		            <button type="submit" name="period" value="1w" class="period-btn"
+		                    th:classappend="${search.period == '1w'} ? ' active'">1주일</button>
+		            <button type="submit" name="period" value="1m" class="period-btn"
+		                    th:classappend="${search.period == '1m'} ? ' active'">1개월</button>
+		            <button type="submit" name="period" value="3m" class="period-btn"
+		                    th:classappend="${search.period == '3m'} ? ' active'">3개월</button>
+		        </div>
+		
+		        <!-- 직접 날짜 입력 (공통) -->
+		        <div class="search-row">
+		            <span style="font-size:13px; color:#aaa; font-weight:600;">직접 입력</span>
+		            <input type="date" name="startDate" class="date-input"
+		                   th:value="${search.startDate}">
+		            <span style="color:#aaa;">~</span>
+		            <input type="date" name="endDate" class="date-input"
+		                   th:value="${search.endDate}">
+		            <button type="submit" class="btn-search">검색</button>
+		            <a href="/customer/order/history" class="btn-reset">초기화</a>
+		        </div>
+		
+		    </form>
+		</div>
+
         <!-- 빈 상태 -->
         <div class="empty-state" th:if="${#lists.isEmpty(orders)}">
             <div class="empty-text">구매 내역이 없어요.</div>
@@ -176,7 +298,7 @@
         <!-- 주문 목록 -->
         <div th:each="order : ${orders}" class="order-card-wrapper">
             <a class="order-card"
-               th:href="@{/customer/order/detail/{orderId}(orderId=${order.orderId})}">
+   					th:href="@{/customer/order/detail/{orderId}(orderId=${order.orderId})}">
 
                 <div class="order-card-header">
                     <div>
@@ -194,13 +316,8 @@
                              th:text="${#temporals.format(order.createdAt, 'yyyy-MM-dd HH:mm')}"></div>
                     </div>
 
-                    <!-- 뱃지 그룹 -->
                     <div class="badge-group">
-
-                        <!-- 결제 완료 고정 뱃지 -->
                         <span class="order-status">결제완료</span>
-
-                        <!-- 배송 상태: 1=결제확인중, 2=배송준비, 3=배송중, 4=배송완료, 9=취소 -->
                         <span class="delivery-badge delivery-checking"
                               th:if="${order.deliveryStatus == 1}">결제확인중</span>
                         <span class="delivery-badge delivery-ready"
@@ -211,8 +328,6 @@
                               th:if="${order.deliveryStatus == 4}">배송완료</span>
                         <span class="delivery-badge delivery-cancel"
                               th:if="${order.deliveryStatus == 9}">취소</span>
-
-                        <!-- 개인거래(bid_id 있음)일 때만 업체 수락 상태 표시 -->
                         <th:block th:if="${order.bidId != null}">
                             <span class="accept-badge accept-pending"
                                   th:if="${order.acceptStatus == 'PENDING'}">검토중</span>
@@ -221,7 +336,6 @@
                             <span class="accept-badge accept-rejected"
                                   th:if="${order.acceptStatus == 'REJECTED'}">거절됨</span>
                         </th:block>
-
                     </div>
                 </div>
 
@@ -254,22 +368,37 @@
             </a>
         </div>
 
-        <!-- 페이징 -->
+        <!-- 페이징 (검색 조건 유지) -->
         <div class="pagination" th:if="${totalPages > 1}">
             <a class="page-btn"
                th:classappend="${currentPage == 1} ? 'disabled'"
-               th:href="@{/customer/order/history(page=${currentPage - 1})}">&lsaquo;</a>
+               th:href="@{/customer/order/history(page=${currentPage - 1},
+				        searchType=${search.searchType},
+				        keyword=${search.keyword},
+				        startDate=${search.startDate},
+				        endDate=${search.endDate},
+				        period=${search.period})}">&lsaquo;</a>
 
             <th:block th:each="i : ${#numbers.sequence(1, totalPages)}">
                 <a class="page-btn"
                    th:classappend="${i == currentPage} ? 'active'"
-                   th:href="@{/customer/order/history(page=${i})}"
+                   th:href="@{/customer/order/history(page=${i},
+					        searchType=${search.searchType},
+					        keyword=${search.keyword},
+					        startDate=${search.startDate},
+					        endDate=${search.endDate},
+					        period=${search.period})}"
                    th:text="${i}">1</a>
             </th:block>
 
             <a class="page-btn"
                th:classappend="${currentPage == totalPages} ? 'disabled'"
-               th:href="@{/customer/order/history(page=${currentPage + 1})}">&rsaquo;</a>
+               th:href="@{/customer/order/history(page=${currentPage + 1},
+				        searchType=${search.searchType},
+				        keyword=${search.keyword},
+				        startDate=${search.startDate},
+				        endDate=${search.endDate},
+				        period=${search.period})}">&rsaquo;</a>
         </div>
 
     </div>

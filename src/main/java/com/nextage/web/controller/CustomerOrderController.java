@@ -2,6 +2,8 @@ package com.nextage.web.controller;
 
 import com.nextage.web.domain.PaymentDTO;
 import com.nextage.web.service.CustomerPaymentService;
+import com.nextage.web.userDetails.CustomerUserDetails;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -20,7 +22,7 @@ public class CustomerOrderController {
     private final CustomerPaymentService paymentService;
 
     // 임시 테스트용 customer_id (로그인 연동 후 제거)
-    private static final Long TEMP_CUSTOMER_ID = 1L;
+    //private static final Long TEMP_CUSTOMER_ID = 1L;
 
     /**
      * POST /order/payment/create
@@ -30,9 +32,10 @@ public class CustomerOrderController {
     @ResponseBody                    // ✅ JSON 응답 메서드에 @ResponseBody 추가
     public ResponseEntity<Map<String, String>> createOrder(
             @RequestBody Map<String, Integer> body,
-            @AuthenticationPrincipal UserDetails userDetails) {
+            @AuthenticationPrincipal CustomerUserDetails userDetails) {
 
-        Long customerId  = TEMP_CUSTOMER_ID;
+        //Long customerId  = TEMP_CUSTOMER_ID;
+    	Long customerId = userDetails.getCustomerId();
         int  totalAmount = body.get("totalAmount");
 
         String orderNo = paymentService.createOrder(customerId, totalAmount);
