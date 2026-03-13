@@ -14,7 +14,7 @@ import com.nextage.web.userDetails.CustomerUserDetails;
 
 
 @Controller
-public class CostomerLoginController {
+public class CustomerLoginController {
 
     @GetMapping("/customer/login")
     public String customerLogin() {
