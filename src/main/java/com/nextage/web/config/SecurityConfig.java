@@ -56,7 +56,7 @@ public WebSecurityCustomizer webSecurityCustomizer() {
             .securityMatcher("/business/**", "/auth/business/**") // 기업 경로만 담당
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/business/login", "/auth/business/loginProc","/business/main","/business/request").permitAll()
+                .requestMatchers("/business/login", "/auth/business/loginProc","/business/main","/business/request","/business/request/list").permitAll()
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
@@ -82,7 +82,7 @@ public WebSecurityCustomizer webSecurityCustomizer() {
         http
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/customer/login", "/auth/customer/loginProc", "/auth/join","/customer/main","/customer/shop","/customer/shop/detail","/customer/request/detail/**","/customer/request","/customer/cart").permitAll()//로그인안해도 접속가능한링크
+                .requestMatchers("/customer/login", "/auth/customer/loginProc", "/auth/join","/customer/main","/customer/shop","/customer/shop/detail","/customer/request/detail/**","/customer/request","/customer/cart","/customer/request/list").permitAll()//로그인안해도 접속가능한링크
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
