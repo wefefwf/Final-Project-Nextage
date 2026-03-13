@@ -1,146 +1,315 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-     layout:decorate="${isMine ? 'layouts/business-layout' : 'layouts/customer-layout'}">
+      layout:decorate="${isMine ? 'layouts/business-layout' : 'layouts/customer-layout'}">
 <head>
     <meta charset="UTF-8">
     <title>Nextage Portfolio</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css"/>
     <link rel="stylesheet" th:href="@{/css/portfolio/portfolio.css}" />
-    
     <style>
         .slick-dots { bottom: -30px !important; }
         .modal-slider { margin-bottom: 30px !important; }
-        /* 숨김 상태일 때 카드 스타일 (흐리게 처리) */
         .is-hidden { opacity: 0.6; filter: grayscale(50%); }
         .slick-prev, .slick-next { display: none !important; }
         .square-img { width: 100% !important; aspect-ratio: 1/1 !important; object-fit: cover !important; border-radius: 20px !important; }
+        .empty-text { color: #bbb; font-style: italic; }
+        .work-period { font-size: 13px; color: #888; margin-top: 5px; }
     </style>
 </head>
 <body>
+
 <th:block layout:fragment="content">
-	<div class="portfolio-content">
-	    <div class="top-row">
-	        <div class="profile-section">
-	            <h2 class="section-title">프로필</h2>
-	            <div class="profile-image-container">
-	                <img th:src="${bizinfo?.profileImage != null ? bizinfo.profileImage : '/images/default-profile.png'}" alt="프로필">
-	            </div>
-	            <div class="profile-btns" th:if="${isMine}">
-	                <button type="button" class="btn-modify" 
-	                        th:text="${bizinfo?.profileImage != null ? '이미지 수정' : '프로필 등록'}"></button>
-	            </div>
-	        </div>
-	
-	        <div class="info-section">
-	            <div class="location-group">
-	                <h2 class="section-title">위치</h2>
-	                <div class="info-box">
-	                    <span th:text="${bizinfo?.location != null ? bizinfo.location : '등록된 위치 정보가 없습니다.'}"
-	                          th:style="${bizinfo?.location == null ? 'color: #bbb;' : ''}"></span>
-	                    
-	                    <div class="box-actions" th:if="${isMine}">
-	                        <button type="button" th:text="${bizinfo?.location != null ? '수정' : '위치 등록'}"></button>
-	                    </div>
-	                </div>
-	            </div>
-	
-	            <div class="career-group">
-	                <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 20px;">
-	                    <h2 class="section-title" style="margin-bottom: 0;">경력</h2>
-	                    <button type="button" class="btn-add-career" th:if="${isMine and #lists.size(careerList) < 3}">+ 경력 추가</button>
-	                </div>
-	                <div class="career-container">
-	                    <div class="info-box career-item" th:each="career : ${careerList}">
-	                        <span th:text="${career.workDescription}"></span>
-	                        <div class="box-actions" th:if="${isMine}">
-	                            <button type="button">삭제</button>
-	                        </div>
-	                    </div>
-	                    
-	                    <div class="info-box empty-box" th:if="${#lists.isEmpty(careerList)}">
-	                        <span style="color: #bbb;">등록된 경력 사항이 없습니다. (최대 3개 등록 가능)</span>
-	                    </div>
-	                </div>
-	            </div>
-	        </div>
-	    </div>
-	
-	    <div class="work-section">
-	        <h2 class="section-title">작업 포트폴리오</h2>
-	        
-	        <div th:if="${#lists.isEmpty(reviewList)}" style="text-align: center; padding: 50px; background: #fff; border-radius: 20px; border: 1px solid #eee;">
-	            <p style="color: #bbb; margin-bottom: 0;">아직 등록된 포트폴리오가 없습니다.</p>
-	        </div>
-	
-	        <div class="work-grid" th:if="${!#lists.isEmpty(reviewList)}">
-	            <th:block th:each="review : ${reviewList}">
-	                <div class="work-card" 
-	                     th:if="${isMine or review.status == 'ACTIVE'}"
-	                     th:classappend="${review.status == 'HIDDEN' ? 'is-hidden' : ''}"
-	                     data-bs-toggle="modal" data-bs-target="#workModal" 
-	                     th:onclick="fillModal(this)">
-	                    
-	                    <div class="card-img-holder">
-	                        <img th:src="${review.image1}">
-	                    </div>
-	                    <div class="card-footer">
-	                        <div class="footer-top">
-	                            <p class="order-num" th:text="'No. ' + ${review.orderNo}"></p>
-	                            <h3 class="card-text" th:text="${review.requestTitle}"></h3>
-	                        </div>
-	                        <div class="footer-bottom">
-	                            <p class="work-period">
-	                                <span th:text="${#temporals.format(review.startDate, 'yyyy.MM.dd')}"></span> ~ 
-	                                <span th:text="${#temporals.format(review.endDate, 'yyyy.MM.dd')}"></span>
-	                            </p>
-	                        </div>
-	                    </div>
-	                    <input type="hidden" class="h-content" th:value="${review.content}">
-	                    <input type="hidden" class="h-img2" th:value="${review.image2}">
-	                    <input type="hidden" class="h-img3" th:value="${review.image3}">
-	                </div>
-	            </th:block>
-	        </div>
-	    </div>
-	</div>
-	
-	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
-	<script th:inline="javascript">
-	// 로직은 싹 빼고 모달 띄우는 용도의 fillModal 함수만 남겨두었습니다.
-	function fillModal(element) {
-	    const img1 = element.querySelector('img').src;
-	    const img2 = element.querySelector('.h-img2').value;
-	    const img3 = element.querySelector('.h-img3').value;
-	    const title = element.querySelector('.card-text').innerText;
-	    const orderNum = element.querySelector('.order-num').innerText;
-	    const period = element.querySelector('.work-period').innerText;
-	    const content = element.querySelector('.h-content').value;
-	
-	    document.getElementById('modalTitle').innerText = title;
-	    document.getElementById('mOrderNum').innerText = orderNum;
-	    document.getElementById('mPeriod').innerText = period;
-	    document.getElementById('mReview').innerText = content;
-	
-	    const slider = $('.modal-slider');
-	    if (slider.hasClass('slick-initialized')) { slider.slick('unslick'); }
-	
-	    $('#mImg1').attr('src', img1);
-	    
-	    // 서브 이미지 유무에 따른 노출 처리
-	    if(img2 && img2 !== 'null' && img2 !== '') { $('#mImg2').attr('src', img2).parent().show(); } 
-	    else { $('#mImg2').parent().hide(); }
-	    
-	    if(img3 && img3 !== 'null' && img3 !== '') { $('#mImg3').attr('src', img3).parent().show(); } 
-	    else { $('#mImg3').parent().hide(); }
-	
-	    $('#workModal').off('shown.bs.modal').on('shown.bs.modal', function () {
-	        slider.slick({ dots: true, arrows: false, infinite: false, slidesToShow: 1, adaptiveHeight: true });
-	    });
-	}
-	</script>
-	</th:block>
+    <div class="portfolio-content">
+        <div class="top-row">
+           <div class="profile-section">
+		    <h2 class="section-title">프로필</h2>
+		    <div class="profile-image-container">
+			    <img th:src="${(bizinfo != null && bizinfo.profileImage != null) ? bizinfo.profileImage : '/images/default-profile.png'}" 
+			         alt="프로필"
+			         class="square-img">
+			</div>
+		    
+		    <div class="profile-btns" th:if="${isMine}">
+		        <button type="button" class="btn-modify">프로필 수정</button>
+		        <button type="button" class="btn-delete" style="background: #333; color: #fff;">프로필 삭제</button>
+		    </div>
+		    
+		    <div class="company-name-box" th:if="${!isMine}">
+			    <strong th:text="${bizinfo?.companyName}">넥스테이지 수선소</strong>
+			</div>
+		</div>
+
+            <div class="info-section">
+                <div class="location-group">
+                    <h2 class="section-title">위치</h2>
+                    <div class="info-box">
+                        <span th:text="${bizinfo?.location != null ? bizinfo.location : '등록된 위치 정보가 없습니다.'}"
+                              th:classappend="${bizinfo?.location == null ? 'empty-text' : ''}"></span>
+                        <div class="box-actions" th:if="${isMine}">
+                            <button type="button" th:text="${bizinfo?.location != null ? '수정' : '추가'}"></button>
+                            <button type="button">삭제</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="career-group">
+                    <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 20px;">
+                        <h2 class="section-title" style="margin-bottom: 0;">경력</h2>
+                        <button type="button" class="btn-add-career" th:if="${isMine and #lists.size(careerList) < 3}">+ 경력 추가</button>
+                    </div>
+                    <div class="career-container">
+                        <div class="info-box career-item" th:each="career : ${careerList}">
+                            <span th:text="${career.workDescription}"></span>
+                            <div class="box-actions" th:if="${isMine}">
+                                <button type="button">수정</button>
+                                <button type="button">삭제</button>
+                            </div>
+                        </div>
+                        <div class="info-box empty-box" th:if="${#lists.isEmpty(careerList)}">
+                            <span class="empty-text">등록된 경력 사항이 없습니다.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="work-section">
+		    <h2 class="section-title">작업 포트폴리오</h2>
+		
+		    <!-- 포트폴리오 있음 -->
+		    <div class="work-grid" th:if="${!#lists.isEmpty(reviewList)}">
+		        <th:block th:each="review : ${reviewList}">
+		            <div class="work-card" 
+		                 th:if="${isMine or review.status == 'ACTIVE'}"
+		                 th:classappend="${review.status == 'HIDDEN' ? 'is-hidden' : ''}"
+		                 data-bs-toggle="modal" data-bs-target="#workModal" 
+		                 th:onclick="fillModal(this)"
+		                 th:data-id="${review.reviewId}"
+		                 th:data-status="${review.status}">
+		                 
+		                <div class="card-img-holder">
+		                    <img th:src="${review.image1}">
+		                </div>
+		
+		                <div class="card-footer">
+		                    <div class="footer-top">
+		                        <p class="order-num" th:text="'No. ' + ${review.orderNo}"></p>
+		                        <h3 class="card-text" th:text="${review.requestTitle}"></h3>
+		                    </div>
+		
+		                    <div class="footer-bottom">
+		                        <p class="work-period">
+		                            <span th:text="${#temporals.format(review.startDate, 'yyyy.MM.dd')}"></span> ~ 
+		                            <span th:text="${#temporals.format(review.endDate, 'yyyy.MM.dd')}"></span>
+		                        </p>
+		                    </div>
+		                </div>
+		
+		                <input type="hidden" class="h-content" th:value="${review.content}">
+		                <input type="hidden" class="h-img2" th:value="${review.image2}">
+		                <input type="hidden" class="h-img3" th:value="${review.image3}">
+		            </div>
+		        </th:block>
+		    </div>
+			<!-- 페이지네이샨 -->
+			<div class="pagination-box" th:if="${totalPages > 0}">
+			    
+			    <a th:if="${startPage > 0}"
+			       th:href="${isMine} ? @{/business/my-portfolio(page=${startPage - 1})} 
+			                          : @{/business/portfolio/{id}(id=${bizinfo.businessId}, page=${startPage - 1})}"
+			       class="page-btn nav-btn">
+			       <i class="bi bi-caret-left"></i>
+			    </a>
+			
+			    <th:block th:each="num : ${#numbers.sequence(startPage, endPage)}">
+			        <a th:href="${isMine} ? @{/business/my-portfolio(page=${num})} 
+			                              : @{/business/portfolio/{id}(id=${bizinfo.businessId}, page=${num})}"
+			           class="page-btn"
+			           th:classappend="${num == page} ? 'active' : ''"
+			           th:text="${num + 1}">
+			        </a>
+			    </th:block>
+			
+			    <a th:if="${endPage < totalPages - 1}"
+			       th:href="${isMine} ? @{/business/my-portfolio(page=${endPage + 1})} 
+			                          : @{/business/portfolio/{id}(id=${bizinfo.businessId}, page=${endPage + 1})}"
+			       class="page-btn nav-btn">
+			       <i class="bi bi-caret-right"></i>
+			    </a>
+			</div>
+		    <!-- 포트폴리오 없음 -->
+		    <div class="empty-portfolio-box" th:if="${#lists.isEmpty(reviewList)}">
+		
+		        <!-- 고객 -->
+		        <div th:if="${!isMine}" class="empty-text-box">
+		            아직 포트폴리오가 없습니다!
+		        </div>
+		
+		        <!-- 본인 -->
+		        <div th:if="${isMine}" class="empty-text-box">
+		            <p>아직 포트폴리오가 없네요!</p>
+		            <p style="margin-bottom:20px;">"제안"하러 갈까요?</p>
+		
+		            <a th:href="@{/business/request/list}" class="btn-go-list">
+		                리스트 보러가기
+		            </a>
+		        </div>
+		
+		    </div>
+		
+		</div>
+
+        <div class="modal fade" id="workModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content" style="border-radius: 35px; border: none;">
+                    <div class="modal-header" style="padding: 35px 40px 20px; border: none; position: relative;">
+                        <h1 class="modal-title" id="modalTitle" style="text-align: center; width: 100%; font-size: 20px;">작업물 상세</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="position: absolute; right: 30px;"></button>
+                    </div>
+                    <div class="modal-body" style="padding: 0 40px 40px;">
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="modal-slider">
+								    <div class="slide-item"><img id="mImg1" src="" class="square-img"></div>
+								    <div class="slide-item"><img id="mImg2" src="" class="square-img"></div>
+								    <div class="slide-item"><img id="mImg3" src="" class="square-img"></div>
+								</div>
+                            </div>
+                            <div class="col-md-6 d-flex flex-column" style="justify-content: space-between;">
+                                <div class="modal-info-content">
+                                    <p id="mOrderNum" style="color:#999; font-size:12px; margin-bottom: 2px;"></p>
+                                    <p id="mPeriod" style="color:#888; font-size:13px; margin-bottom:15px;"></p>
+                                    <h5 class="detail-label" style="font-weight: 600; margin-bottom: 8px;">작업 및 후기 내용</h5>
+                                    <p id="mReview" class="detail-text" style="white-space: pre-wrap; background: #f9f9f9; padding: 15px; border-radius: 12px;"></p>
+                                </div>
+                                <div class="modal-actions" th:if="${isMine}" style="margin-top: 30px; display: flex; justify-content: flex-end;">
+                                    <button type="button" id="btnToggleStatus" onclick="toggleStatus()" style="padding: 10px 20px; border-radius: 12px; border: 1px solid #ddd; background: #fff; font-weight: 500;"></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
+<script th:inline="javascript">
+let selectedReviewId = null;
+let selectedStatus = null;
+let sliderImages = []; // 이미지 주소를 담을 전역 배열
+
+// 1. 카드 클릭 시 데이터를 미리 준비하는 함수
+function fillModal(element) {
+    selectedReviewId = element.dataset.id;
+    selectedStatus = element.getAttribute('data-status');
+
+    const img1 = element.querySelector('.card-img-holder img')?.src;
+    const img2 = element.querySelector('.h-img2')?.value;
+    const img3 = element.querySelector('.h-img3')?.value;
+    const content = element.querySelector('.h-content')?.value;
+
+    // 텍스트 세팅
+    $('#modalTitle').text(element.querySelector('.card-text')?.innerText || '');
+    $('#mOrderNum').text(element.querySelector('.order-num')?.innerText || '');
+    $('#mPeriod').text(element.querySelector('.work-period')?.innerText || '');
+    $('#mReview').text(content || '');
+
+    const btn = document.getElementById('btnToggleStatus');
+    if(btn) btn.innerText = (selectedStatus === 'ACTIVE') ? '비공개로 전환' : '공개로 전환';
+
+    // 이미지 배열 준비
+    sliderImages = [];
+
+    const isValid = (v) => v && v !== 'null' && v !== 'undefined' && v.trim() !== '';
+
+    if (isValid(img1)) sliderImages.push(img1);
+    if (isValid(img2)) sliderImages.push(img2);
+    if (isValid(img3)) sliderImages.push(img3);
+
+    console.log("배열 확인:", sliderImages);
+}
+
+// 2. 모달 열릴 때 Slick 처리
+$(document).ready(function() {
+
+    const $slider = $('.modal-slider');
+
+    $('#workModal').on('shown.bs.modal', function () {
+
+        // 기존 slick 제거
+        if ($slider.hasClass('slick-initialized')) {
+            $slider.slick('unslick');
+        }
+
+        // 기본 이미지 숨김
+        $('#mImg1').parent().hide();
+        $('#mImg2').parent().hide();
+        $('#mImg3').parent().hide();
+
+        // 이미지 세팅
+        if(sliderImages[0]){
+            $('#mImg1').attr('src', sliderImages[0]).parent().show();
+        }
+
+        if(sliderImages[1]){
+            $('#mImg2').attr('src', sliderImages[1]).parent().show();
+        }
+
+        if(sliderImages[2]){
+            $('#mImg3').attr('src', sliderImages[2]).parent().show();
+        }
+
+        // 이미지 2개 이상이면 slick 실행
+        if(sliderImages.length >= 2){
+
+            $slider.slick({
+                dots: true,
+                arrows: false,
+                infinite: true,
+                slidesToShow: 1,
+                slidesToScroll: 1,
+                speed: 300,
+                fade: true
+            });
+
+            $slider.slick('setPosition');
+        }
+    });
+
+    // 모달 닫힐 때 slick 제거
+    $('#workModal').on('hide.bs.modal', function () {
+        if ($slider.hasClass('slick-initialized')) {
+            $slider.slick('unslick');
+        }
+    });
+});
+
+// 3. 상태 변경
+function toggleStatus() {
+
+    const nextStatus = (selectedStatus === 'ACTIVE') ? 'HIDDEN' : 'ACTIVE';
+
+    if(!confirm(`상태를 ${nextStatus === 'HIDDEN' ? '비공개' : '공개'}로 변경하시겠습니까?`)) return;
+
+    $.ajax({
+        url: '/business/portfolio/updateStatus',
+        type: 'POST',
+        data: { reviewId: selectedReviewId, status: nextStatus },
+        success: function(){
+            alert('변경되었습니다.');
+            location.reload();
+        },
+        error: function(){
+            alert('오류 발생');
+        }
+    });
+}
+</script>
+</th:block>
 </body>
 </html>
