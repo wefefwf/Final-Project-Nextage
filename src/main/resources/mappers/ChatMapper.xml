@@ -21,7 +21,12 @@
                 WHEN DATE(m.send_at) = CURDATE() THEN DATE_FORMAT(m.send_at, '%H:%i')
                 WHEN DATE(m.send_at) = DATE_SUB(CURDATE(), INTERVAL 1 DAY) THEN '어제'
                 ELSE DATE_FORMAT(m.send_at, '%m-%d')
-            END as lastMessageTime
+            END as lastMessageTime,
+            (SELECT COUNT(*) 
+             FROM chat_message cm 
+             WHERE cm.room_id = cr.room_id 
+               AND cm.sender_type != #{userType} 
+               AND cm.is_read = 0) as unreadCount
             ]]>
         FROM chat_room cr
         <choose>
@@ -72,5 +77,19 @@
         INSERT INTO chat_message (room_id, sender_id, sender_type, content, send_at)
         VALUES (#{roomId}, #{senderId}, #{senderType}, #{content}, NOW())
     </insert>
+
+    <update id="updateMessageReadStatus">
+        UPDATE chat_message
+        SET is_read = 1
+        WHERE room_id = #{roomId}
+          AND sender_type != #{userType}
+          AND is_read = 0
+    </update>
+
+    <select id="selectRoomById" resultType="com.nextage.web.domain.ChatRoomDTO">
+        SELECT room_id as roomId, customer_id as customerId, business_id as businessId
+        FROM chat_room
+        WHERE room_id = #{roomId}
+    </select>
 
 </mapper>
