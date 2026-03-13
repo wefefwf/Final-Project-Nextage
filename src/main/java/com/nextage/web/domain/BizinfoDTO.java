@@ -20,4 +20,5 @@ public class BizinfoDTO {
     private String location;     // 활동 지역
     private String profileImage; // 프로필 이미지 경로
     
+    private String companyName;  // 업체명 (company_name)
 }
