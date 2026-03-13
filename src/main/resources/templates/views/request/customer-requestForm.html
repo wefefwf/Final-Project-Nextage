@@ -97,13 +97,24 @@
     .apple-input:focus { background: #fff; border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
     .apple-input.textarea { resize: none; line-height: 1.6; }
 
+    /* 캘린더 인풋 스타일 */
+    .apple-input[type="date"] { cursor: pointer; }
+    .apple-input[type="date"]::-webkit-calendar-picker-indicator {
+      opacity: 0.4;
+      cursor: pointer;
+      filter: invert(0);
+      transition: opacity 0.2s;
+    }
+    .apple-input[type="date"]::-webkit-calendar-picker-indicator:hover { opacity: 0.8; }
+
     .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .input-col { display: flex; flex-direction: column; gap: 8px; }
     .input-prefix-wrap { position: relative; }
     .input-prefix { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); font-size: 0.95rem; font-weight: 700; color: var(--text-secondary); pointer-events: none; }
     .input-prefix-wrap .apple-input { padding-left: 34px; }
-    .apple-select { width: 100%; padding: 18px 44px 18px 20px; background: rgba(255,255,255,0.8); backdrop-filter: blur(12px); border: 1.5px solid var(--border); border-radius: var(--radius-lg); font-size: 0.95rem; font-family: inherit; color: var(--text-primary); outline: none; transition: all 0.25s var(--ease-apple); -webkit-appearance: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23aeaeb2' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 16px center; cursor: pointer; }
-    .apple-select:focus { background-color: #fff; border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
+
+    /* ✅ 인라인 에러 메시지 */
+    .input-error { display: none; font-size: 0.75rem; color: #ff3b30; padding-left: 4px; margin-top: -4px; }
 
     .file-label { display: flex; align-items: center; gap: 12px; padding: 18px 20px; border-radius: var(--radius-lg); background: rgba(255,255,255,0.8); border: 1.5px dashed var(--border); cursor: pointer; color: var(--text-secondary); font-size: 0.9rem; font-weight: 500; transition: all 0.25s var(--ease-apple); }
     .file-label:hover { background: #fff; border-color: var(--accent); color: var(--accent); }
@@ -233,20 +244,14 @@
             <div class="form-label">희망 가격</div>
             <div class="input-prefix-wrap">
               <span class="input-prefix">₩</span>
-              <input type="number" id="reqBudget" class="apple-input" placeholder="50,000" min="0" step="1000">
+              <input type="number" id="reqBudget" class="apple-input" placeholder="금액 입력" step="1000" min="0">
             </div>
+            <!-- ✅ 인라인 에러 메시지 -->
+            <div class="input-error" id="budgetError">1원 이상의 금액을 입력해 주세요.</div>
           </div>
           <div class="input-col">
-            <div class="form-label">희망 기간</div>
-            <select id="reqDeadline" class="apple-select">
-              <option value="" disabled selected>기간 선택</option>
-              <option value="3">3일 이내</option>
-              <option value="7">1주일 이내</option>
-              <option value="14">2주일 이내</option>
-              <option value="30">1개월 이내</option>
-              <option value="60">2개월 이내</option>
-              <option value="0">기간 협의</option>
-            </select>
+            <div class="form-label">희망 마감일</div>
+            <input type="date" id="reqDeadline" class="apple-input">
           </div>
         </div>
         <div class="form-label" style="margin-top:8px;">참고 파일 첨부 <span style="color:var(--text-tertiary);font-weight:400;">(선택)</span></div>
@@ -268,13 +273,18 @@
 
   <script>
     let currentStep = 1;
-    let selectedCategory = null; // 숫자 ID가 담길 변수
+    let selectedCategory = null;
     const selectedTags = new Set();
+
+    (function setMinDate() {
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('reqDeadline').setAttribute('min', today);
+    })();
 
     function selectCategory(el, val) {
       document.querySelectorAll('.category-card').forEach(c => c.classList.remove('active'));
       el.classList.add('active');
-      selectedCategory = val; // 여기서 숫자가 담김
+      selectedCategory = val;
     }
 
     function toggleTag(el, tag) {
@@ -411,32 +421,36 @@
       document.getElementById('backBtn').style.display = currentStep === 1 ? 'none' : 'inline';
     }
 
-    // [수정: 데이터 필드명 및 categoryId 타입 전송]
     function submitRequest() {
-        const title  = document.getElementById('reqTitle').value.trim();
-        const detail = document.getElementById('reqDetail').value.trim();
-        const budget = document.getElementById('reqBudget').value;
-        const deadlineDays = document.getElementById('reqDeadline').value;
+        const title   = document.getElementById('reqTitle').value.trim();
+        const detail  = document.getElementById('reqDetail').value.trim();
+        const budget  = document.getElementById('reqBudget').value;
+        const selectedDate = document.getElementById('reqDeadline').value;
+        const btn = document.getElementById('mainBtn');
+        const budgetError = document.getElementById('budgetError');
 
         if (!title) { alert('의뢰 제목을 입력해 주세요.'); return; }
         if (!selectedCategory) { alert('카테고리를 선택해 주세요.'); return; }
 
-        let finalDueDate = "";
-        const date = new Date();
-        if (deadlineDays && deadlineDays !== "0") {
-            date.setDate(date.getDate() + parseInt(deadlineDays));
-            finalDueDate = date.toISOString().split('T')[0];
-        } else {
-            date.setFullYear(date.getFullYear() + 1); 
-            finalDueDate = date.toISOString().split('T')[0];
+        // ✅ 가격 검증: 빈값이거나 1 미만이면 인라인 에러 표시
+        if (!budget || Number(budget) < 1) {
+            budgetError.style.display = 'block';
+            return;
+        }
+        budgetError.style.display = 'none';
+
+        let finalDueDate = selectedDate;
+        if (!finalDueDate) {
+            const fallback = new Date();
+            fallback.setFullYear(fallback.getFullYear() + 1);
+            finalDueDate = fallback.toISOString().split('T')[0];
         }
 
         const formData = new FormData();
-        // DTO 필드명에 맞춰서 categoryId(Long) 전달
-        formData.append('categoryId', selectedCategory); 
+        formData.append('categoryId', selectedCategory);
         formData.append('title', title);
         formData.append('description', detail);
-        formData.append('hopePrice', budget || 0); 
+        formData.append('hopePrice', budget);
         formData.append('requestedDueDate', finalDueDate);
 
         const tagsString = [...selectedTags].map(tag => tag.replace('#', '').trim()).join(',');
@@ -445,13 +459,12 @@
         const file = document.getElementById('fileInput').files[0];
         if (file) formData.append('files', file);
 
-        const btn = document.getElementById('mainBtn');
         btn.innerText = '제출 중…';
         btn.disabled = true;
 
-        fetch('/customer/request/insert', { 
-            method: 'POST', 
-            body: formData 
+        fetch('/customer/request/insert', {
+            method: 'POST',
+            body: formData
         })
         .then(res => {
             if (res.ok) {

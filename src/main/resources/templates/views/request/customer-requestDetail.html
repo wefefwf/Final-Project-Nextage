@@ -151,13 +151,12 @@
       <div class="stat-card">
         <div class="stat-item">
           <span class="stat-item-label">희망 가격</span>
-          <span class="stat-item-val pink"
-                th:text="${(request.hopePrice != null and request.hopePrice > 0) ? '₩' + #numbers.formatInteger(request.hopePrice, 0, 'COMMA') : '협의'}">협의</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-item-label">희망 기간</span>
-          <span class="stat-item-val"
-                th:text="${(request.requestedDueDate != null and !#strings.isEmpty(request.requestedDueDate)) ? request.requestedDueDate : '기간 협의'}">기간 협의</span>
+<span class="stat-item-val pink"
+      th:text="${(request.hopePrice != null and request.hopePrice > 0) ? '₩' + #numbers.formatInteger(request.hopePrice, 0, 'COMMA') : '-'}">-</span>
+
+<span class="stat-item-label">희망 마감일</span>
+<span class="stat-item-val"
+      th:text="${(request.requestedDueDate != null and !#strings.isEmpty(request.requestedDueDate)) ? request.requestedDueDate : '-'}">-</span>
         </div>
       </div>
 
@@ -225,7 +224,6 @@
   }
 /*]]>*/
 </script>
-<!-- 지울주석 -->
 </th:block>
 </body>
 </html>
