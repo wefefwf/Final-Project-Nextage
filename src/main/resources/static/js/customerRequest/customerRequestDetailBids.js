@@ -5,14 +5,51 @@ let selectedBidIds = new Set();
 let currentSortType = 'priceDesc';
 let currentSelectedBid = null;
 let currentSelectStep = 1;
-const TOTAL_SELECT_STEPS = 4;
+const TOTAL_SELECT_STEPS = 2;
 
 let isLoggedIn = false;
 let isBusinessUser = false;
 let currentBusinessId = null;
+let currentCustomerId = 0;
+let requestOwnerCustomerId = 0;
+
 let currentHopePrice = 0;
 let currentMinAllowedPrice = 0;
 let currentMaxAllowedPrice = 0;
+let currentRequestStatus = '';
+
+(function initToastRoot() {
+    if (document.getElementById('bid-toast-root')) return;
+    const root = document.createElement('div');
+    root.id = 'bid-toast-root';
+    root.style.cssText = 'position:fixed;bottom:28px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;z-index:99999;pointer-events:none';
+    document.body.appendChild(root);
+})();
+
+function showToast(type, msg, duration) {
+    duration = duration || 3400;
+    const root = document.getElementById('bid-toast-root');
+    if (!root) return;
+    const icons = { success: '✔', error: '✕', warn: '!' };
+    const classes = { success: 'bid-toast-success', error: 'bid-toast-error', warn: 'bid-toast-warn' };
+    const el = document.createElement('div');
+    el.className = 'bid-toast ' + (classes[type] || 'bid-toast-success');
+    el.style.pointerEvents = 'auto';
+    el.innerHTML = '<span class="bid-toast-icon">' + icons[type] + '</span><span class="bid-toast-msg">' + msg + '</span><button class="bid-toast-close" onclick="dismissToast(this.closest(\'.bid-toast\'))">✕</button>';
+    root.appendChild(el);
+    el._toastTimer = setTimeout(function() { dismissToast(el); }, duration);
+}
+
+function dismissToast(el) {
+    if (!el || el._dismissed) return;
+    el._dismissed = true;
+    clearTimeout(el._toastTimer);
+    el.classList.add('bid-toast-hiding');
+    el.addEventListener('animationend', function() { el.remove(); }, { once: true });
+}
+
+/* ── 선정 모달 캐시 ── */
+let cachedSelectInfo = null;
 
 function moveBidModalsToBody() {
     const compareModal = document.getElementById('compare-modal');
@@ -30,25 +67,31 @@ function moveBidModalsToBody() {
 function initBidSection({
     requestId,
     hopePrice,
+	requestStatus,
+	requestCustomerId,
     isLoggedIn: login,
     isBusinessUser: businessUser,
-    currentBusinessId: businessId
+    currentBusinessId: businessId,
+	currentCustomerId: customerId
 }) {
     currentRequestId = requestId;
     currentHopePrice = Number(hopePrice || 0);
+	currentRequestStatus = requestStatus || '';
     currentMinAllowedPrice = currentHopePrice > 0
         ? Math.ceil(currentHopePrice * 0.95)
         : 0;
-
+	requestOwnerCustomerId = Number(requestCustomerId || 0);
+		
     isLoggedIn = login;
     isBusinessUser = businessUser;
     currentBusinessId = businessId;
+	currentCustomerId = Number(customerId || 0);
 
     moveBidModalsToBody();
 
     toggleBidCreateSection();
     applyBidCreateFormConstraints();
-	renderBidPricePresets();
+    renderBidPricePresets();
 
     if (requestId) {
         refreshBidList(requestId);
@@ -64,11 +107,17 @@ function toggleBidCreateSection() {
         return;
     }
 
-    if (isBusinessUser) {
-        section.classList.remove('d-none');
-    } else {
+	if (!isBusinessUser) {
         section.classList.add('d-none');
+        return;
     }
+
+    if (currentRequestStatus !== 'OPEN') {
+        setBidCreateDisabled('현재 이 의뢰글은 제안 가능한 상태가 아닙니다.');
+        return;
+    }
+
+    section.classList.remove('d-none');
 }
 
 function applyBidCreateFormConstraints() {
@@ -97,24 +146,21 @@ function setBidCreateDisabled(message) {
     if (!section) return;
 
     section.innerHTML = `
-				<div class="bid-create-card">
-						<div class="bid-create-header">
-								<h3 class="bid-create-title">제안 상태</h3>
-								<p class="bid-create-subtitle">${message}</p>
-						</div>
-				</div>
-		`;
+        <div class="bid-create-card">
+            <div class="bid-create-header">
+                <h3 class="bid-create-title">제안 상태</h3>
+                <p class="bid-create-subtitle">${message}</p>
+            </div>
+        </div>
+    `;
     section.classList.remove('d-none');
 }
 
-function submitBidCreate() {
-	if (!confirm('제안을 등록하시겠습니까?')) return;
-	
+function doSubmitBidCreate() {
     if (!isBusinessUser) {
         alert('업체 회원만 제안할 수 있습니다.');
         return;
     }
-
     if (!currentRequestId) {
         alert('의뢰글 정보가 없습니다.');
         return;
@@ -125,30 +171,16 @@ function submitBidCreate() {
     const expectedDueDate = document.getElementById('bid-create-due-date')?.value || '';
     const asAvailableValue = document.getElementById('bid-create-as-available')?.value || '';
 
-    if (!description) {
-        alert('제안 설명을 입력해주세요.');
-        return;
-    }
-
-    if (!validateBidPriceInput({ showAlert: true, refocus: true })) {
-        return;
-    }
-
-    if (!expectedDueDate) {
-        alert('예상 완료일을 선택해주세요.');
-        return;
-    }
+    if (!description) { alert('제안 설명을 입력해주세요.'); return; }
+    if (!validateBidPriceInput({ showAlert: true, refocus: true })) return;
+    if (!expectedDueDate) { alert('예상 완료일을 선택해주세요.'); return; }
 
     const today = new Date().toISOString().split('T')[0];
     if (expectedDueDate < today) {
         alert('예상 완료일은 오늘 이후 날짜만 선택할 수 있습니다.');
         return;
     }
-
-    if (asAvailableValue === '') {
-        alert('A/S 여부를 선택해주세요.');
-        return;
-    }
+    if (asAvailableValue === '') { alert('A/S 여부를 선택해주세요.'); return; }
 
     const payload = {
         requestId: currentRequestId,
@@ -161,29 +193,57 @@ function submitBidCreate() {
 
     fetch('/api/bids/', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
     })
         .then(async res => {
             const data = await res.json();
-
             if (!res.ok || data.success === false) {
                 throw new Error(data.message || '제안 등록에 실패했습니다.');
             }
-
             return data;
         })
         .then(data => {
-            alert(data.message || '제안이 등록되었습니다.');
+            showToast('success', data.message || '제안이 등록되었습니다.');
             resetBidCreateForm();
             refreshBidList(currentRequestId);
         })
         .catch(err => {
-            console.error(err);
-            alert(err.message);
+            showToast('error', err.message);
         });
+}
+
+// 등록 버튼 클릭 — 인라인 확인 UI 표시
+function submitBidCreate() {
+    const submitBtn = document.getElementById('btn-submit-bid-create');
+    const actionsEl = submitBtn?.closest('.bid-create-actions');
+    if (!submitBtn || !actionsEl) return;
+
+    // 이미 확인 UI가 떠 있으면 중복 생성 방지
+    if (document.getElementById('bid-submit-confirm-zone')) return;
+
+    submitBtn.style.display = 'none';
+
+    const confirmZone = document.createElement('div');
+    confirmZone.id = 'bid-submit-confirm-zone';
+    confirmZone.className = 'bid-submit-confirm-zone';
+    confirmZone.innerHTML = `
+        <span class="bid-submit-confirm-msg">등록할까요?</span>
+        <button type="button" class="btn-bid-submit-cancel">취소</button>
+        <button type="button" class="btn-bid-submit-ok">등록</button>
+    `;
+    actionsEl.appendChild(confirmZone);
+
+    confirmZone.querySelector('.btn-bid-submit-cancel').onclick = () => {
+        confirmZone.remove();
+        submitBtn.style.display = '';
+    };
+
+    confirmZone.querySelector('.btn-bid-submit-ok').onclick = () => {
+        confirmZone.remove();
+        submitBtn.style.display = '';
+        doSubmitBidCreate(); // 실제 등록 실행
+    };
 }
 
 function resetBidCreateForm() {
@@ -197,7 +257,6 @@ function resetBidCreateForm() {
     if (dueDateEl) dueDateEl.value = '';
     if (asAvailableEl) asAvailableEl.value = '';
 
-    // 스텝 초기화
     currentBidStep = 1;
     bidAsValue = '';
     document.getElementById('as-yes').className = 'toggle-btn';
@@ -235,32 +294,19 @@ function validateBidPriceInput({ showAlert = false, refocus = false } = {}) {
 
     const rawValue = sanitizePriceInputValue(priceInput.value);
 
-    if (!rawValue) {
-        return true;
-    }
+    if (!rawValue) return true;
 
     const price = parseInt(rawValue, 10);
 
     if (Number.isNaN(price) || price <= 0) {
-        if (showAlert) {
-            alert('제안 가격을 올바르게 입력해주세요.');
-        }
-        if (refocus) {
-            setTimeout(() => priceInput.focus(), 0);
-        }
+        if (showAlert) alert('제안 가격을 올바르게 입력해주세요.');
+        if (refocus) setTimeout(() => priceInput.focus(), 0);
         return false;
     }
 
     if (currentMinAllowedPrice > 0 && price < currentMinAllowedPrice) {
-        if (showAlert) {
-            alert(`제안 가격은 최소 ₩ ${formatPrice(currentMinAllowedPrice)} 이상이어야 합니다.`);
-        }
-        if (refocus) {
-            setTimeout(() => {
-                priceInput.focus();
-                priceInput.select();
-            }, 0);
-        }
+        if (showAlert) alert(`제안 가격은 최소 ₩ ${formatPrice(currentMinAllowedPrice)} 이상이어야 합니다.`);
+        if (refocus) setTimeout(() => { priceInput.focus(); priceInput.select(); }, 0);
         return false;
     }
 
@@ -276,9 +322,7 @@ function clearSelectedBids() {
     selectedBidIds.clear();
 
     document.querySelectorAll('.bid-compare-checkbox').forEach(checkbox => {
-        if (!checkbox.disabled) {
-            checkbox.checked = false;
-        }
+        if (!checkbox.disabled) checkbox.checked = false;
     });
 
     syncCompareButton();
@@ -290,13 +334,8 @@ function updateCompareButtons() {
     const clearBtn = document.getElementById('btn-clear-compare');
     const compareBtn = document.getElementById('btn-open-compare');
 
-    if (clearBtn) {
-        clearBtn.classList.toggle('d-none', checkedCount < 1);
-    }
-
-    if (compareBtn) {
-        compareBtn.classList.toggle('d-none', checkedCount < 2);
-    }
+    if (clearBtn) clearBtn.classList.toggle('d-none', checkedCount < 1);
+    if (compareBtn) compareBtn.classList.toggle('d-none', checkedCount < 2);
 }
 
 function updateBidStatus(bidId, newStatus) {
@@ -306,20 +345,40 @@ function updateBidStatus(bidId, newStatus) {
         body: JSON.stringify({ status: newStatus })
     }).then(async res => {
         const data = await res.json();
-
         if (!res.ok || data.success === false) {
             throw new Error(data.message || '상태 변경에 실패했습니다.');
         }
-
         return data;
     });
 }
 
 function rejectBid(bidId) {
-    if (!confirm('정말 거절하시겠습니까?')) return;
+    const actionsEl = document.getElementById(`bid-actions-${bidId}`);
+    if (!actionsEl) return;
 
+    actionsEl.innerHTML = `
+        <div class="reject-confirm-zone" id="reject-zone-${bidId}">
+            <span class="reject-confirm-msg">정말 거절할까요?</span>
+            <button class="btn-reject-cancel" onclick="cancelReject(${bidId})">취소</button>
+            <button class="btn-reject-confirm" onclick="confirmReject(${bidId})">거절</button>
+        </div>
+    `;
+}
+
+function cancelReject(bidId) {
+    const actionsEl = document.getElementById(`bid-actions-${bidId}`);
+    if (!actionsEl) return;
+
+    actionsEl.innerHTML = `
+        <button class="btn-select-bid" onclick="selectBid(${bidId})">선정</button>
+        <button class="btn-reject-bid" onclick="rejectBid(${bidId})">거절</button>
+    `;
+}
+
+function confirmReject(bidId) {
     updateBidStatus(bidId, 'REJECTED')
         .then(() => {
+			showToast('success', '제안을 거절했습니다.');
             clearSelectedBids();
             refreshBidList(currentRequestId);
         })
@@ -331,12 +390,10 @@ function rejectBid(bidId) {
 
 function selectBid(bidId) {
     const bid = currentBidData.find(item => item.bidId === bidId);
-
     if (!bid) {
         alert('선택한 제안 정보를 찾을 수 없습니다.');
         return;
     }
-
     openSelectBidModal(bid);
 }
 
@@ -371,18 +428,9 @@ function handleBidCheckboxChange(checkbox, bidId) {
 }
 
 function compareWithinGroup(a, b) {
-    if (currentSortType === 'priceAsc') {
-        return (a.price || 0) - (b.price || 0);
-    }
-
-    if (currentSortType === 'priceDesc') {
-        return (b.price || 0) - (a.price || 0);
-    }
-
-    if (currentSortType === 'oldest') {
-        return new Date(a.createdAt) - new Date(b.createdAt);
-    }
-
+    if (currentSortType === 'priceAsc') return (a.price || 0) - (b.price || 0);
+    if (currentSortType === 'priceDesc') return (b.price || 0) - (a.price || 0);
+    if (currentSortType === 'oldest') return new Date(a.createdAt) - new Date(b.createdAt);
     return new Date(b.createdAt) - new Date(a.createdAt);
 }
 
@@ -395,15 +443,12 @@ function getBidGroupOrder(status) {
 function applyStatusPriority(data) {
     return [...data].sort((a, b) => {
         const groupDiff = getBidGroupOrder(a.status) - getBidGroupOrder(b.status);
-
-        if (groupDiff !== 0) {
-            return groupDiff;
-        }
-
+        if (groupDiff !== 0) return groupDiff;
         return compareWithinGroup(a, b);
     });
 }
 
+/* ── 비교 모달 ── */
 function openCompareModal() {
     const modal = document.getElementById('compare-modal');
     const body = document.getElementById('compare-modal-body');
@@ -416,46 +461,40 @@ function openCompareModal() {
     }
 
     const columnsHtml = selectedBids.map(bid => `
-				<div class="compare-column">
-						<div class="compare-vendor-name">전문가 #${bid.businessId}</div>
-
-						<div class="compare-item">
-								<span class="compare-label">제안일</span>
-								<span class="compare-value">${formatDate(bid.createdAt)}</span>
-						</div>
-
-						<div class="compare-item">
-								<span class="compare-label">가격</span>
-								<span class="compare-value">₩ ${formatPrice(bid.price)}</span>
-						</div>
-
-						<div class="compare-item">
-								<span class="compare-label">예상 완료일</span>
-								<span class="compare-value">${bid.expectedDueDate || '-'}</span>
-						</div>
-
-						<div class="compare-item">
-								<span class="compare-label">A/S 여부</span>
-								<span class="compare-value">${bid.asAvailable ? '가능' : '불가'}</span>
-						</div>
-
-						<div class="compare-item compare-item-description">
-								<span class="compare-label">설명</span>
-								<span class="compare-value">${bid.description || '-'}</span>
-						</div>
-
-						<div class="compare-item">
-								<span class="compare-label">상태</span>
-								<span class="compare-value">${getStatusText(bid.status)}</span>
-						</div>
-				</div>
-		`).join('');
+        <div class="compare-column">
+            <div class="compare-vendor-name">전문가 #${bid.businessId}</div>
+            <div class="compare-item">
+                <span class="compare-label">제안일</span>
+                <span class="compare-value">${formatDate(bid.createdAt)}</span>
+            </div>
+            <div class="compare-item">
+                <span class="compare-label">가격</span>
+                <span class="compare-value">₩ ${formatPrice(bid.price)}</span>
+            </div>
+            <div class="compare-item">
+                <span class="compare-label">예상 완료일</span>
+                <span class="compare-value">${bid.expectedDueDate || '-'}</span>
+            </div>
+            <div class="compare-item">
+                <span class="compare-label">A/S 여부</span>
+                <span class="compare-value">${bid.asAvailable ? '가능' : '불가'}</span>
+            </div>
+            <div class="compare-item compare-item-description">
+                <span class="compare-label">설명</span>
+                <span class="compare-value">${bid.description || '-'}</span>
+            </div>
+            <div class="compare-item">
+                <span class="compare-label">상태</span>
+                <span class="compare-value">${getStatusText(bid.status)}</span>
+            </div>
+        </div>
+    `).join('');
 
     body.innerHTML = `
-				<div class="compare-grid compare-grid-${selectedBids.length}">
-						${columnsHtml}
-				</div>
-		`;
+        <div class="compare-grid compare-grid-${selectedBids.length}">
+            ${columnsHtml}
+        </div>
+    `;
 
     modal.classList.remove('hidden');
     document.body.classList.add('modal-open');
@@ -464,23 +503,17 @@ function openCompareModal() {
 function closeCompareModal() {
     const modal = document.getElementById('compare-modal');
     if (!modal) return;
-
     modal.classList.add('hidden');
     document.body.classList.remove('modal-open');
 }
 
+/* ── 선정 모달 ── */
 function openSelectBidModal(bid) {
     const modal = document.getElementById('select-bid-modal');
     if (!modal) return;
 
     currentSelectedBid = bid;
-
-    document.getElementById('select-modal-vendor-name').textContent = `전문가 #${bid.businessId}`;
-    document.getElementById('select-modal-created-at').textContent = formatDate(bid.createdAt);
-    document.getElementById('select-modal-price').textContent = `₩ ${formatPrice(bid.price)}`;
-    document.getElementById('select-modal-due-date').textContent = bid.expectedDueDate || '-';
-    document.getElementById('select-modal-as-available').textContent = bid.asAvailable ? '가능' : '불가';
-
+    cachedSelectInfo = null;
     resetSelectBidForm();
 
     modal.classList.remove('hidden');
@@ -494,6 +527,7 @@ function closeSelectBidModal() {
     modal.classList.add('hidden');
     currentSelectedBid = null;
     currentSelectStep = 1;
+    cachedSelectInfo = null;
     document.body.classList.remove('modal-open');
 }
 
@@ -510,163 +544,236 @@ function getStatusText(status) {
 function resetSelectBidForm() {
     currentSelectStep = 1;
 
-    document.getElementById('select-modal-size').value = '';
-    document.getElementById('select-modal-address').value = '';
-    document.getElementById('select-modal-request').value = '';
-    document.getElementById('select-modal-agree').checked = false;
-
-    document.getElementById('confirm-size').textContent = '-';
-    document.getElementById('confirm-address').textContent = '-';
-    document.getElementById('confirm-request').textContent = '-';
+    const sizeEl = document.getElementById('select-modal-size');
+    const agreeEl = document.getElementById('select-modal-agree');
+    if (sizeEl) sizeEl.value = '';
+    if (agreeEl) agreeEl.checked = false;
 
     updateSelectStepUI();
 }
 
 function updateSelectStepUI() {
-	document.querySelectorAll('.select-step-panel').forEach(panel => {
-		panel.classList.toggle(
-			'active',
-			Number(panel.dataset.stepPanel) === currentSelectStep
-		);
-	});
+    // 패널 토글
+    document.querySelectorAll('.select-step-panel').forEach(panel => {
+        panel.classList.toggle('active', Number(panel.dataset.stepPanel) === currentSelectStep);
+    });
 
-	// select-stepper 안의 step-dot만 타겟
-	document.querySelectorAll('.select-stepper .step-dot').forEach(dot => {
-		const step = Number(dot.dataset.step);
-		dot.classList.toggle('active', step === currentSelectStep);
-		dot.classList.toggle('done', step < currentSelectStep);
-	});
+    // 스텝 닷
+    document.querySelectorAll('.select-stepper .step-dot').forEach(dot => {
+        const s = Number(dot.dataset.step);
+        dot.classList.toggle('active', s === currentSelectStep);
+        dot.classList.toggle('done', s < currentSelectStep);
+    });
 
-	document.querySelectorAll('.select-stepper .step-title').forEach(title => {
-		const step = Number(title.dataset.stepTitle);
-		title.classList.toggle('active', step === currentSelectStep);
-	});
+    // 스텝 타이틀
+    document.querySelectorAll('.select-stepper .step-title').forEach(title => {
+        title.classList.toggle('active', Number(title.dataset.stepTitle) === currentSelectStep);
+    });
 
-	const prevBtn = document.getElementById('btn-prev-select-step');
-	const nextBtn = document.getElementById('btn-next-select-step');
-	const submitBtn = document.getElementById('btn-submit-select-bid');
-
-	if (prevBtn) {
-		prevBtn.classList.toggle('d-none', currentSelectStep === 1);
-	}
-
-	if (nextBtn) {
-		nextBtn.classList.toggle('d-none', currentSelectStep === TOTAL_SELECT_STEPS);
-	}
-
-	if (submitBtn) {
-		submitBtn.classList.toggle('d-none', currentSelectStep !== TOTAL_SELECT_STEPS);
-	}
-}
-
-function updateSelectConfirmValues() {
-    const size = document.getElementById('select-modal-size').value.trim();
-    const address = document.getElementById('select-modal-address').value.trim();
-    const request = document.getElementById('select-modal-request').value.trim();
-
-    document.getElementById('confirm-size').textContent = size || '-';
-    document.getElementById('confirm-address').textContent = address || '-';
-    document.getElementById('confirm-request').textContent = request || '-';
-}
-
-function validateCurrentStep() {
-    if (currentSelectStep === 1) {
-        const size = document.getElementById('select-modal-size').value.trim();
-        if (!size) {
-            alert('치수 정보를 입력해주세요.');
-            return false;
-        }
+    // 헤더 타이틀
+    const headerTitle = document.getElementById('select-modal-title-text');
+    if (headerTitle) {
+        headerTitle.textContent = currentSelectStep === 1 ? '치수 입력' : '최종 확인 및 결제';
     }
 
-    if (currentSelectStep === 2) {
-        const address = document.getElementById('select-modal-address').value.trim();
-        if (!address) {
-            alert('배송지 정보를 입력해주세요.');
-            return false;
-        }
-    }
+    // 버튼
+    const prevBtn = document.getElementById('btn-prev-select-step');
+    const nextBtn = document.getElementById('btn-next-select-step');
+    const submitBtn = document.getElementById('btn-submit-select-bid');
 
-    if (currentSelectStep === 3) {
-        const request = document.getElementById('select-modal-request').value.trim();
-        if (!request) {
-            alert('요청사항을 입력해주세요.');
-            return false;
-        }
-    }
-
-    return true;
+    prevBtn?.classList.toggle('d-none', currentSelectStep === 1);
+    nextBtn?.classList.toggle('d-none', currentSelectStep === TOTAL_SELECT_STEPS);
+    submitBtn?.classList.toggle('d-none', currentSelectStep !== TOTAL_SELECT_STEPS);
 }
 
 function goNextSelectStep() {
-    if (!validateCurrentStep()) return;
-
-    if (currentSelectStep === 3) {
-        updateSelectConfirmValues();
-    }
-
-    if (currentSelectStep < TOTAL_SELECT_STEPS) {
-        currentSelectStep += 1;
+    if (currentSelectStep === 1) {
+        const size = document.getElementById('select-modal-size').value.trim();
+        if (!size) {
+            alert('치수를 입력해주세요.');
+            return;
+        }
+        currentSelectStep = 2;
         updateSelectStepUI();
+        loadSelectInfo();
+        return;
     }
 }
 
 function goPrevSelectStep() {
     if (currentSelectStep > 1) {
-        currentSelectStep -= 1;
+        currentSelectStep--;
         updateSelectStepUI();
     }
 }
 
+function loadSelectInfo() {
+    const loading = document.getElementById('select-confirm-loading');
+    const content = document.getElementById('select-confirm-content');
+
+    loading.classList.remove('d-none');
+    content.classList.add('d-none');
+
+    // 캐시 있으면 재사용
+    if (cachedSelectInfo) {
+        fillSelectConfirm(cachedSelectInfo);
+        return;
+    }
+
+    fetch(`/api/bids/${currentSelectedBid.bidId}/select-info`)
+        .then(res => {
+            if (!res.ok) throw new Error('정보 조회에 실패했습니다.');
+            return res.json();
+        })
+        .then(data => {
+            cachedSelectInfo = data;
+            fillSelectConfirm(data);
+        })
+        .catch(err => {
+            alert(err.message);
+            // 실패 시 step 1로 복귀
+            currentSelectStep = 1;
+            updateSelectStepUI();
+        });
+}
+
+function fillSelectConfirm(info) {
+    const loading = document.getElementById('select-confirm-loading');
+    const content = document.getElementById('select-confirm-content');
+
+    // 의뢰 정보
+    document.getElementById('ci-request-title').textContent = info.request?.title || '❌정보 조회 실패❌';
+    document.getElementById('ci-request-desc').textContent = info.request?.description || '❌정보 조회 실패❌';
+    document.getElementById('ci-hope-price').textContent =
+        info.request?.hopePrice ? `₩ ${formatPrice(info.request.hopePrice)}` : '❌정보 조회 실패❌';
+    document.getElementById('ci-requested-due-date').textContent = info.request?.requestedDueDate || '❌정보 조회 실패❌';
+    document.getElementById('ci-dimensions').textContent =
+        document.getElementById('select-modal-size').value.trim() || '-';
+
+    // 업체 제안
+    document.getElementById('ci-vendor-name').textContent =
+        info.bid?.businessId ? `전문가 #${info.bid.businessId}` : '❌정보 조회 실패❌';
+    document.getElementById('ci-bid-price').textContent =
+        info.bid?.price ? `₩ ${formatPrice(info.bid.price)}` : '❌정보 조회 실패❌';
+    document.getElementById('ci-bid-due-date').textContent = info.bid?.expectedDueDate || '❌정보 조회 실패❌';
+    document.getElementById('ci-as-available').textContent =
+        info.bid == null ? '❌정보 조회 실패❌' : (info.bid.asAvailable ? '✔ 가능' : '✖ 불가');
+    document.getElementById('ci-bid-desc').textContent = info.bid?.description || '❌정보 조회 실패❌';
+
+    // 배송 정보
+    document.getElementById('ci-address').textContent = info.customer?.address || '❌정보 조회 실패❌';
+    document.getElementById('ci-phone').textContent = info.customer?.phoneNumber || '❌정보 조회 실패❌';
+
+    loading.classList.add('d-none');
+    content.classList.remove('d-none');
+}
+
+function submitSelectBid() {
+    const agreeChecked = document.getElementById('select-modal-agree').checked;
+    if (!agreeChecked) {
+        alert('결제 동의가 필요합니다.');
+        return;
+    }
+
+    const size = document.getElementById('select-modal-size').value.trim();
+    if (!size) {
+        alert('치수 정보가 없습니다.');
+        currentSelectStep = 1;
+        updateSelectStepUI();
+        return;
+    }
+
+    if (!currentSelectedBid) {
+        alert('선택된 업체 정보가 없습니다.');
+        return;
+    }
+
+    // 결제 API
+    alert('결제 API 연결 전입니다.\n결제 성공 시 치수 저장 + 선정이 처리됩니다.');
+
+    // TODO: 결제 API 연동 후 성공 콜백에서 호출
+    // confirmSelectBid(size);
+}
+
+function confirmSelectBid(dimensions) {
+    const payload = {
+        bidId: currentSelectedBid.bidId,
+        dimensions: { raw: dimensions }  // request.dimensions JSON 컬럼에 저장
+    };
+
+    fetch(`/api/bids/${currentSelectedBid.bidId}/select`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    })
+        .then(async res => {
+            const data = await res.json();
+            if (!res.ok || data.success === false) {
+                throw new Error(data.message || '선정 처리에 실패했습니다.');
+            }
+            return data;
+        })
+        .then(() => {
+            closeSelectBidModal();
+            alert('선정이 완료되었습니다!');
+            refreshBidList(currentRequestId);
+        })
+        .catch(err => {
+            alert(err.message);
+        });
+}
+
+/* ── 이벤트 리스너 ── */
 document.addEventListener('keyup', (e) => {
-	if (e.target.id !== 'bid-create-price') return;
+    if (e.target.id !== 'bid-create-price') return;
 
-	const raw = sanitizePriceInputValue(e.target.value);
-	const price = Number(raw);
-	const errEl = document.getElementById('err-price');
+    const raw = sanitizePriceInputValue(e.target.value);
+    const price = Number(raw);
+    const errEl = document.getElementById('err-price');
 
-	if (!raw || price <= 0) {
-		e.target.classList.remove('error');
-		if (errEl) errEl.classList.remove('visible');
-	} else if (currentMinAllowedPrice > 0 && price < currentMinAllowedPrice) {
-		e.target.classList.add('error');
-		if (errEl) {
-			errEl.textContent = `최소 제안 가격은 ₩ ${formatPrice(currentMinAllowedPrice)} 입니다.`;
-			errEl.classList.add('visible');
-		}
-	} else if (currentMaxAllowedPrice > 0 && price > currentMaxAllowedPrice) {
-		e.target.classList.add('error');
-		if (errEl) {
-			errEl.textContent = `현재 최저 제안가 ₩ ${formatPrice(currentMaxAllowedPrice)} 보다 낮게 입력해주세요.`;
-			errEl.classList.add('visible');
-		}
-	} else {
-		e.target.classList.remove('error');
-		if (errEl) errEl.classList.remove('visible');
-	}
+    if (!raw || price <= 0) {
+        e.target.classList.remove('error');
+        if (errEl) errEl.classList.remove('visible');
+    } else if (currentMinAllowedPrice > 0 && price < currentMinAllowedPrice) {
+        e.target.classList.add('error');
+        if (errEl) {
+            errEl.textContent = `최소 제안 가격은 ₩ ${formatPrice(currentMinAllowedPrice)} 입니다.`;
+            errEl.classList.add('visible');
+        }
+    } else if (currentMaxAllowedPrice > 0 && price > currentMaxAllowedPrice) {
+        e.target.classList.add('error');
+        if (errEl) {
+            errEl.textContent = `현재 최저 제안가 ₩ ${formatPrice(currentMaxAllowedPrice)} 보다 낮게 입력해주세요.`;
+            errEl.classList.add('visible');
+        }
+    } else {
+        e.target.classList.remove('error');
+        if (errEl) errEl.classList.remove('visible');
+    }
 });
 
 document.addEventListener('input', (e) => {
-	if (e.target.id === 'bid-create-price') {
-		const cursorEnd = e.target.selectionEnd;
-		const beforeLength = e.target.value.length;
+    if (e.target.id === 'bid-create-price') {
+        const cursorEnd = e.target.selectionEnd;
+        const beforeLength = e.target.value.length;
 
-		e.target.value = formatPriceInputValue(e.target.value);
+        e.target.value = formatPriceInputValue(e.target.value);
 
-		const afterLength = e.target.value.length;
-		const diff = afterLength - beforeLength;
-		const nextPos = Math.max((cursorEnd || afterLength) + diff, 0);
+        const afterLength = e.target.value.length;
+        const diff = afterLength - beforeLength;
+        const nextPos = Math.max((cursorEnd || afterLength) + diff, 0);
 
-		requestAnimationFrame(() => {
-			e.target.setSelectionRange(nextPos, nextPos);
-		});
-	}
+        requestAnimationFrame(() => {
+            e.target.setSelectionRange(nextPos, nextPos);
+        });
+    }
 });
 
 document.addEventListener('blur', (e) => {
-	if (e.target.id === 'bid-create-price') {
-		const rawValue = sanitizePriceInputValue(e.target.value);
-		e.target.value = formatPriceInputValue(rawValue);
-	}
+    if (e.target.id === 'bid-create-price') {
+        const rawValue = sanitizePriceInputValue(e.target.value);
+        e.target.value = formatPriceInputValue(rawValue);
+    }
 }, true);
 
 document.addEventListener('change', (e) => {
@@ -675,28 +782,27 @@ document.addEventListener('change', (e) => {
         handleBidCheckboxChange(e.target, bidId);
     }
 
-	if (e.target.id === 'bid-create-due-date') {
-			const errEl = document.getElementById('err-due-date');
-			const today = new Date().toISOString().split('T')[0];
+    if (e.target.id === 'bid-create-due-date') {
+        const errEl = document.getElementById('err-due-date');
+        const today = new Date().toISOString().split('T')[0];
 
-			if (!e.target.value) {
-				e.target.classList.add('error');
-				if (errEl) {
-					errEl.textContent = '예상 완료일을 선택해주세요.';
-					errEl.classList.add('visible');
-				}
-			} else if (e.target.value < today) {
-				e.target.classList.add('error');
-				if (errEl) {
-					errEl.textContent = '오늘 이후 날짜를 선택해주세요.';
-					errEl.classList.add('visible');
-				}
-			} else {
-				e.target.classList.remove('error');
-				if (errEl) errEl.classList.remove('visible');
-			}
-		}
-		
+        if (!e.target.value) {
+            e.target.classList.add('error');
+            if (errEl) {
+                errEl.textContent = '예상 완료일을 선택해주세요.';
+                errEl.classList.add('visible');
+            }
+        } else if (e.target.value < today) {
+            e.target.classList.add('error');
+            if (errEl) {
+                errEl.textContent = '오늘 이후 날짜를 선택해주세요.';
+                errEl.classList.add('visible');
+            }
+        } else {
+            e.target.classList.remove('error');
+            if (errEl) errEl.classList.remove('visible');
+        }
+    }
 });
 
 document.addEventListener('click', (e) => {
@@ -722,7 +828,6 @@ document.addEventListener('click', (e) => {
         document.querySelectorAll('.pro-menu.show').forEach(menu => {
             menu.classList.remove('show');
         });
-
         const isOpen = sortMenu.classList.toggle('show');
         sortButton.classList.toggle('active', isOpen);
         return;
@@ -739,13 +844,10 @@ document.addEventListener('click', (e) => {
         sortOption.classList.add('active');
 
         if (sortButton) {
-            sortButton.innerHTML = `${sortOption.textContent} <span class="sort-arrow">▼</span>`;
+            sortButton.innerHTML = `${sortOption.textContent}`;
             sortButton.classList.remove('active');
         }
-
-        if (sortMenu) {
-            sortMenu.classList.remove('show');
-        }
+        if (sortMenu) sortMenu.classList.remove('show');
 
         renderBidList(currentBidData);
         return;
@@ -759,10 +861,7 @@ document.addEventListener('click', (e) => {
             if (m !== menu) m.classList.remove('show');
         });
 
-        if (menu) {
-            menu.classList.toggle('show');
-        }
-
+        if (menu) menu.classList.toggle('show');
         if (sortMenu) sortMenu.classList.remove('show');
         if (sortButton) sortButton.classList.remove('active');
         return;
@@ -816,77 +915,16 @@ document.addEventListener('click', (e) => {
     }
 
     if (e.target.id === 'btn-submit-select-bid') {
-        const agreeChecked = document.getElementById('select-modal-agree').checked;
-        const size = document.getElementById('select-modal-size').value.trim();
-        const address = document.getElementById('select-modal-address').value.trim();
-        const request = document.getElementById('select-modal-request').value.trim();
-
-        if (!currentSelectedBid) {
-            alert('선택된 업체 정보가 없습니다.');
-            return;
-        }
-
-        if (!size) {
-            alert('치수 정보를 입력해주세요.');
-            currentSelectStep = 1;
-            updateSelectStepUI();
-            return;
-        }
-
-        if (!address) {
-            alert('배송지 정보를 입력해주세요.');
-            currentSelectStep = 2;
-            updateSelectStepUI();
-            return;
-        }
-
-        if (!request) {
-            alert('요청사항을 입력해주세요.');
-            currentSelectStep = 3;
-            updateSelectStepUI();
-            return;
-        }
-
-        if (!agreeChecked) {
-            alert('약관 동의가 필요합니다.');
-            return;
-        }
-
-        const detailPayload = {
-            size,
-            address,
-            request
-        };
-
-        const detailText = [
-            `[치수]`,
-            size,
-            ``,
-            `[배송지]`,
-            address,
-            ``,
-            `[요청사항]`,
-            request
-        ].join('\n');
-
-        alert(
-            `결제 기능은 아직 연결 전입니다.\n` +
-            `선택된 업체: 전문가 #${currentSelectedBid.businessId}\n\n` +
-            detailText
-        );
-
-        console.log('전달 payload 예시:', {
-            bidId: currentSelectedBid.bidId,
-            detail: detailPayload
-        });
-
+        submitSelectBid();
         return;
     }
 });
 
+/* ── 제안 리스트 렌더링 ── */
 function renderBidList(data) {
     const container = document.getElementById('bid-list-container');
     const emptyMessage = document.getElementById('bid-empty-message');
+	const isRequestOwnerCustomer = isLoggedIn && !isBusinessUser && Number(currentCustomerId) === Number(requestOwnerCustomerId);
 
     container.innerHTML = '';
 
@@ -900,8 +938,6 @@ function renderBidList(data) {
     );
 
     document.getElementById('bid-count-display').innerText = activeData.length;
-    syncCompareButton();
-    updateCompareButtons();
 
     if (activeData.length === 0) {
         emptyMessage.classList.remove('d-none');
@@ -919,7 +955,6 @@ function renderBidList(data) {
         const isWithdrawn = bid.status === 'WITHDRAWN';
         const checked = selectedBidIds.has(bid.bidId) ? 'checked' : '';
         const isOtherBidLocked = hasSelected && !isSelected;
-
         const disableActionButtons = (hasSelected && !isSelected) || isRejected || isWithdrawn;
         const disableCompareCheckbox = isRejected || isWithdrawn ? 'disabled' : '';
 
@@ -933,84 +968,82 @@ function renderBidList(data) {
         }
 
         const html = `
-						<div class="bid-item ${isSelected ? 'bid-selected' : ''}">
-								<div class="bid-header">
-										<div class="bid-header-left">
-												${isLoggedIn && !isBusinessUser ? `
-														<label class="bid-compare-check">
-																<input
-																		type="checkbox"
-																		class="bid-compare-checkbox"
-																		data-bid-id="${bid.bidId}"
-																		${checked}
-																		${disableCompareCheckbox}
-																/>
-														</label>
-												` : ''}
+            <div class="bid-item ${isSelected ? 'bid-selected' : ''}">
+                <div class="bid-header">
+                    <div class="bid-header-left">
+                        ${isLoggedIn && !isBusinessUser ? `
+                            <label class="bid-compare-check">
+                                <input
+                                    type="checkbox"
+                                    class="bid-compare-checkbox"
+                                    data-bid-id="${bid.bidId}"
+                                    ${checked}
+                                    ${disableCompareCheckbox}
+                                />
+                            </label>
+                        ` : ''}
 
-												<div class="pro-info" data-business-id="${bid.businessId}">
-														<div class="pro-avatar">
-																<img src="/image/default-profile.png" alt="업체 프로필">
-														</div>
-														<div class="pro-text">
-																<span class="pro-name">전문가 #${bid.businessId}</span>
-																<span class="bid-date">${formatDate(bid.createdAt)}</span>
-														</div>
-														<span class="pro-arrow">▼</span>
-												</div>
-										</div>
+                        <div class="pro-info" data-business-id="${bid.businessId}">
+                            <div class="pro-avatar">
+                                <img src="/image/default-profile.png" alt="업체 프로필">
+                            </div>
+                            <div class="pro-text">
+                                <span class="pro-name">전문가 #${bid.businessId}</span>
+                                <span class="bid-date">${formatDate(bid.createdAt)}</span>
+                            </div>
+                            <span class="pro-arrow">▼</span>
+                        </div>
+                    </div>
 
-										<div class="pro-menu" id="pro-menu-${bid.businessId}">
-												<a href="/business/portfolio/${bid.businessId}" class="menu-item">업체 정보</a>
+                    <div class="pro-menu" id="pro-menu-${bid.businessId}">
+                        <a href="/business/portfolio/${bid.businessId}" class="menu-item">업체 정보</a>
+                        ${isOtherBidLocked ? `` : `
+                            <div class="menu-divider"></div>
+                            <a href="/chat/${bid.businessId}" class="menu-item">실시간 채팅</a>
+                        `}
+                    </div>
 
-												${isOtherBidLocked
-                ? ``
-                : `
-																<div class="menu-divider"></div>
-																<a href="/chat/${bid.businessId}" class="menu-item">실시간 채팅</a>
-																`
-            }
-										</div>
+                    <div class="bid-header-right">
+                        ${isMyBid ? `<span class="bid-my-badge">내 제안</span>` : ''}
+                        ${statusMsg}
+                    </div>
+                </div>
 
-										<div class="bid-header-right">
-												${isMyBid ? `<span class="bid-my-badge">내 제안</span>` : ''}
-												${statusMsg}
-										</div>
-								</div>
+                <div class="bid-content">
+                    <p class="description">${bid.description || ''}</p>
+                    <div class="bid-specs">
+                        <div class="spec-item">
+                            <span class="label">예상 완료일</span>
+                            <span class="value">${bid.expectedDueDate || '-'}</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="label">A/S</span>
+                            <span class="value">${bid.asAvailable ? '가능' : '불가'}</span>
+                        </div>
+                    </div>
+                </div>
 
-								<div class="bid-content">
-										<p class="description">${bid.description || ''}</p>
-
-										<div class="bid-specs">
-												<div class="spec-item">
-														<span class="label">예상 완료일</span>
-														<span class="value">${bid.expectedDueDate || '-'}</span>
-												</div>
-												<div class="spec-item">
-														<span class="label">A/S</span>
-														<span class="value">${bid.asAvailable ? '가능' : '불가'}</span>
-												</div>
-										</div>
-								</div>
-
-								<div class="bid-footer">
-										<div class="bid-price">
-												<span class="label">제안 가격 &nbsp;:&nbsp;</span>
-												<strong>₩ ${formatPrice(bid.price)}</strong>
-										</div>
-
-										<div class="bid-actions">
-												${isLoggedIn && !isBusinessUser && bid.status === 'ACTIVE' && !disableActionButtons ? `
-														<button class="btn-select-bid" onclick="selectBid(${bid.bidId})">선정</button>
-														<button class="btn-reject-bid" onclick="rejectBid(${bid.bidId})">거절</button>
-												` : ''}
-										</div>
-								</div>
-						</div>
-				`;
+                <div class="bid-footer">
+                    <div class="bid-price">
+                        <span class="label">제안 가격 &nbsp;:&nbsp;</span>
+                        <strong>₩ ${formatPrice(bid.price)}</strong>
+                    </div>
+                    <div class="bid-actions" id="bid-actions-${bid.bidId}">
+                        ${isRequestOwnerCustomer && bid.status === 'ACTIVE' && !disableActionButtons ? `
+                            <button class="btn-select-bid" onclick="selectBid(${bid.bidId})">선정</button>
+                            <button class="btn-reject-bid" onclick="rejectBid(${bid.bidId})">거절</button>
+                        ` : ''}
+                    </div>
+                </div>
+            </div>
+        `;
 
         container.insertAdjacentHTML('beforeend', html);
     });
+	
+	syncCompareButton();
+    updateCompareButtons();
+		
 }
 
 function refreshBidList(requestId) {
@@ -1018,31 +1051,28 @@ function refreshBidList(requestId) {
 
     fetch(`/api/bids/request/${requestId}`)
         .then(res => {
-            if (!res.ok) {
-                throw new Error('제안 목록 조회에 실패했습니다.');
-            }
+            if (!res.ok) throw new Error('제안 목록 조회에 실패했습니다.');
             return res.json();
         })
         .then(data => {
             currentBidData = data;
             renderBidList(data);
-			
-			// 기존 ACTIVE 제안 중 최저가 계산
-			const activeBids = data.filter(b => b.status === 'ACTIVE');
-			if (activeBids.length > 0) {
-				currentMaxAllowedPrice = Math.min(...activeBids.map(b => b.price));
-			} else {
-				currentMaxAllowedPrice = 0;
-			}
 
-			renderBidPricePresets();
+            // 기존 ACTIVE 제안 중 최저가 계산
+            const activeBids = data.filter(b => b.status === 'ACTIVE');
+            if (activeBids.length > 0) {
+                currentMaxAllowedPrice = Math.min(...activeBids.map(b => b.price));
+            } else {
+                currentMaxAllowedPrice = 0;
+            }
+
+            renderBidPricePresets();
 
             if (isBusinessUser && currentBusinessId) {
                 const alreadySubmitted = data.some(
                     bid => Number(bid.businessId) === Number(currentBusinessId)
                         && bid.status === 'ACTIVE'
                 );
-
                 if (alreadySubmitted) {
                     setBidCreateDisabled('이미 이 의뢰글에 제안을 등록했습니다.');
                 }
@@ -1054,7 +1084,7 @@ function refreshBidList(requestId) {
         });
 }
 
-/* ───── 스텝 위자드 ───── */
+/* ── 제안 등록 스텝 위자드 ── */
 let currentBidStep = 1;
 const TOTAL_BID_STEPS = 4;
 let bidAsValue = '';
@@ -1062,11 +1092,10 @@ let bidAsValue = '';
 function setBidPrice(n) {
     const el = document.getElementById('bid-create-price');
     if (el) el.value = formatPrice(n);
-	
-	// 에러 해제
-	el.classList.remove('error');
-	const errEl = document.getElementById('err-price');
-	if (errEl) errEl.classList.remove('visible');
+
+    el.classList.remove('error');
+    const errEl = document.getElementById('err-price');
+    if (errEl) errEl.classList.remove('visible');
 }
 
 function setBidAS(val) {
@@ -1074,39 +1103,35 @@ function setBidAS(val) {
     document.getElementById('bid-create-as-available').value = val;
     document.getElementById('as-yes').className = 'toggle-btn' + (val === true ? ' active-yes' : '');
     document.getElementById('as-no').className = 'toggle-btn' + (val === false ? ' active-no' : '');
-	
-	// 에러 해제
-	const errEl = document.getElementById('err-as');
-	if (errEl) errEl.classList.remove('visible');
+
+    const errEl = document.getElementById('err-as');
+    if (errEl) errEl.classList.remove('visible');
 }
 
 function updateBidStepUI() {
-	// bid-step-panels 안의 패널만 타겟
-	document.querySelectorAll('.bid-step-panels .bid-step-panel').forEach(p => {
-		p.classList.toggle('active', Number(p.dataset.panel) === currentBidStep);
-	});
+    document.querySelectorAll('.bid-step-panels .bid-step-panel').forEach(p => {
+        p.classList.toggle('active', Number(p.dataset.panel) === currentBidStep);
+    });
 
-	// bid-step-indicator 안의 노드만 타겟
-	document.querySelectorAll('#bid-step-indicator .step-node').forEach(node => {
-		const n = Number(node.dataset.node);
-		node.classList.toggle('active', n === currentBidStep);
-		node.classList.toggle('done', n < currentBidStep);
-		const dot = node.querySelector('.step-dot');
-		if (n < currentBidStep) dot.textContent = '✓';
-		else if (n > currentBidStep) dot.textContent = n;
-		else dot.textContent = n;
-	});
+    document.querySelectorAll('#bid-step-indicator .step-node').forEach(node => {
+        const n = Number(node.dataset.node);
+        node.classList.toggle('active', n === currentBidStep);
+        node.classList.toggle('done', n < currentBidStep);
+        const dot = node.querySelector('.step-dot');
+        if (n < currentBidStep) dot.textContent = '✓';
+        else dot.textContent = n;
+    });
 
-	const fill = document.getElementById('bid-progress-fill');
-	if (fill) fill.style.width = (currentBidStep / TOTAL_BID_STEPS * 100) + '%';
+    const fill = document.getElementById('bid-progress-fill');
+    if (fill) fill.style.width = (currentBidStep / TOTAL_BID_STEPS * 100) + '%';
 
-	const backBtn = document.getElementById('btn-bid-back');
-	const nextBtn = document.getElementById('btn-bid-next');
-	const submitBtn = document.getElementById('btn-submit-bid-create');
+    const backBtn = document.getElementById('btn-bid-back');
+    const nextBtn = document.getElementById('btn-bid-next');
+    const submitBtn = document.getElementById('btn-submit-bid-create');
 
-	if (backBtn) backBtn.classList.toggle('d-none', currentBidStep === 1);
-	if (nextBtn) nextBtn.classList.toggle('d-none', currentBidStep === TOTAL_BID_STEPS);
-	if (submitBtn) submitBtn.classList.toggle('d-none', currentBidStep !== TOTAL_BID_STEPS);
+    if (backBtn) backBtn.classList.toggle('d-none', currentBidStep === 1);
+    if (nextBtn) nextBtn.classList.toggle('d-none', currentBidStep === TOTAL_BID_STEPS);
+    if (submitBtn) submitBtn.classList.toggle('d-none', currentBidStep !== TOTAL_BID_STEPS);
 }
 
 function fillBidConfirm() {
@@ -1141,17 +1166,7 @@ function validateBidStep() {
     clearBidErrors();
     let valid = true;
 
-    if (currentBidStep === 1) {
-        const desc = document.getElementById('bid-create-description');
-        if (!desc.value.trim()) {
-            desc.classList.add('error');
-            showBidError('err-description', '제안 설명을 입력해주세요.');
-            desc.focus();
-            valid = false;
-        }
-    }
-
-    if (currentBidStep === 2) {
+    if (currentBidStep === 1) {  // 가격
         const priceEl = document.getElementById('bid-create-price');
         const raw = sanitizePriceInputValue(priceEl.value);
         if (!raw || Number(raw) <= 0) {
@@ -1159,20 +1174,20 @@ function validateBidStep() {
             showBidError('err-price', '제안 가격을 입력해주세요.');
             priceEl.focus();
             valid = false;
-		} else if (currentMinAllowedPrice > 0 && Number(raw) < currentMinAllowedPrice) {
-			priceEl.classList.add('error');
-			showBidError('err-price', `최소 제안 가격은 ₩ ${formatPrice(currentMinAllowedPrice)} 입니다.`);
-			priceEl.focus();
-			valid = false;
-		} else if (currentMaxAllowedPrice > 0 && Number(raw) > currentMaxAllowedPrice) {
-			priceEl.classList.add('error');
-			showBidError('err-price', `현재 최저 제안가 ₩ ${formatPrice(currentMaxAllowedPrice)} 보다 낮게 입력해주세요.`);
-			priceEl.focus();
-			valid = false;
-		}
+        } else if (currentMinAllowedPrice > 0 && Number(raw) < currentMinAllowedPrice) {
+            priceEl.classList.add('error');
+            showBidError('err-price', `최소 제안 가격은 ₩ ${formatPrice(currentMinAllowedPrice)} 입니다.`);
+            priceEl.focus();
+            valid = false;
+        } else if (currentMaxAllowedPrice > 0 && Number(raw) > currentMaxAllowedPrice) {
+            priceEl.classList.add('error');
+            showBidError('err-price', `현재 최저 제안가 ₩ ${formatPrice(currentMaxAllowedPrice)} 보다 낮게 입력해주세요.`);
+            priceEl.focus();
+            valid = false;
+        }
     }
 
-    if (currentBidStep === 3) {
+    if (currentBidStep === 2) {  // 일정 · A/S
         const dateEl = document.getElementById('bid-create-due-date');
         const today = new Date().toISOString().split('T')[0];
         if (!dateEl.value) {
@@ -1190,6 +1205,16 @@ function validateBidStep() {
         }
     }
 
+    if (currentBidStep === 3) {  // 제안 설명
+        const desc = document.getElementById('bid-create-description');
+        if (!desc.value.trim()) {
+            desc.classList.add('error');
+            showBidError('err-description', '제안 설명을 입력해주세요.');
+            desc.focus();
+            valid = false;
+        }
+    }
+
     return valid;
 }
 
@@ -1199,14 +1224,6 @@ function goBidNext() {
     if (currentBidStep < TOTAL_BID_STEPS) {
         currentBidStep++;
         updateBidStepUI();
-		
-		// STEP 2로 넘어오면 가격 인풋에 포커스
-		if (currentBidStep === 2) {
-			setTimeout(() => {
-				const priceEl = document.getElementById('bid-create-price');
-				if (priceEl) priceEl.focus();
-			}, 50);
-		}
     }
 }
 
@@ -1217,58 +1234,46 @@ function goBidPrev() {
     }
 }
 
+/* ── 가격 프리셋 ── */
 function renderBidPricePresets() {
-	const container = document.getElementById('bid-price-presets');
-	if (!container) return;
+    const container = document.getElementById('bid-price-presets');
+    if (!container) return;
 
-	const base = currentMinAllowedPrice > 0 ? currentMinAllowedPrice : 10000;
+    const base = currentMinAllowedPrice > 0 ? currentMinAllowedPrice : 10000;
 
-	// 최대가격이 있으면 min~max 사이를 균등하게 나눠서 프리셋 생성
-	if (currentMaxAllowedPrice > 0 && currentMaxAllowedPrice >= base) {
-		const range = currentMaxAllowedPrice - base;
-		const candidates = range === 0
-			? [base]
-			: [
-				base,
-				Math.round(base + range * 0.5),
-				currentMaxAllowedPrice,
-			];
+    if (currentMaxAllowedPrice > 0 && currentMaxAllowedPrice >= base) {
+        const range = currentMaxAllowedPrice - base;
+        const candidates = range === 0
+            ? [base]
+            : [base, Math.round(base + range * 0.5), currentMaxAllowedPrice];
 
-		const presets = [...new Set(candidates)];
+        const presets = [...new Set(candidates)];
+        container.innerHTML = presets.map(price => `
+            <button class="preset-chip" type="button" onclick="setBidPrice(${price})">
+                ${formatPrice(price)}원
+            </button>
+        `).join('');
+        return;
+    }
 
-		container.innerHTML = presets.map(price => `
-			<button class="preset-chip" type="button" onclick="setBidPrice(${price})">
-				${formatPrice(price)}원
-			</button>
-		`).join('');
-		return;
-	}
+    const candidates = [
+        Math.ceil(base / 10000) * 10000,
+        Math.ceil(base * 1.5 / 10000) * 10000,
+        Math.ceil(base * 2 / 10000) * 10000,
+        Math.ceil(base * 3 / 10000) * 10000,
+        Math.ceil(base * 5 / 10000) * 10000,
+    ];
 
-	// 최대가격 없으면 기존 방식
-	const candidates = [
-		Math.ceil(base / 10000) * 10000,
-		Math.ceil(base * 1.5 / 10000) * 10000,
-		Math.ceil(base * 2 / 10000) * 10000,
-		Math.ceil(base * 3 / 10000) * 10000,
-		Math.ceil(base * 5 / 10000) * 10000,
-	];
+    const presets = [...new Set(candidates)];
 
-	const presets = [...new Set(candidates)];
+    if (presets.length === 0) {
+        container.innerHTML = '';
+        return;
+    }
 
-	container.innerHTML = presets.map(price => `
-		<button class="preset-chip" type="button" onclick="setBidPrice(${price})">
-			${formatPrice(price)}원
-		</button>
-	`).join('');
-
-	if (presets.length === 0) {
-		container.innerHTML = '';
-		return;
-	}
-
-	container.innerHTML = presets.map(price => `
-		<button class="preset-chip" type="button" onclick="setBidPrice(${price})">
-			${formatPrice(price)}원
-		</button>
-	`).join('');
+    container.innerHTML = presets.map(price => `
+        <button class="preset-chip" type="button" onclick="setBidPrice(${price})">
+            ${formatPrice(price)}원
+        </button>
+    `).join('');
 }

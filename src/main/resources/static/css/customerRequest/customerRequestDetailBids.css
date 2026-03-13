@@ -30,18 +30,23 @@
 
 /* 제안 카드 */
 .bid-item {
-	background: #fff;
-	border: 1px solid #eee;
-	border-radius: 14px;
-	padding: 22px;
-	margin-bottom: 16px;
-	transition: all 0.25s ease;
-	overflow: visible;
+    background: #fff;
+    border: 1px solid #f0e8f4;
+    border-radius: 16px;
+    padding: 22px;
+    margin-bottom: 14px;
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.bid-item:hover {
+    box-shadow: 0 6px 24px rgba(255, 121, 198, 0.1);
+    transform: translateY(-1px);
 }
 
 .bid-selected {
-	border: 2px solid #ffc3e9;
-	background: #fff;
+    border: 2px solid #ff79c6;
+    background: #fffcff;
+    box-shadow: 0 4px 20px rgba(255, 121, 198, 0.12);
 }
 
 .bid-header {
@@ -66,10 +71,13 @@
 	margin-right: 4px;
 }
 
+/* ── 체크박스 ── */
 .bid-compare-checkbox {
-	width: 18px;
-	height: 18px;
-	cursor: pointer;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #e879a8;
+    border-radius: 4px;
 }
 
 /* 업체 정보 */
@@ -207,10 +215,27 @@
 	padding-top: 15px;
 }
 
+/* ── 가격 표시 ── */
+.bid-price {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.bid-price .label {
+    font-size: 13px;
+    color: #aaa;
+    font-weight: 500;
+}
+
 .bid-price strong {
-	font-size: 24px;
-	font-weight: 700;
-	color: #2c3e50;
+    font-size: 22px;
+    font-weight: 800;
+    background: linear-gradient(135deg, #e879a8, #a855f7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -0.5px;
 }
 
 .bid-actions {
@@ -218,93 +243,126 @@
 	gap: 10px;
 }
 
-/* 상태 텍스트 */
+/* ── 상태 배지 ── */
 .selected-message {
-	display: inline-flex;
-	align-items: center;
-	padding: 6px 12px;
-	border-radius: 999px;
-	font-size: 13px;
-	font-weight: 700;
-	line-height: 1;
-	background-color: #f9eef5;
-	color: #ff79c6;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #ff79c6, #c084fc);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(255, 121, 198, 0.3);
 }
 
 .bid-status-withdrawn {
-	display: inline-flex;
-	align-items: center;
-	padding: 6px 12px;
-	border-radius: 999px;
-	font-size: 13px;
-	font-weight: 700;
-	line-height: 1;
-	background-color: #ffe2e0;
-	color: #e46962;
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    background: #f3f3f3;
+    color: #aaa;
 }
 
 .bid-status-rejected {
-	display: inline-flex;
-	align-items: center;
-	padding: 6px 12px;
-	border-radius: 999px;
-	font-size: 13px;
-	font-weight: 700;
-	line-height: 1;
-	background-color: #fff4e0;
-	color: #e4ab62;
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    background: #fff0f8;
+    color: #e879a8;
+    border: 1px solid #f9c8e2;
 }
 
-/* 버튼 */
+/* ── 선정 버튼 ── */
 .btn-select-bid {
-	background-color: #6283e4;
-	color: #fff;
-	border: 1px solid #ddd;
-	padding: 8px 20px;
-	border-radius: 50px;
-	cursor: pointer;
-	font-weight: 600;
-	transition: all 0.2s;
+    background: #e879a8;
+    color: #fff;
+    border: 1px solid #f9c8e2;
+    padding: 7px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: inherit;
+    transition: opacity .15s;
+    transition: opacity .15s;
 }
 
 .btn-select-bid:hover {
-	background-color: #4e7bff;
+    opacity: .85;
 }
 
+/* ── 거절 버튼 ── */
 .btn-reject-bid {
-	background-color: #e46962;
-	color: #fff;
-	border: 1px solid #ddd;
-	padding: 8px 20px;
-	border-radius: 50px;
-	cursor: pointer;
-	font-weight: 600;
-	transition: all 0.2s;
+    background: #fff;
+    color: #e879a8;
+    border: 1px solid #f9c8e2;
+    padding: 7px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: inherit;
+    transition: opacity .15s;
+    transition: opacity .15s;
 }
 
 .btn-reject-bid:hover {
-	background-color: #eb5c54;
-	border-color: #fff;
+    opacity: .85;
 }
 
-.btn-clear-compare, .btn-compare {
-	display: inline-block;
-	background-color: rgb(192, 192, 192);
-	color: #fff !important;
-	padding: 8px 20px;
-	border-radius: 20px;
-	font-size: 14px;
-	font-weight: 600;
-	text-decoration: none !important;
-	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-	transition: all 0.3s ease;
-	white-space: nowrap;
-	border: none;
+/* ── 선택해제 버튼 ── */
+.btn-clear-compare {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: #fff;
+    color: #888;
+    border: 1.5px solid #e8e8e8;
+    padding: 8px 18px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
-.btn-clear-compare:hover, .btn-compare:hover {
-	background-color: #000;
-	transform: translateY(-2px);
+.btn-clear-compare:hover {
+    border-color: #ff79c6;
+    color: #e879a8;
+}
+
+/* ── 비교하기 버튼 ── */
+.btn-compare {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: linear-gradient(135deg, #ff79c6, #c084fc);
+    color: #fff;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    box-shadow: 0 3px 10px rgba(255, 121, 198, 0.3);
+}
+
+.btn-compare:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+    box-shadow: 0 5px 16px rgba(255, 121, 198, 0.4);
 }
 
 /* 빈 상태 */
@@ -437,21 +495,22 @@ body.modal-open {
 	position: relative;
 }
 
+/* ── 정렬 버튼 ── */
 .bid-sort-button {
-	background-color: #fff !important;
-	border: 1px solid #eee !important;
-	border-radius: 20px !important;
-	padding: 8px 20px !important;
-	font-size: 14px !important;
-	font-weight: 600 !important;
-	color: #666 !important;
-	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-	transition: all 0.3s ease;
+    background: #fff !important;
+    border: 1.5px solid #f0e8f4 !important;
+    border-radius: 20px !important;
+    padding: 8px 18px !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    color: #888 !important;
+    transition: all 0.2s ease;
+    cursor: pointer;
 }
 
 .bid-sort-button:hover {
-	border-color: #ff79c6 !important;
-	color: #ff79c6 !important;
+    border-color: #ff79c6 !important;
+    color: #e879a8 !important;
 }
 
 .sort-arrow {
@@ -811,25 +870,21 @@ body.modal-open {
 }
 
 .btn-step-secondary {
-	margin-right: auto;
-	background: #f1f3f5;
-	color: #444;
-	display: inline-flex;
-	align-items: center;
-	gap: 7px;
-	border: none;
-	padding: 11px 26px;
-	border-radius: 20px;
-	font-size: 14px;
-	font-weight: 700;
-	font-family: inherit;
-	cursor: pointer;
-	transition: all .2s;
+    background: #fff;
+    color: #888;
+    border: 1.5px solid #e8e8e8;
+    padding: 7px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    transition: all .15s;
 }
 
 .btn-step-secondary:hover {
-	transform: translateY(-1px);
-	background: #e5e7eb;
+    background: #f5f5f5;
+    border-color: #ccc;
 }
 
 .bid-create-section {
@@ -921,16 +976,16 @@ body.modal-open {
 	flex-wrap: wrap;
 }
 
+/* ── 내 제안 배지 ── */
 .bid-my-badge {
-	display: inline-flex;
-	align-items: center;
-	padding: 6px 12px;
-	background: #eef4ff;
-	color: #2f6fec;
-	border-radius: 999px;
-	font-size: 13px;
-	font-weight: 700;
-	line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 12px;
+    background: linear-gradient(135deg, #fce7f3, #ede9fe);
+    color: #c026d3;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
 }
 
 .bid-create-guide {
@@ -1058,16 +1113,15 @@ body.modal-open {
 	animation: bidFadeSlide .22s ease;
 }
 
-@
-keyframes bidFadeSlide {from { opacity:0;
-	transform: translateX(14px);
+/* 애니메이션 */
+@keyframes bidFadeSlide {
+    from { opacity: 0; transform: translateX(14px); }
+    to { opacity: 1; transform: translateX(0); }
 }
 
-to {
-	opacity: 1;
-	transform: translateX(0);
-}
-
+@keyframes errorFadeIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 /* 힌트 텍스트 */
@@ -1301,44 +1355,39 @@ to {
 }
 
 .btn-step-primary {
-	margin-left: auto;
-	display: inline-flex;
-	align-items: center;
-	gap: 7px;
-	background: linear-gradient(135deg, #ff79c6, #c084fc);
-	color: #fff;
-	border: none;
-	padding: 11px 26px;
-	border-radius: 20px;
-	font-size: 14px;
-	font-weight: 700;
-	font-family: inherit;
-	cursor: pointer;
-	transition: all .2s;
+    background: #e879a8;
+    color: #fff;
+    border: 1px solid #f9c8e2;
+    padding: 7px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: inherit;
+    transition: opacity .15s;
+    transition: opacity .15s;
 }
 
 .btn-step-primary:hover {
-	transform: translateY(-1px);
+    opacity: .85;
 }
 
 .btn-submit-bid-create {
-	margin-left: auto;
-	background: #1a1a2e;
-	color: #fff;
-	border: none;
-	padding: 11px 26px;
-	border-radius: 20px;
-	font-size: 14px;
-	font-weight: 700;
-	font-family: inherit;
-	cursor: pointer;
-	box-shadow: 0 4px 14px rgba(0, 0, 0, .18);
-	transition: all .2s;
+    background: #e879a8;
+    color: #fff;
+    border: 1px solid #f9c8e2;
+    padding: 7px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: inherit;
+    transition: opacity .15s;
+    transition: opacity .15s;
 }
 
 .btn-submit-bid-create:hover {
-	background: #2d2d4e;
-	transform: translateY(-1px);
+    opacity: .85;
 }
 
 /* 모바일 */
@@ -1440,11 +1489,6 @@ to {
 	visibility: visible;
 }
 
-@keyframes errorFadeIn {
-		from { opacity: 0; transform: translateY(-4px); }
-		to	 { opacity: 1; transform: translateY(0); }
-}
-
 .bid-create-input.error,
 .bid-create-textarea.error {
 		border-color: #fc8181;
@@ -1458,7 +1502,7 @@ to {
 	gap: 8px;
 }
 
-.bid-step3-grid {
+.bid-step2-grid {
 	display: grid;
 	grid-template-columns: 1fr 1fr;
 	gap: 16px;
@@ -1466,7 +1510,251 @@ to {
 }
 
 @media (max-width: 480px) {
-	.bid-step3-grid {
+	.bid-step2-grid {
 		grid-template-columns: 1fr;
 	}
 }
+
+/* ── 선정 모달 스텝 (2단) ── */
+.select-step-titles {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+/* ── 최종 확인 로딩 ── */
+.select-confirm-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 0;
+    gap: 14px;
+    color: #aaa;
+    font-size: 14px;
+}
+
+.select-loading-spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid #f0e8f4;
+    border-top-color: #ff79c6;
+    border-radius: 50%;
+    animation: spinnerRot 0.7s linear infinite;
+}
+
+@keyframes spinnerRot {
+    to { transform: rotate(360deg); }
+}
+
+/* ── 확인 섹션 ── */
+.confirm-section-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #c026d3;
+    margin: 18px 0 8px;
+    letter-spacing: 0.3px;
+}
+
+.confirm-info-card {
+    border: 1px solid #f0e8f4;
+    border-radius: 14px;
+    overflow: hidden;
+    background: #fff;
+}
+
+.confirm-info-row {
+    display: flex;
+    gap: 12px;
+    padding: 11px 16px;
+    border-bottom: 1px solid #f7f0fc;
+    align-items: flex-start;
+}
+
+.confirm-info-row:last-child {
+    border-bottom: none;
+}
+
+.confirm-info-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #aaa;
+    min-width: 72px;
+    flex-shrink: 0;
+    padding-top: 1px;
+}
+
+.confirm-info-value {
+    font-size: 14px;
+    color: #222;
+    font-weight: 500;
+    line-height: 1.5;
+    word-break: break-word;
+}
+
+.confirm-info-value-pre {
+    white-space: pre-wrap;
+}
+
+.confirm-price-highlight {
+    font-size: 16px;
+    font-weight: 800;
+    background: linear-gradient(135deg, #e879a8, #a855f7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* ── 동의 체크박스 ── */
+.select-agree-row {
+    margin: 18px 0 4px;
+    padding: 14px 16px;
+    background: #fdf4ff;
+    border-radius: 12px;
+    border: 1px solid #f0e8f4;
+}
+
+.select-form-hint {
+    font-size: 12px;
+    color: #bbb;
+    margin: -4px 0 8px;
+}
+
+/* ── 인라인 거절 확인 ── */
+.reject-confirm-zone {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    animation: rejectSlideIn .18s ease;
+}
+
+@keyframes rejectSlideIn {
+    from { opacity: 0; transform: translateX(8px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+.reject-confirm-msg {
+    font-size: 13px;
+    color: var(--color-text-secondary, #888);
+    white-space: nowrap;
+}
+
+.btn-reject-cancel {
+    background: #fff;
+    color: #888;
+    border: 1.5px solid #e8e8e8;
+    padding: 7px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    transition: all .15s;
+}
+
+.btn-reject-cancel:hover {
+    background: #f5f5f5;
+    border-color: #ccc;
+}
+
+.btn-reject-confirm {
+    background: #e879a8;
+    color: #fff;
+    border: none;
+    padding: 7px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: inherit;
+    transition: opacity .15s;
+}
+
+.btn-reject-confirm:hover {
+    opacity: .85;
+}
+
+/* ── 제안 등록 인라인 확인 ── */
+.bid-submit-confirm-zone {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+    animation: rejectSlideIn .18s ease;
+}
+
+.bid-submit-confirm-msg {
+    font-size: 13px;
+    color: #888;
+    white-space: nowrap;
+}
+
+.btn-bid-submit-cancel {
+    background: #fff;
+    color: #888;
+    border: 1.5px solid #e8e8e8;
+    padding: 7px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    transition: all .15s;
+}
+
+.btn-bid-submit-cancel:hover {
+    background: #f5f5f5;
+    border-color: #ccc;
+}
+
+.btn-bid-submit-ok {
+    background: #1a1a2e;
+    color: #fff;
+    border: none;
+    padding: 7px 18px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: inherit;
+    transition: opacity .15s;
+}
+
+.btn-bid-submit-ok:hover {
+    opacity: .82;
+}
+
+/* ── 토스트 ── */
+#bid-toast-root { pointer-events: none; }
+
+.bid-toast {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 18px 12px 16px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    white-space: nowrap;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.18);
+    animation: bidToastIn .22s cubic-bezier(.34,1.56,.64,1) forwards;
+}
+.bid-toast-hiding  { animation: bidToastOut .22s ease forwards; }
+.bid-toast-success { background: #1a1a2e; color: #fff; }
+.bid-toast-error   { background: #e879a8; color: #fff; }
+.bid-toast-warn    { background: #f59e0b; color: #1a1a2e; }
+
+.bid-toast-icon  { font-size: 14px; opacity: .9; }
+.bid-toast-msg   { flex: 1; }
+.bid-toast-close {
+    background: none; border: none; color: inherit;
+    opacity: .55; cursor: pointer; font-size: 14px;
+    padding: 0 0 0 6px; font-family: inherit; transition: opacity .15s;
+}
+.bid-toast-close:hover { opacity: 1; }
+
+@keyframes bidToastIn  { from { opacity:0; transform: translateY(14px) scale(.93); } to { opacity:1; transform: translateY(0) scale(1); } }
+@keyframes bidToastOut { from { opacity:1; transform: translateY(0) scale(1); }   to { opacity:0; transform: translateY(8px) scale(.93); } }
