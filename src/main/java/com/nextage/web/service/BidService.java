@@ -1,10 +1,13 @@
 package com.nextage.web.service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nextage.web.domain.BidDTO;
 import com.nextage.web.domain.RequestDTO;
 import com.nextage.web.mapper.BidsMapper;
@@ -105,5 +108,44 @@ public class BidService {
 
         throw new IllegalArgumentException("허용되지 않는 상태값입니다.");
     }
+    
+    
+    // select-info: request + bid + customer 조합해서 반환
+    public Map<String, Object> getSelectInfo(Long bidId) {
+        // 1. bid 조회 → requestId, businessId 추출
+        // 2. request 조회 (title, description, hopePrice, hopePeriod)
+        // 3. customer 조회 (address, phoneNumber) - request의 customerId로
+        // 4. Map으로 조합해서 반환
+        
+        Map<String, Object> info = new HashMap<>();
+        
+        BidDTO bid = bidsMapper.selectBidById(bidId);
+        if (bid == null) throw new IllegalArgumentException("제안 정보를 찾을 수 없습니다.");
+        
+        RequestDTO requestInfo = requestMapper.selectRequestDetail(bid.getRequestId());
+//        CustomerDTO customerInfo = customerMapper.findAddressAndPhoneByRequestId(bid.getRequestId());
+        Map<String, Object> customerInfo = null;
+        
+        info.put("bid", bid);
+        info.put("request", requestInfo);
+        info.put("customer", customerInfo);
+        
+        return info;
+    }
+
+    // select: 트랜잭션으로 치수 저장 + bid 상태 SELECTED 동시 처리
+    @Transactional
+    public void selectBidWithDimensions(Long bidId, Object dimensions) {
+        BidDTO bid = bidsMapper.selectBidById(bidId);
+        if (bid == null) throw new IllegalArgumentException("제안 정보를 찾을 수 없습니다.");
+        
+        // 1. request.dimensions 저장 (JSON 직렬화)
+//        String dimensionsJson = new ObjectMapper().writeValueAsString(dimensions);
+//        requestMapper.updateDimensions(bid.getRequestId(), dimensionsJson);
+        
+        // 2. bid 상태 SELECTED로 변경
+//        bidsMapper.updateStatus(bidId, "SELECTED");
+    }
+    
 
 }
