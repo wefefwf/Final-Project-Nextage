@@ -20,6 +20,9 @@ public class CustomerUserDetails implements UserDetails {
         this.customer = customer;
     }
 
+    public Long getCustomerId() { return customer.getCustomerId(); }
+    public String getRole()     { return customer.getRole(); }
+    
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + customer.getRole()));

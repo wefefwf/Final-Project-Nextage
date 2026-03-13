@@ -20,6 +20,9 @@ public class BusinessUserDetails implements UserDetails{
         this.business = business;
     }
 
+    public Long getBusinessId() { return business.getBusinessId(); }
+    public String getRole()     { return business.getRole(); }
+    
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + business.getRole()));
