@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+       xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       layout:decorate="~{layouts/customer-layout}">
 <head>
     <meta charset="UTF-8">
@@ -17,8 +18,8 @@
         </div>
 
         <div class="admin-action-row">
-            <a th:href="@{/customer/shop/edit(id=${kit.kitId}, page=${page})}" class="btn-edit">상품 업데이트</a>
-            <button type="button" class="btn-delete" th:onclick="|deleteKit(${kit.kitId})|">상품 삭제</button>
+            <a th:href="@{/customer/shop/edit(id=${kit.kitId}, page=${page})}" class="btn-edit" sec:authorize="hasRole('CADMIN')">상품 업데이트</a>
+            <button type="button" class="btn-delete" th:onclick="|deleteKit(${kit.kitId})|" sec:authorize="hasRole('CADMIN')">상품 삭제</button>
         </div>
 
         <div class="product-main-row">
