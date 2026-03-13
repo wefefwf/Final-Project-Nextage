@@ -24,4 +24,12 @@ public class ReviewDTO {
     
     private String status;       // 상태 (ACTIVE 등)
     private LocalDateTime createdAt; // 생성일
+    
+    //테이블 추가 x
+    private String orderNo;      // 주문번호 (orders 테이블)
+    private String requestTitle; // 의뢰제목 (request 테이블)
+    private LocalDateTime startDate; // 작업시작일 (order_items 생성일)
+    private LocalDateTime endDate;   // 작업마감일 (request 마감일)
+    
+    
 }
