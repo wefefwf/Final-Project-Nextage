@@ -38,6 +38,8 @@ dependencies {
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	
 	implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
+	
+	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
 
 	// ── 추가 의존성: WebClient + JSON 처리 ───────────────
 	implementation 'org.springframework.boot:spring-boot-starter-webflux' // WebClient 사용

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.nextage.web.mapper.CustomerMapper">
+  <select id="findByLoginId" resultType="com.nextage.web.domain.CustomerDTO">
+       SELECT * FROM customer WHERE login_id = #{loginId} AND deleted_at IS NULL
+   </select>
+ <!--  <insert id="insertCustomer">
+        INSERT INTO customer (login_id, email, nickname, password_hash, phone_number, address, role)
+        VALUES (#{loginId}, #{email}, #{nickname}, #{passwordHash}, #{phoneNumber}, #{address}, 'CUSER')
+    </insert>
+
+    <update id="updateCustomer">
+        UPDATE customer SET nickname = #{nickname}, phone_number = #{phoneNumber}, address = #{address}
+        WHERE login_id = #{loginId} AND deleted_at IS NULL
+    </update>-->
+</mapper>

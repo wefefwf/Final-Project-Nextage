@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
-@RequestMapping("/order")  // /order → /order/detail 로 변경
+@RequestMapping("/customer/order")  // /order → /order/detail 로 변경
 @RequiredArgsConstructor
 public class CustomerOrderHistoryController {
 

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<p>아이디: <span th:text="${business.loginId}">아이디</span></p>
+    <p>닉네임: <span th:text="${business.companyName}">닉네임</span></p>
+    <p>이메일: <span th:text="${business.phoneNumber}">전화번호</span></p>
+	<div class="actions">
+	
+    
+    <!-- 둘다보이게-->
+    <button class="btn"  sec:authorize="hasAnyRole('BUSER', 'BADMIN')">둘다보이는버튼</button>
+    
+    <!--  관리자  -->
+    <button class="btn btn-danger"  sec:authorize="hasRole('BADMIN')">어드민만보이는버튼</button>
+</div>
+
+</body>
+</html>

@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @Controller                          // ✅ @RestController → @Controller 로 변경
-@RequestMapping("/order")
+@RequestMapping("/customer/order")
 @RequiredArgsConstructor
 public class CustomerOrderController {
 
@@ -75,7 +75,7 @@ public class CustomerOrderController {
 
         model.addAttribute("orderNo",     orderNo);
         model.addAttribute("totalAmount", totalAmount != null ? totalAmount : 0);
-        model.addAttribute("redirectUrl", "/order/history");
+        model.addAttribute("redirectUrl", "/customer/order/history");
         return "views/shop/customer-payment-complete";
     }
 }

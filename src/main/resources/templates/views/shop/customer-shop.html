@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       layout:decorate="~{layouts/customer-layout}">
 <head>
 <meta charset="UTF-8">
@@ -22,7 +23,7 @@
 		        </p>
 		    </div>
 		    <div class="col-auto d-flex align-items-center gap-2">
-		        <a th:href="@{/customer/shopForm}" class="btn-write">
+		        <a th:href="@{/customer/shopForm}" class="btn-write" sec:authorize="hasRole('CADMIN')">
 		            상품 등록
 		        </a>
 		        <div class="dropdown shop-sort">

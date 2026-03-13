@@ -176,7 +176,7 @@
         <!-- 주문 목록 -->
         <div th:each="order : ${orders}" class="order-card-wrapper">
             <a class="order-card"
-               th:href="@{/order/detail/{orderId}(orderId=${order.orderId})}">
+               th:href="@{/customer/order/detail/{orderId}(orderId=${order.orderId})}">
 
                 <div class="order-card-header">
                     <div>
@@ -258,18 +258,18 @@
         <div class="pagination" th:if="${totalPages > 1}">
             <a class="page-btn"
                th:classappend="${currentPage == 1} ? 'disabled'"
-               th:href="@{/order/history(page=${currentPage - 1})}">&lsaquo;</a>
+               th:href="@{/customer/order/history(page=${currentPage - 1})}">&lsaquo;</a>
 
             <th:block th:each="i : ${#numbers.sequence(1, totalPages)}">
                 <a class="page-btn"
                    th:classappend="${i == currentPage} ? 'active'"
-                   th:href="@{/order/history(page=${i})}"
+                   th:href="@{/customer/order/history(page=${i})}"
                    th:text="${i}">1</a>
             </th:block>
 
             <a class="page-btn"
                th:classappend="${currentPage == totalPages} ? 'disabled'"
-               th:href="@{/order/history(page=${currentPage + 1})}">&rsaquo;</a>
+               th:href="@{/customer/order/history(page=${currentPage + 1})}">&rsaquo;</a>
         </div>
 
     </div>

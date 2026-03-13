@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" 
+			xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
     <header th:fragment="header" class="main-header-container">
         <div class="header-inner">
             <div class="header-logo">
@@ -18,8 +19,8 @@
 							  결제/배송
 							</button>
 							<ul class="dropdown-menu">
-							  <li><a class="dropdown-item" th:href="@{/cart}">장바구니</a></li>
-							  <li><a class="dropdown-item" th:href="@{/order/history}">주문내역</a></li>
+							  <li><a class="dropdown-item" th:href="@{/customer/cart}">장바구니</a></li>
+							  <li><a class="dropdown-item" th:href="@{/customer/order/history}">주문내역</a></li>
 							</ul>
 						</div>
 					</li>
@@ -36,7 +37,8 @@
 						</div>
 					</li>
 					<li class="login-item">
-			            <a th:href="@{/auth/loginProc}" class="login-btn">Login</a>
+			            <a sec:authorize="isAnonymous()"    th:href="@{/customer/login}"    class="login-btn">Login</a>
+			            <a sec:authorize="isAuthenticated()"   th:href="@{/auth/customer/logoutAction}"  class="login-btn">Logout</a>
 			        </li>
                 </ul>
             </nav>

@@ -170,7 +170,7 @@
         document.getElementById('paymentModalOverlay').style.display = 'flex';
 
         // order_no 사전 생성
-        fetch('/order/payment/create', {
+        fetch('/customer/order/payment/create', {
             method : 'POST',
             headers: { 'Content-Type': 'application/json' },
             body   : JSON.stringify({ totalAmount: _totalAmount })
@@ -231,7 +231,7 @@
             }
 
             // 서버 검증 요청
-            return fetch('/order/payment/verify', {
+            return fetch('/customer/order/payment/verify', {
                 method : 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body   : JSON.stringify({
@@ -270,7 +270,7 @@
 		        payBtn.style.boxShadow  = '0 4px 20px rgba(109,202,138,0.35)';
 
 		        setTimeout(function() {
-		            location.href = '/order/complete?orderNo=' + data.orderNo;
+		            location.href = '/customer/order/complete?orderNo=' + data.orderNo;
 		        }, 2000);
 		    } else {
 		        document.getElementById('paymentStatusMsg').innerHTML

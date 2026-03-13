@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/business-layout}"> <div layout:fragment="content">
+    <style>
+        .chat-page-container { max-width: 1200px; margin: 40px auto; display: flex; height: 750px; border: 1px solid #ddd; border-radius: 12px; overflow: hidden; background: #fff; }
+        .chat-sidebar { width: 320px; border-right: 1px solid #eee; display: flex; flex-direction: column; }
+        .sidebar-header { padding: 25px; font-weight: bold; font-size: 1.1rem; border-bottom: 1px solid #eee; }
+        .chat-list { flex: 1; overflow-y: auto; }
+        .chat-item { padding: 20px; border-bottom: 1px solid #f9f9f9; cursor: pointer; }
+        .chat-item.active { background: #e7f1ff; border-left: 5px solid #0d6efd; }
+        
+        .chat-main { flex: 1; display: flex; flex-direction: column; background: #fdfdfd; }
+        .chat-body { flex: 1; overflow-y: auto; padding: 25px; display: flex; flex-direction: column; gap: 10px; }
+        
+        .msg-bubble { max-width: 75%; padding: 10px 15px; border-radius: 15px; font-size: 14px; position: relative; }
+        .msg-right { align-self: flex-end; background: #0d6efd; color: #fff; border-bottom-right-radius: 2px; }
+        .msg-left { align-self: flex-start; background: #fff; border: 1px solid #ddd; color: #333; border-bottom-left-radius: 2px; }
+        .msg-time { font-size: 10px; color: #999; margin-top: 5px; display: block; }
+    </style>
+
+    <div class="chat-page-container shadow-sm">
+        <div class="chat-sidebar">
+            <div class="sidebar-header">고객 문의 내역</div> <div class="chat-list">
+                <div th:each="room : ${myRooms}" 
+                     class="chat-item" 
+                     th:classappend="${currentRoomId != null && room.roomId == currentRoomId ? 'active' : ''}"
+                     th:onclick="|location.href='/biz/chat?roomId=' + ${room.roomId}|">
+                    <div class="d-flex justify-content-between">
+                        <span class="fw-bold" th:text="${room.targetName}">고객명</span>
+                        <small th:text="${room.lastMessageTime}">시간</small>
+                    </div>
+                    <div class="text-muted small text-truncate mt-1" th:text="${room.lastMessage}">마지막 메시지 내용</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-main">
+            <div class="chat-body" id="chatBody">
+                <div th:each="msg : ${messages}" 
+                     class="msg-bubble" 
+                     th:classappend="${msg.senderType == 'BUSINESS' ? 'msg-right' : 'msg-left'}">
+                    <span th:text="${msg.content}">대화 내용</span>
+                    <span class="msg-time" th:text="${msg.sendAt}">시간</span>
+                </div>
+                
+                <div th:if="${currentRoomId == null}" class="m-auto text-muted">
+                    대화방을 선택해 주세요.
+                </div>
+            </div>
+
+            <div class="chat-footer p-3 bg-white border-top" th:if="${currentRoomId != null}">
+                <div class="input-group">
+                    <input type="text" id="messageInput" class="form-control" placeholder="메시지를 입력하세요...">
+                    <button class="btn btn-primary" onclick="sendMessage()">전송</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        const chatBody = document.getElementById('chatBody');
+        if(chatBody) chatBody.scrollTop = chatBody.scrollHeight;
+
+        function sendMessage() {
+            alert('WebSocket 연동 전입니다!');
+        }
+    </script>
+</div>
+</html>

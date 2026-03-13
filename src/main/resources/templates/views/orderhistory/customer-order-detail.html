@@ -255,7 +255,7 @@
 <th:block layout:fragment="content">
     <div class="detail-wrapper">
 
-        <a href="/order/history" class="back-btn">&larr; 구매내역으로</a>
+        <a href="/customer/order/history" class="back-btn">&larr; 구매내역으로</a>
 
         <h2 class="page-title">주문 상세</h2>
         <p class="page-subtitle" th:text="${order.orderNo}">ORDER_...</p>
@@ -453,11 +453,11 @@
 
             var orderId = btn.dataset.orderId;
 
-            fetch('/order/delete/' + orderId, { method: 'DELETE' })
+            fetch('/customer/order/delete/' + orderId, { method: 'DELETE' })
             .then(function(r) { return r.json(); })
             .then(function(data) {
                 if (data.success) {
-                    location.href = '/order/history';
+                    location.href = '/customer/order/history';
                 } else {
                     alert(data.message || '삭제에 실패했습니다.');
                 }
@@ -473,7 +473,7 @@
                 return;
             }
 
-            fetch('/order/review', {
+            fetch('/customer/order/review', {
                 method : 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body   : JSON.stringify({
