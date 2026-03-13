@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @Controller
-@RequestMapping("/cart")
+@RequestMapping("/customer/cart")
 @RequiredArgsConstructor
 public class CustomerCartController {
 
