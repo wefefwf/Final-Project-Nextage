@@ -1,4 +1,4 @@
-package com.nextage.web.service;
+package com.nextage.web.controller;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
