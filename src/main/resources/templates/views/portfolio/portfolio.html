@@ -26,8 +26,10 @@
            <div class="profile-section">
 		    <h2 class="section-title">프로필</h2>
 		    <div class="profile-image-container">
-		        <img th:src="${bizinfo?.profileImage != null ? bizinfo.profileImage : '/images/default-profile.png'}" alt="프로필">
-		    </div>
+			    <img th:src="${(bizinfo != null && bizinfo.profileImage != null) ? bizinfo.profileImage : '/images/default-profile.png'}" 
+			         alt="프로필"
+			         class="square-img">
+			</div>
 		    
 		    <div class="profile-btns" th:if="${isMine}">
 		        <button type="button" class="btn-modify">프로필 수정</button>
