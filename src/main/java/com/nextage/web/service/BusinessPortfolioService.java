@@ -26,6 +26,52 @@ public class BusinessPortfolioService {
 	@Autowired
 	public BusinessPortfolioMapper portfolioMapper;
 	
+	//저장 path
+	@Value("${file.upload-dir}")
+    private String uploadDir;
+	
+	//이름 바꾸고 확장자바꾸는용도
+		public String uploadFile(MultipartFile file) {
+			
+		    // 1. 파일이 비어있으면(안 올렸으면) 그냥 null 돌려주기
+			if (file == null || file.isEmpty()) return null;
+			
+			String originalFilename = file.getOriginalFilename();
+		    String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+		    String uuidName = UUID.randomUUID().toString() + extension;
+		    
+		 // 1. DB에 저장될 경로 (통합된 /images/kit/ 경로 사용)
+		    String dbPath = "/images/" + uuidName;
+		    
+
+		 // 2. 물리적 저장 경로 (D:/nextageImage/kit/uuid.jpg)
+		    try {
+		        // uploadDir(D:/nextageImage) 바로 아래의 kit 폴더에 저장
+		    	String savePath = uploadDir.endsWith("/") ? uploadDir : uploadDir + "/";
+		        
+		        File folder = new File(savePath);
+		        if (!folder.exists()) folder.mkdirs(); 
+
+		        file.transferTo(new File(savePath + uuidName));
+		    } catch (IOException e) {
+		        e.printStackTrace();
+		        return null;
+		    }
+
+		    return dbPath;
+		}
+		
+	//이미지 수정
+	public void updateProfile(long businessId,MultipartFile file){
+		
+		//이름 저장후 불러내기
+		String profileImage = uploadFile(file);
+		
+		if (profileImage != null) {
+			portfolioMapper.updateProfile(businessId, profileImage);
+	    }
+	}
+		
 	//업체정보 
 	public BizinfoDTO getPortfolio(long id){
 		return portfolioMapper.getPortfolio(id);

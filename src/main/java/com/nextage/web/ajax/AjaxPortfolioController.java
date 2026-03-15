@@ -5,6 +5,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.nextage.web.service.BusinessPortfolioService;
 import com.nextage.web.userDetails.BusinessUserDetails;
@@ -75,4 +76,21 @@ public class AjaxPortfolioController {
 		
 	}
 	
+	//프로필 이미지 추가.삭제
+	@PostMapping("/business/portfolio/updateProfileImage")
+	public String updateProfile(@AuthenticationPrincipal BusinessUserDetails userDetails,
+										@RequestParam("profileImage") MultipartFile file){
+		//파일이 비면
+		    if (file.isEmpty()) {
+		        return "파일이 비어있습니다.";
+		    }
+		    try {
+		        // 1. 로그인한 사장님 ID 가져오기
+		        Long businessId = userDetails.getBusiness().getBusinessId();
+		        pService.updateProfile(businessId, file);
+		        return "success";
+		    } catch (Exception e) {
+		        return "fail";
+		    }
+		}
 }

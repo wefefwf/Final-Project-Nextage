@@ -275,3 +275,36 @@ function toggleStatus() {
 	        }
 	    });
 	});
+	//이미지 추가,수정
+	function uploadProfileImage(input) {
+	    // 1. 선택된 파일이 있는지 확인
+	    if (!input.files || !input.files[0]) return;
+
+	    const file = input.files[0];
+	    
+	    // 2. 파일이 진짜 이미지인지 간단히 체크 (보안)
+	    if (!file.type.match('image.*')) {
+	        alert("이미지 파일만 업로드 가능합니다.");
+	        return;
+	    }
+
+	    // 3. FormData 객체 생성 (파일 전송용 바구니)
+	    const formData = new FormData();
+	    formData.append("profileImage", file); 
+
+	    // 4. 서버로 전송
+	    $.ajax({
+	        url: '/business/portfolio/updateProfileImage',
+	        type: 'POST',
+	        data: formData,
+	        processData: false, // 파일 전송 시 필수!
+	        contentType: false, // 파일 전송 시 필수!
+	        success: function(response) {
+	            alert("프로필 이미지가 변경되었습니다.");
+	            location.reload(); // 화면 새로고침해서 바뀐 사진 보여주기
+	        },
+	        error: function() {
+	            alert("이미지 업로드 실패");
+	        }
+	    });
+	}

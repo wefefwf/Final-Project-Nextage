@@ -309,3 +309,25 @@ body {
 }
 
 .info-box span { flex: 1; display: flex; align-items: center; margin-right: 20px; }
+.company-name-box {
+    /* 마진 탑으로 밀어내는 게 아니라, 부모의 높이에 따라 유동적으로 바닥에 붙게 설정 */
+    margin-top: auto !important; 
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 13px 20px;
+ 	 background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);	
+    border: 1px solid #f0f0f2;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    
+    /* 사장님 버튼(`btn-modify`)들과 높이를 똑같이 맞춰서 이질감 제거 */
+    min-height: 48px; 
+}
+
+.company-name-box strong {
+    font-size: 19px; /* 조금 더 강조 */
+    font-weight: 700;
+    color:  #495057; 
+}

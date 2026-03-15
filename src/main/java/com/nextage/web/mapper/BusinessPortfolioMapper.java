@@ -46,4 +46,7 @@ public interface BusinessPortfolioMapper {
 	
 	//경력추가
 	public void addCareer(@Param("businessId")long businessId,@Param("workDescription") String workDescription);
+	
+	//이미지 수정
+	public void updateProfile(@Param("businessId")long businessId,@Param("profileImage") String profileImage);
 }

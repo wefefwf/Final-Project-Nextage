@@ -32,8 +32,9 @@
 			         class="square-img">
 			</div>
 		    <div class="profile-btns" th:if="${isMine}">
+		    <input type="file" id="profileInput" style="display: none;" accept="image/*" onchange="uploadProfileImage(this)">
 			    <button type="button"
-			            class="btn-modify"
+			            class="btn-modify" onclick="document.getElementById('profileInput').click()"
 			            th:text="${bizinfo?.profileImage != null ? '프로필 수정' : '프로필 추가'}">
 			    </button>
 			    <button type="button"

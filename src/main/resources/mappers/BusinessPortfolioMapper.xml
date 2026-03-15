@@ -114,5 +114,12 @@ OFFSET #{offset}
     )
 	</insert>
 	
+	<!-- 이미지 수정-->
+	<update id="updateProfile">
+    	UPDATE bizinfo 
+    	SET profile_image = #{profileImage} 
+    	WHERE business_id = #{businessId}
+	</update>
+	
 	
 </mapper>
