@@ -43,12 +43,14 @@ public class BusinessPortfolioController {
 			//시큐리티에서 값꺼내오기 
 			BusinessDTO  business = businessUserDetails.getBusiness();
 			
+			Boolean isMine = true;
+			
 			BizinfoDTO bizinfo = portfolioService.getPortfolio(business.getBusinessId());
-			List<ReviewDTO> reviewList = portfolioService.getReview(business.getBusinessId(),size,offset);
+			List<ReviewDTO> reviewList = portfolioService.getReview(business.getBusinessId(),size,offset,isMine);
 			List<CareerDTO> careerList = portfolioService.getCareer(business.getBusinessId());
 			
 			// 2. 전체 개수 및 페이지네이션 계산 (추가된 부분)
-	        long totalReviews = portfolioService.getTotalReviewCount(business.getBusinessId()); 
+	        long totalReviews = portfolioService.getTotalReviewCount(business.getBusinessId(),isMine); 
 	        int totalPages = (int) Math.ceil((double) totalReviews / size);
 	        
 	     // 시작 페이지 계산 (0, 10, 20...)
@@ -86,13 +88,14 @@ public class BusinessPortfolioController {
 		 int offset = page * size;
 		 int blockLimit = 10; // 한 번에 보여줄 페이지 번호 개수
 		 
+		 Boolean isMine = false;
 		 
 		BizinfoDTO bizinfo = portfolioService.getPortfolio(businessId);
-		List<ReviewDTO> reviewList = portfolioService.getReview(businessId,size,offset);
+		List<ReviewDTO> reviewList = portfolioService.getReview(businessId,size,offset,isMine);
 		List<CareerDTO> careerList = portfolioService.getCareer(businessId);
 		
 		// 2. 전체 개수 및 페이지네이션 계산 (추가된 부분)
-        long totalReviews = portfolioService.getTotalReviewCount(businessId); 
+        long totalReviews = portfolioService.getTotalReviewCount(businessId,isMine); 
         int totalPages = (int) Math.ceil((double) totalReviews / size);
         
         // 시작 페이지 계산 (0, 10, 20...)

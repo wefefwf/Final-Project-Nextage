@@ -32,8 +32,8 @@ public class BusinessPortfolioService {
 	}
 	
 	//리뷰 들고오기
-	public List<ReviewDTO> getReview(long id,int size,int offset){
-		return portfolioMapper.getReview(id,size,offset);
+	public List<ReviewDTO> getReview(long id,int size,int offset,boolean isMine){
+		return portfolioMapper.getReview(id,size,offset,isMine);
 	}
 	
 	//경력 들고오기
@@ -42,9 +42,13 @@ public class BusinessPortfolioService {
 	}
 	
 	//리뷰 갯수들고오기 
-		public long getTotalReviewCount(long id){
-			return portfolioMapper.getTotalReviewCount(id);
+		public long getTotalReviewCount(long id,boolean isMine){
+			return portfolioMapper.getTotalReviewCount(id,isMine);
 		}
 		
+	//status 변경
+		public void updateStatus(long reviewId, String status){
+			portfolioMapper.updateStatus(reviewId, status);
+		}
 	
 }

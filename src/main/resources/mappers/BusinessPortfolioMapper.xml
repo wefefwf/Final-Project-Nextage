@@ -33,6 +33,9 @@ JOIN orders o ON oi.order_id = o.order_id
 JOIN bids b ON o.bid_id = b.bid_id
 JOIN request req ON b.request_id = req.request_id
 WHERE r.business_id = #{id}
+<if test="!isMine">
+    AND r.status = 'ACTIVE'
+</if>
 ORDER BY r.created_at DESC
 LIMIT #{size}
 OFFSET #{offset}
@@ -55,5 +58,16 @@ OFFSET #{offset}
 	    SELECT COUNT(*) 
 	    FROM review 
 	    WHERE business_id = #{id}
+	    <if test="!isMine">
+    		AND status = 'ACTIVE'
+		</if>
+	    
 	</select>
+	
+	<!-- review Status업그레읻 -->
+	<update id="updateStatus">
+	    UPDATE review
+	    SET status = #{status}
+	    WHERE review_id = #{reviewId}
+	</update>
 </mapper>
