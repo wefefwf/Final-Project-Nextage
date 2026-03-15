@@ -70,4 +70,49 @@ OFFSET #{offset}
 	    SET status = #{status}
 	    WHERE review_id = #{reviewId}
 	</update>
+	
+	<!-- 위치 업데이트 -->
+	<update id ="updateLocation">
+		UPDATE bizinfo
+		SET location =#{location}
+		WHERE business_id =#{businessId}
+	</update>
+		
+	<!-- 위치삭제 -->
+	<update id="deleteLocation">
+	    UPDATE bizinfo 
+	    SET location = NULL 
+	    WHERE business_id = #{businessId}
+	</update>
+	
+	<!-- 커리어 삭제 -->
+	<delete id="deleteCareer">
+	    DELETE FROM career 
+	    WHERE career_id = #{careerId}
+	</delete>
+	
+	<!-- 프로필 이미지 삭제 -->
+	<update id="deleteProfileImage">
+	    UPDATE bizinfo 
+	    SET profile_image = NULL 
+	    WHERE business_id = #{id}
+	</update>
+	
+	<!-- 경력 업데이트 -->
+	<update id="updateCareer">
+	    UPDATE career
+		SET work_description = #{workDescription}
+		WHERE career_id = #{careerId}
+	</update>
+		
+	<!-- 경력 추가 -->
+	<insert id="addCareer">
+    INSERT INTO career (bizinfo_id, work_description)
+    VALUES (
+        (SELECT bizinfo_id FROM bizinfo WHERE business_id = #{businessId}),
+        #{workDescription}
+    )
+	</insert>
+	
+	
 </mapper>

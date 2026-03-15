@@ -28,4 +28,22 @@ public interface BusinessPortfolioMapper {
 	
 	//모달 status 변경
 	public void updateStatus(@Param("reviewId") long reviewId, @Param("status") String status);
+	
+	//위치변경
+	public void updateLocation(@Param("businessId") long businessId,@Param("location") String location);
+	
+	//위치삭제
+	public void deleteLocation(@Param("businessId") long businessId);
+		
+	// 프로필 삭제
+	public void deleteProfileImage(@Param("id") long id);	
+	
+	//경력 삭제
+	public void deleteCareer(@Param("careerId") long careerId);
+	
+	//경력 업데이트
+	public void updateCareer(@Param("careerId") long careerId,@Param("workDescription") String workDescription);
+	
+	//경력추가
+	public void addCareer(@Param("businessId")long businessId,@Param("workDescription") String workDescription);
 }

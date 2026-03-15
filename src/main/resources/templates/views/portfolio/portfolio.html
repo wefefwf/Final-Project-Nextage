@@ -24,23 +24,31 @@
     <div class="portfolio-content">
         <div class="top-row">
            <div class="profile-section">
+           <!-- 이미지 -->
 		    <h2 class="section-title">프로필</h2>
 		    <div class="profile-image-container">
 			    <img th:src="${(bizinfo != null && bizinfo.profileImage != null) ? bizinfo.profileImage : '/images/default-profile.png'}" 
 			         alt="프로필"
 			         class="square-img">
 			</div>
-		    
 		    <div class="profile-btns" th:if="${isMine}">
-		        <button type="button" class="btn-modify">프로필 수정</button>
-		        <button type="button" class="btn-delete" style="background: #333; color: #fff;">프로필 삭제</button>
-		    </div>
-		    
+			    <button type="button"
+			            class="btn-modify"
+			            th:text="${bizinfo?.profileImage != null ? '프로필 수정' : '프로필 추가'}">
+			    </button>
+			    <button type="button"
+			            class="btn-delete"
+			            style="background: #333; color: #fff;"
+			            th:if="${bizinfo?.profileImage != null}" onclick="deleteItem('profile')">
+			        프로필 삭제
+			    </button>
+			</div>
+		    <!--  customer는 이름으로 보이게-->
 		    <div class="company-name-box" th:if="${!isMine}">
 			    <strong th:text="${bizinfo?.companyName}">넥스테이지 수선소</strong>
 			</div>
 		</div>
-
+			<!-- 위치 -->
             <div class="info-section">
                 <div class="location-group">
                     <h2 class="section-title">위치</h2>
@@ -48,12 +56,12 @@
                         <span th:text="${bizinfo?.location != null ? bizinfo.location : '등록된 위치 정보가 없습니다.'}"
                               th:classappend="${bizinfo?.location == null ? 'empty-text' : ''}"></span>
                         <div class="box-actions" th:if="${isMine}">
-                            <button type="button" th:text="${bizinfo?.location != null ? '수정' : '추가'}"></button>
-                            <button type="button">삭제</button>
+                            <button type="button" th:text="${bizinfo?.location != null ? '수정' : '추가'}"  onclick="editLocation(this)"></button>
+                            <button type="button" onclick="deleteItem('location')">삭제</button>
                         </div>
                     </div>
                 </div>
-
+				<!-- 경력 -->
                 <div class="career-group">
                     <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 20px;">
                         <h2 class="section-title" style="margin-bottom: 0;">경력</h2>
@@ -63,8 +71,8 @@
                         <div class="info-box career-item" th:each="career : ${careerList}">
                             <span th:text="${career.workDescription}"></span>
                             <div class="box-actions" th:if="${isMine}">
-                                <button type="button">수정</button>
-                                <button type="button">삭제</button>
+                                <button type="button"  th:onclick="|editCareer(this, ${career.careerId})|">수정</button>
+                                <button type="button" th:onclick="|deleteItem('career', ${career.careerId})|">삭제</button>
                             </div>
                         </div>
                         <div class="info-box empty-box" th:if="${#lists.isEmpty(careerList)}">
@@ -74,7 +82,7 @@
                 </div>
             </div>
         </div>
-
+		<!-- review뜨는 부분 -->
         <div class="work-section">
 		    <h2 class="section-title">작업 포트폴리오</h2>
 		
@@ -160,7 +168,7 @@
 		    </div>
 		
 		</div>
-
+		<!--  모달 -->
         <div class="modal fade" id="workModal" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-lg">
                 <div class="modal-content" style="border-radius: 35px; border: none;">
@@ -194,122 +202,10 @@
             </div>
         </div>
     </div>
-
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
-<script th:inline="javascript">
-let selectedReviewId = null;
-let selectedStatus = null;
-let sliderImages = []; // 이미지 주소를 담을 전역 배열
-
-// 1. 카드 클릭 시 데이터를 미리 준비하는 함수
-function fillModal(element) {
-    selectedReviewId = element.dataset.id;
-    selectedStatus = element.getAttribute('data-status');
-
-    const img1 = element.querySelector('.card-img-holder img')?.src;
-    const img2 = element.querySelector('.h-img2')?.value;
-    const img3 = element.querySelector('.h-img3')?.value;
-    const content = element.querySelector('.h-content')?.value;
-
-    // 텍스트 세팅
-    $('#modalTitle').text(element.querySelector('.card-text')?.innerText || '');
-    $('#mOrderNum').text(element.querySelector('.order-num')?.innerText || '');
-    $('#mPeriod').text(element.querySelector('.work-period')?.innerText || '');
-    $('#mReview').text(content || '');
-
-    const btn = document.getElementById('btnToggleStatus');
-    if(btn) btn.innerText = (selectedStatus === 'ACTIVE') ? '비공개로 전환' : '공개로 전환';
-
-    // 이미지 배열 준비
-    sliderImages = [];
-
-    const isValid = (v) => v && v !== 'null' && v !== 'undefined' && v.trim() !== '';
-
-    if (isValid(img1)) sliderImages.push(img1);
-    if (isValid(img2)) sliderImages.push(img2);
-    if (isValid(img3)) sliderImages.push(img3);
-
-    console.log("배열 확인:", sliderImages);
-}
-
-// 2. 모달 열릴 때 Slick 처리
-$(document).ready(function() {
-
-    const $slider = $('.modal-slider');
-
-    $('#workModal').on('shown.bs.modal', function () {
-
-        // 기존 slick 제거
-        if ($slider.hasClass('slick-initialized')) {
-            $slider.slick('unslick');
-        }
-
-        // 기본 이미지 숨김
-        $('#mImg1').parent().hide();
-        $('#mImg2').parent().hide();
-        $('#mImg3').parent().hide();
-
-        // 이미지 세팅
-        if(sliderImages[0]){
-            $('#mImg1').attr('src', sliderImages[0]).parent().show();
-        }
-
-        if(sliderImages[1]){
-            $('#mImg2').attr('src', sliderImages[1]).parent().show();
-        }
-
-        if(sliderImages[2]){
-            $('#mImg3').attr('src', sliderImages[2]).parent().show();
-        }
-
-        // 이미지 2개 이상이면 slick 실행
-        if(sliderImages.length >= 2){
-
-            $slider.slick({
-                dots: true,
-                arrows: false,
-                infinite: true,
-                slidesToShow: 1,
-                slidesToScroll: 1,
-                speed: 300,
-                fade: true
-            });
-
-            $slider.slick('setPosition');
-        }
-    });
-
-    // 모달 닫힐 때 slick 제거
-    $('#workModal').on('hide.bs.modal', function () {
-        if ($slider.hasClass('slick-initialized')) {
-            $slider.slick('unslick');
-        }
-    });
-});
-
-// 3. 상태 변경
-function toggleStatus() {
-
-    const nextStatus = (selectedStatus === 'ACTIVE') ? 'HIDDEN' : 'ACTIVE';
-
-    if(!confirm(`상태를 ${nextStatus === 'HIDDEN' ? '비공개' : '공개'}로 변경하시겠습니까?`)) return;
-
-    $.ajax({
-        url: '/business/portfolio/updateStatus',
-        type: 'POST',
-        data: { reviewId: selectedReviewId, status: nextStatus },
-        success: function(){
-            alert('변경되었습니다.');
-            location.reload();
-        },
-        error: function(){
-            alert('오류 발생');
-        }
-    });
-}
-</script>
+    <script th:src="@{/js/portfolio/portfolio.js}"></script>
 </th:block>
 </body>
 </html>

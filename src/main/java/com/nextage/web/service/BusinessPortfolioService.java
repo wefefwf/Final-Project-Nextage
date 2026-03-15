@@ -50,5 +50,34 @@ public class BusinessPortfolioService {
 		public void updateStatus(long reviewId, String status){
 			portfolioMapper.updateStatus(reviewId, status);
 		}
+	//Location 업데이트
+		public void updateLocation(long businessId,String location){
+			portfolioMapper.updateLocation(businessId,location);
+		}
 	
+	//Location삭제
+		public void deleteLocation(long businessId) {
+	        // 컨트롤러에서 null을 보내면 DB 컬럼이 NULL로 업데이트됨
+	        portfolioMapper.deleteLocation(businessId);
+	    }
+		//이미지 삭제
+	public void deleteProfileImage(long businessId) {
+        // 컨트롤러에서 null을 보내면 DB 컬럼이 NULL로 업데이트됨
+        portfolioMapper.deleteProfileImage(businessId);
+    }
+	
+	// 경력 삭제 (이건 행 자체를 날리는 거니까 id 하나만)
+    public void deleteCareer(long careerId) {
+        portfolioMapper.deleteCareer(careerId);
+    }
+    
+    //경력 수정
+    public void updateCareer(long careerId,String workDescription){
+    	portfolioMapper.updateCareer(careerId,workDescription);
+    }
+    
+    //경력 추가
+    public void addCareer(long businessId,String workDescription){
+    	portfolioMapper.addCareer(businessId,workDescription);
+    }
 }
