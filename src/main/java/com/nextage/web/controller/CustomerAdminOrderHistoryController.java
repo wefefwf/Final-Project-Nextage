@@ -19,7 +19,7 @@ import java.util.Map;
 @Controller
 @RequestMapping("/customer/admin/order")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('CADMIN')")
+@PreAuthorize("isAuthenticated()")
 public class CustomerAdminOrderHistoryController {
 
     // ✅ BusinessOrderHistoryService → CustomerOrderHistoryService 로 교체
