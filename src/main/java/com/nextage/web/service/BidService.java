@@ -170,13 +170,23 @@ public class BidService {
     	return orderNo;
     }
 
-    // 금액 검증
+    // 금액 검증 (+주문내역에서 order_items 필요)
+    @Transactional
     public boolean verifyBidPayment(String orderNo, String impUid, int paidAmount) {
     	Integer savedAmount = bidsMapper.selectTotalAmountByOrderNo(orderNo);
     	if (savedAmount == null) return false;
     	if (savedAmount != paidAmount) return false;
 
     	bidsMapper.updateBidOrderStatus(orderNo, impUid, "PAID");
+
+    	Long orderId = bidsMapper.selectOrderIdByOrderNo(orderNo);
+    	System.out.println("orderId: " + orderId);
+    	
+    	if (orderId != null) {
+    		bidsMapper.insertBidOrderItem(orderId, paidAmount);
+    		System.out.println("insertBidOrderItem 완료");
+    	}
+
     	return true;
     }
     
