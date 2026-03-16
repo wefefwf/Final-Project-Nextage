@@ -27,8 +27,11 @@ public class BusinessMainController {
     	
     	// 1. 시큐리티에서 로그인한 사장님 정보 꺼내오기
         Long businessId = null;
+        String companyName = "";
+        
         if (businessUserDetails != null) {
             businessId = businessUserDetails.getBusiness().getBusinessId();
+            companyName = businessUserDetails.getBusiness().getCompanyName();
         }
     	
     	//1. 의뢰글 리스트
@@ -46,6 +49,7 @@ public class BusinessMainController {
         }
         
         model.addAttribute("businessId", businessId);
+        model.addAttribute("companyName", companyName);
         model.addAttribute("newPostList", newPostList);
         model.addAttribute("portfolioList", portfolioList);
         return "views/main/business-main";
