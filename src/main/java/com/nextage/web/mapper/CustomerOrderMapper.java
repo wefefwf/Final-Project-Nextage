@@ -9,6 +9,7 @@ public interface CustomerOrderMapper {
     // 주문 사전 생성 (payment_status = READY)
 	void insertOrder(@Param("orderNo")     String orderNo,
             @Param("customerId")  Long   customerId,
+            @Param("businessId")  Long   businessId,
             @Param("totalAmount") int    totalAmount);
 
     // 결제 완료 후 imp_uid + payment_status 업데이트

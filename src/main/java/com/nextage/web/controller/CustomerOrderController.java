@@ -24,21 +24,20 @@ public class CustomerOrderController {
     // 임시 테스트용 customer_id (로그인 연동 후 제거)
     //private static final Long TEMP_CUSTOMER_ID = 1L;
 
-    /**
-     * POST /order/payment/create
-     * 주문 사전 생성 → order_no 반환
-     */
     @PostMapping("/payment/create")
-    @ResponseBody                    // ✅ JSON 응답 메서드에 @ResponseBody 추가
+    @ResponseBody
     public ResponseEntity<Map<String, String>> createOrder(
             @RequestBody Map<String, Integer> body,
             @AuthenticationPrincipal CustomerUserDetails userDetails) {
 
-        //Long customerId  = TEMP_CUSTOMER_ID;
-    	Long customerId = userDetails.getCustomerId();
-        int  totalAmount = body.get("totalAmount");
+        if (userDetails == null) {
+            return ResponseEntity.status(401)
+                   .body(Map.of("error", "로그인이 필요합니다."));
+        }
 
-        String orderNo = paymentService.createOrder(customerId, totalAmount);
+        Long customerId  = userDetails.getCustomerId();
+        int  totalAmount = body.get("totalAmount");
+        String orderNo   = paymentService.createOrder(customerId, totalAmount);
         return ResponseEntity.ok(Map.of("orderNo", orderNo));
     }
 
