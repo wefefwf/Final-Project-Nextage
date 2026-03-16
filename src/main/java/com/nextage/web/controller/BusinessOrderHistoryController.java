@@ -56,6 +56,7 @@ public class BusinessOrderHistoryController {
         model.addAttribute("currentPage",    page);
         model.addAttribute("totalPages",     totalPages);
         model.addAttribute("search",         search);
+        model.addAttribute("isAdmin", "BADMIN".equals(role));
         return "views/orderhistory/business-order-history";
     }
 

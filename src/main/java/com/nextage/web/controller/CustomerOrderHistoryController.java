@@ -123,4 +123,19 @@ public class CustomerOrderHistoryController {
             return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
         }
     }
+    
+    @GetMapping("/review/{orderItemId}")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getReview(
+            @PathVariable("orderItemId") Long orderItemId,
+            @AuthenticationPrincipal CustomerUserDetails userDetails) {
+        if (userDetails == null)
+            return ResponseEntity.status(401).body(Map.of("success", false));
+
+        com.nextage.web.domain.ReviewDTO review = service.getReview(orderItemId);
+        if (review == null)
+            return ResponseEntity.ok(Map.of("success", false));
+        return ResponseEntity.ok(Map.of("success", true, "content", review.getContent(),
+                                        "createdAt", review.getCreatedAt().toString()));
+    }
 }

@@ -15,7 +15,7 @@ public class ReviewDTO {
     private Long orderItemId;    // order_item_id (FK)
     private Long customerId;     // customer_id (FK)
     private Long businessId;     // business_id (FK)
-    private String content;      // 리뷰 내용
+    private String content;     // 리뷰 내용
     
     // 이미지 경로 (최대 3개)
     private String image1;       // 필수

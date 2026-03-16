@@ -95,7 +95,7 @@ public class CustomerOrderHistoryService {
     @Transactional
     public void rejectOrder(Long orderId) {
         customerOrderHistoryMapper.updateAcceptStatus(orderId, "REJECTED");
-        customerOrderHistoryMapper.updateDeliveryStatus(orderId, 9);  // ← 취소 상태
+        customerOrderHistoryMapper.updateDeliveryStatus(orderId, 9);
         log.info("주문 취소 - orderId: {}", orderId);
     }
 
@@ -115,6 +115,14 @@ public class CustomerOrderHistoryService {
     }
 
     /* ─────────────────────────────────────────
+       후기 조회
+       ───────────────────────────────────────── */
+    @Transactional(readOnly = true)
+    public ReviewDTO getReview(Long orderItemId) {
+        return customerReviewMapper.selectReviewByOrderItemId(orderItemId);
+    }
+
+    /* ─────────────────────────────────────────
        주문 삭제
        ───────────────────────────────────────── */
     @Transactional
@@ -125,4 +133,5 @@ public class CustomerOrderHistoryService {
         customerOrderHistoryMapper.deleteOrderByOrderId(orderId);
         log.info("주문 삭제 - orderId: {}, customerId: {}", orderId, customerId);
     }
+    
 }

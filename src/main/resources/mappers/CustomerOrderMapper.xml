@@ -6,8 +6,8 @@
 
     <!-- 주문 사전 생성 (Kit 구매) -->
     <insert id="insertOrder">
-        INSERT INTO orders (order_no, customer_id, business_id, total_amount, payment_status, accept_status, created_at)
-		VALUES (#{orderNo}, #{customerId}, #{businessId}, #{totalAmount}, 'READY', 'PENDING', NOW())
+        INSERT INTO orders (order_no, customer_id, total_amount, payment_status, accept_status, created_at)
+		VALUES (#{orderNo}, #{customerId}, #{totalAmount}, 'READY', 'PENDING', NOW())
     </insert>
 
     <!-- 결제 후 imp_uid + payment_status 업데이트 -->

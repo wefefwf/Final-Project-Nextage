@@ -157,7 +157,7 @@
         </form>
     </div>
 
-    <div class="top-section">
+    <div class="top-section" th:if="${!isAdmin}">
         <!-- 왼쪽: 새 주문 목록 -->
         <div class="panel">
             <div class="panel-header">
@@ -179,7 +179,16 @@
                     <div class="pending-info">
                         <div class="pending-name" th:text="${order.customerNickname} + ' 님의 주문'"></div>
                         <div class="pending-sub"
-                             th:text="${order.items != null and !#lists.isEmpty(order.items) ? order.items[0].productName : '상품 정보 없음'}"></div>
+						     th:if="${order.items != null and !#lists.isEmpty(order.items)}"
+						     th:text="${order.items[0].productName} + 
+						              (${#lists.size(order.items)} > 1 
+						               ? ' 외 ' + (${#lists.size(order.items)} - 1) + '건' 
+						               : '')">
+						</div>
+						<div class="pending-sub"
+						     th:if="${order.items == null or #lists.isEmpty(order.items)}">
+						    상품 정보 없음
+						</div>
                     </div>
                     <div class="pending-price"
                          th:text="${#numbers.formatInteger(order.totalAmount, 3, 'COMMA') + '원'}"></div>
@@ -233,7 +242,14 @@
 
         <div class="order-info">
             <div class="order-name"
-                 th:text="${order.items != null and !#lists.isEmpty(order.items) ? order.items[0].productName : '주문'}"></div>
+			     th:if="${order.items != null and !#lists.isEmpty(order.items)}"
+			     th:text="${order.items[0].productName} + 
+			              (${#lists.size(order.items)} > 1 
+			               ? ' 외 ' + (${#lists.size(order.items)} - 1) + '건' 
+			               : '')">
+			</div>
+			<div class="order-name"
+			     th:if="${order.items == null or #lists.isEmpty(order.items)}">주문</div>
             <div class="order-sub"
                  style="font-family:'Montserrat',sans-serif; color:#bd93f9; font-size:11px; font-weight:700; margin-top:2px;"
                  th:text="${order.orderNo}"></div>
@@ -250,17 +266,18 @@
         <span class="status-badge status-done"     th:if="${order.deliveryStatus == 4}">배송완료</span>
         <span class="status-badge status-cancel"   th:if="${order.deliveryStatus == 9}">취소</span>
 
-        <div class="order-btns">
-            <button class="btn btn-blue"
-                    th:data-order-id="${order.orderId}"
-                    th:data-delivery-status="${order.deliveryStatus}"
-                    onclick="openDeliveryModal(event, this)">배송관리</button>
-
-            <a class="btn btn-green"
-               th:if="${order.roomId != null}"
-               th:href="@{/chat(roomId=${order.roomId})}"
-               onclick="event.stopPropagation()">채팅보기</a>
-        </div>
+        <!-- 수정: BADMIN은 배송관리 버튼 숨김 -->
+		<div class="order-btns">
+		    <button class="btn btn-blue"
+		            th:if="${!isAdmin}"
+		            th:data-order-id="${order.orderId}"
+		            th:data-delivery-status="${order.deliveryStatus}"
+		            onclick="openDeliveryModal(event, this)">배송관리</button>
+		    <a class="btn btn-green"
+		       th:if="${order.roomId != null}"
+		       th:href="@{/business/chat(roomId=${order.roomId})}"
+		       onclick="event.stopPropagation()">채팅보기</a>
+		</div>
     </div>
 
     <!-- 페이징 -->

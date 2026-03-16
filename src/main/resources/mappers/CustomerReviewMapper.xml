@@ -3,15 +3,22 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.nextage.web.mapper.CustomerReviewMapper">
 
-    <insert id="insertReview">
-        INSERT INTO review (order_item_id, customer_id, business_id, content)
-        VALUES (#{orderItemId}, #{customerId}, #{businessId}, #{content})
-    </insert>
-
-    <select id="existsReview" resultType="boolean">
-        SELECT COUNT(*) > 0
-        FROM review
-        WHERE order_item_id = #{orderItemId}
-    </select>
-
+   <insert id="insertReview">
+	    INSERT INTO review (order_item_id, customer_id, business_id, content)
+	    VALUES (#{orderItemId}, #{customerId}, #{businessId}, #{content})
+	</insert>
+	
+	<select id="existsReview" resultType="boolean">
+	    SELECT COUNT(*) > 0
+	    FROM review
+	    WHERE order_item_id = #{orderItemId}
+	</select>
+	
+	<!-- 추가 -->
+	<select id="selectReviewByOrderItemId" resultType="com.nextage.web.domain.ReviewDTO">
+	    SELECT review_id, order_item_id, customer_id, business_id, content, created_at
+	    FROM review
+	    WHERE order_item_id = #{orderItemId}
+	    LIMIT 1
+	</select>
 </mapper>

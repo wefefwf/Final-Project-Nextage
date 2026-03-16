@@ -376,17 +376,19 @@
                 </div>
 
                 <!-- 후기 버튼: 개인거래(bid_id 있음)일 때만 표시 -->
-                <th:block th:if="${order.bidId != null}">
-                    <button class="btn-reviewed" th:if="${item.reviewed}">후기 완료</button>
-                    <button class="btn-review"
-                            th:if="${!item.reviewed}"
-                            th:data-order-item-id="${item.orderItemId}"
-                            th:data-business-id="${item.businessId}"
-                            th:data-product-name="${item.productName}"
-                            onclick="openReviewModalFromBtn(this)">
-                        후기 작성
-                    </button>
-                </th:block>
+                <th:block th:if="${order.bidId != null and order.deliveryStatus == 4}">
+				    <button class="btn-reviewed"
+				            th:if="${item.reviewed}"
+				            th:data-order-item-id="${item.orderItemId}"
+				            th:data-product-name="${item.productName}"
+				            onclick="openReviewReadModal(this)">후기 보기</button>
+				    <button class="btn-review"
+				            th:if="${!item.reviewed}"
+				            th:data-order-item-id="${item.orderItemId}"
+				            th:data-business-id="${item.businessId}"
+				            th:data-product-name="${item.productName}"
+				            onclick="openReviewModalFromBtn(this)">후기 작성</button>
+				</th:block>
             </div>
 
             <div class="total-row">
@@ -422,6 +424,28 @@
             <div class="review-msg" id="reviewMsg"></div>
         </div>
     </div>
+    
+    <!-- 후기 보기 모달 -->
+	<div class="modal-overlay" id="reviewReadModalOverlay">
+	    <div class="modal-box">
+	        <button class="modal-close" onclick="closeReviewReadModal()">&times;</button>
+	        <div class="modal-title">내 후기</div>
+	        <div class="modal-subtitle">작성한 후기 내용입니다.</div>
+	        <div class="modal-product-name" id="readReviewProductName"></div>
+	        <div class="review-label">후기 내용</div>
+	        <div id="readReviewContent" style="
+	            width:100%; min-height:110px;
+	            border:1.5px solid #ebebeb; border-radius:12px;
+	            padding:12px 14px; font-size:14px;
+	            color:#333; background:#fafafa; line-height:1.6;
+	            white-space:pre-wrap;">
+	        </div>
+	        <div id="readReviewDate" style="
+	            text-align:right; font-size:12px;
+	            color:#bbb; margin-top:10px;">
+	        </div>
+	    </div>
+	</div>
 
     <script th:inline="javascript">
     /*<![CDATA[*/
@@ -500,6 +524,47 @@
                 document.getElementById('reviewMsg').innerHTML =
                     '<span style="color:#ff6b6b;">오류가 발생했습니다.</span>';
             });
+            
+            document.addEventListener('DOMContentLoaded', function() {
+                document.getElementById('reviewModalOverlay')
+                    .addEventListener('click', function(e) {
+                        if (e.target === this) closeReviewModal();
+                    });
+                // 추가
+                document.getElementById('reviewReadModalOverlay')
+                    .addEventListener('click', function(e) {
+                        if (e.target === this) closeReviewReadModal();
+                    });
+            });
+
+            function openReviewReadModal(btn) {
+                var orderItemId = btn.dataset.orderItemId;
+                var productName = btn.dataset.productName;
+
+                document.getElementById('readReviewProductName').textContent = productName;
+                document.getElementById('readReviewContent').textContent     = '불러오는 중...';
+                document.getElementById('readReviewDate').textContent        = '';
+                document.getElementById('reviewReadModalOverlay').classList.add('show');
+
+                fetch('/customer/order/review/' + orderItemId)
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (data.success) {
+                        document.getElementById('readReviewContent').textContent = data.content;
+                        document.getElementById('readReviewDate').textContent
+                            = '작성일: ' + data.createdAt.substring(0, 10);
+                    } else {
+                        document.getElementById('readReviewContent').textContent = '후기를 불러올 수 없습니다.';
+                    }
+                })
+                .catch(function() {
+                    document.getElementById('readReviewContent').textContent = '오류가 발생했습니다.';
+                });
+            }
+
+            function closeReviewReadModal() {
+                document.getElementById('reviewReadModalOverlay').classList.remove('show');
+            }
         }
     /*]]>*/
     </script>

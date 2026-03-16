@@ -3,10 +3,6 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.nextage.web.mapper.BusinessOrderHistoryMapper">
 
-    <!-- =============================================
-         BUSER: 본인에게 온 개인거래(bid) 주문 목록
-         (ACCEPTED 상태만 하단 리스트에 표시)
-         ============================================= -->
     <select id="selectAcceptedOrders" resultType="com.nextage.web.domain.OrderHistoryDTO">
         SELECT
             o.order_id, o.order_no, o.business_id, o.bid_id,
@@ -20,17 +16,22 @@
                                AND cr.customer_id = o.customer_id
         WHERE o.business_id    = #{businessId}
           AND o.payment_status = 'PAID'
-          AND o.accept_status  = 'ACCEPTED'
+          AND o.accept_status IN ('ACCEPTED', 'REJECTED')
           AND o.bid_id IS NOT NULL
         <if test="search != null and search.keyword != null and search.keyword != ''">
             AND (
                 c.nickname LIKE CONCAT('%', #{search.keyword}, '%')
                 OR o.order_no LIKE CONCAT('%', #{search.keyword}, '%')
                 OR EXISTS (
-                    SELECT 1 FROM bids b
-                    JOIN request r ON r.request_id = b.request_id
-                    WHERE b.bid_id = o.bid_id
-                      AND r.title LIKE CONCAT('%', #{search.keyword}, '%')
+                    SELECT 1 FROM order_items oi
+                    LEFT JOIN kit k ON k.kit_id = oi.kit_id
+                    LEFT JOIN bids b ON b.bid_id = o.bid_id
+                    LEFT JOIN request r ON r.request_id = b.request_id
+                    WHERE oi.order_id = o.order_id
+                      AND (
+                          k.name LIKE CONCAT('%', #{search.keyword}, '%')
+                          OR r.title LIKE CONCAT('%', #{search.keyword}, '%')
+                      )
                 )
             )
         </if>
@@ -50,17 +51,22 @@
         JOIN customer c ON c.customer_id = o.customer_id
         WHERE o.business_id    = #{businessId}
           AND o.payment_status = 'PAID'
-          AND o.accept_status  = 'ACCEPTED'
+          AND o.accept_status IN ('ACCEPTED', 'REJECTED')
           AND o.bid_id IS NOT NULL
         <if test="search != null and search.keyword != null and search.keyword != ''">
             AND (
                 c.nickname LIKE CONCAT('%', #{search.keyword}, '%')
                 OR o.order_no LIKE CONCAT('%', #{search.keyword}, '%')
                 OR EXISTS (
-                    SELECT 1 FROM bids b
-                    JOIN request r ON r.request_id = b.request_id
-                    WHERE b.bid_id = o.bid_id
-                      AND r.title LIKE CONCAT('%', #{search.keyword}, '%')
+                    SELECT 1 FROM order_items oi
+                    LEFT JOIN kit k ON k.kit_id = oi.kit_id
+                    LEFT JOIN bids b ON b.bid_id = o.bid_id
+                    LEFT JOIN request r ON r.request_id = b.request_id
+                    WHERE oi.order_id = o.order_id
+                      AND (
+                          k.name LIKE CONCAT('%', #{search.keyword}, '%')
+                          OR r.title LIKE CONCAT('%', #{search.keyword}, '%')
+                      )
                 )
             )
         </if>
@@ -72,10 +78,6 @@
         </if>
     </select>
 
-    <!-- =============================================
-         BADMIN: 모든 개인거래(bid) 주문 전체 상태 조회
-         (PENDING, ACCEPTED, REJECTED 모두 포함)
-         ============================================= -->
     <select id="selectAllOrdersForAdmin" resultType="com.nextage.web.domain.OrderHistoryDTO">
         SELECT
             o.order_id, o.order_no, o.business_id, o.bid_id,
@@ -94,10 +96,15 @@
                 c.nickname LIKE CONCAT('%', #{search.keyword}, '%')
                 OR o.order_no LIKE CONCAT('%', #{search.keyword}, '%')
                 OR EXISTS (
-                    SELECT 1 FROM bids b
-                    JOIN request r ON r.request_id = b.request_id
-                    WHERE b.bid_id = o.bid_id
-                      AND r.title LIKE CONCAT('%', #{search.keyword}, '%')
+                    SELECT 1 FROM order_items oi
+                    LEFT JOIN kit k ON k.kit_id = oi.kit_id
+                    LEFT JOIN bids b ON b.bid_id = o.bid_id
+                    LEFT JOIN request r ON r.request_id = b.request_id
+                    WHERE oi.order_id = o.order_id
+                      AND (
+                          k.name LIKE CONCAT('%', #{search.keyword}, '%')
+                          OR r.title LIKE CONCAT('%', #{search.keyword}, '%')
+                      )
                 )
             )
         </if>
@@ -122,10 +129,15 @@
                 c.nickname LIKE CONCAT('%', #{search.keyword}, '%')
                 OR o.order_no LIKE CONCAT('%', #{search.keyword}, '%')
                 OR EXISTS (
-                    SELECT 1 FROM bids b
-                    JOIN request r ON r.request_id = b.request_id
-                    WHERE b.bid_id = o.bid_id
-                      AND r.title LIKE CONCAT('%', #{search.keyword}, '%')
+                    SELECT 1 FROM order_items oi
+                    LEFT JOIN kit k ON k.kit_id = oi.kit_id
+                    LEFT JOIN bids b ON b.bid_id = o.bid_id
+                    LEFT JOIN request r ON r.request_id = b.request_id
+                    WHERE oi.order_id = o.order_id
+                      AND (
+                          k.name LIKE CONCAT('%', #{search.keyword}, '%')
+                          OR r.title LIKE CONCAT('%', #{search.keyword}, '%')
+                      )
                 )
             )
         </if>
@@ -137,9 +149,6 @@
         </if>
     </select>
 
-    <!-- =============================================
-         PENDING 주문 (상단 패널용)
-         ============================================= -->
     <select id="selectPendingOrders" resultType="com.nextage.web.domain.OrderHistoryDTO">
         SELECT
             o.order_id, o.order_no, o.business_id, o.bid_id,
@@ -175,9 +184,6 @@
         ORDER BY o.created_at DESC
     </select>
 
-    <!-- =============================================
-         공통
-         ============================================= -->
     <select id="selectOrderDetail" resultType="com.nextage.web.domain.OrderHistoryDTO">
         SELECT
             o.order_id, o.order_no, o.business_id, o.bid_id,
@@ -208,7 +214,6 @@
         WHERE oi.order_id = #{orderId}
     </select>
 
-    <!-- Mapper 인터페이스 선언 유지용 -->
     <select id="selectOrdersByBusinessId" resultType="com.nextage.web.domain.OrderHistoryDTO">
         SELECT
             o.order_id, o.order_no, o.business_id, o.bid_id,
@@ -235,9 +240,6 @@
           AND o.bid_id IS NOT NULL
     </select>
 
-    <!-- =============================================
-         채팅방 생성 (주문 수락 시)
-         ============================================= -->
     <insert id="insertChatRoom">
         INSERT INTO chat_room (bid_id, customer_id, business_id)
         VALUES (#{bidId}, #{customerId}, #{businessId})
@@ -257,9 +259,6 @@
         VALUES (#{roomId}, #{businessId}, #{customerId})
     </insert>
 
-    <!-- =============================================
-         상태 변경
-         ============================================= -->
     <update id="updateDeliveryStatus">
         UPDATE orders SET delivery_status = #{deliveryStatus}
         WHERE order_id = #{orderId}

@@ -29,7 +29,7 @@ public class CustomerPaymentService {
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"))
                 + "_" + (int)(Math.random() * 9000 + 1000);
         Long businessId = 1L;
-        orderMapper.insertOrder(orderNo, customerId, businessId, totalAmount);
+        orderMapper.insertOrder(orderNo, customerId, totalAmount);
         log.info("주문 생성 - orderNo: {}, customerId: {}, totalAmount: {}",
                 orderNo, customerId, totalAmount);
         return orderNo;
