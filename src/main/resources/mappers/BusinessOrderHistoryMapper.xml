@@ -291,5 +291,9 @@
 	      AND o.due_date IS NOT NULL
 	    ORDER BY o.due_date ASC
 	</select>
+	
+	<select id="selectRequestIdByBidId" resultType="Long">
+	    SELECT request_id FROM bids WHERE bid_id = #{bidId}
+	</select>
 
 </mapper>
