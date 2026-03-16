@@ -1,6 +1,9 @@
 package com.nextage.web.controller;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -10,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import com.nextage.web.domain.OrderHistoryDTO;
 import com.nextage.web.domain.RequestDTO;
 import com.nextage.web.domain.ReviewDTO;
+import com.nextage.web.domain.ScheduleOrderDTO;
 import com.nextage.web.service.BusinessOrderHistoryService;
 import com.nextage.web.service.BusinessPortfolioService;
 import com.nextage.web.service.CustomerRequestService;
@@ -61,6 +65,23 @@ public class BusinessMainController {
             }
         }
 
+        //4. 캘린더
+     // 4. 전체 일정 및 오늘 작업
+        List<ScheduleOrderDTO> scheduleList = businessOrderHistoryService.getScheduleOrders(businessId);
+        scheduleList.sort((a, b) -> a.getDueDate().compareTo(b.getDueDate()));
+
+        LocalDate today = LocalDate.now();
+        List<ScheduleOrderDTO> todayWork = scheduleList.stream()
+                .filter(order -> !order.getCreatedAt().toLocalDate().isAfter(today)
+                              && !order.getDueDate().toLocalDate().isBefore(today))
+                .collect(Collectors.toList());
+
+        
+        
+        
+        
+        model.addAttribute("scheduleList", scheduleList);
+        model.addAttribute("todayWork", todayWork);
         model.addAttribute("businessId",    businessId);
         model.addAttribute("companyName",   companyName);
         model.addAttribute("newPostList",   newPostList);
