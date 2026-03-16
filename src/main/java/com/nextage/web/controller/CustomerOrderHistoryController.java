@@ -138,4 +138,22 @@ public class CustomerOrderHistoryController {
         return ResponseEntity.ok(Map.of("success", true, "content", review.getContent(),
                                         "createdAt", review.getCreatedAt().toString()));
     }
+    
+    @PutMapping("/review/{orderItemId}")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> updateReview(
+            @PathVariable("orderItemId") Long orderItemId,
+            @RequestBody Map<String, String> body,
+            @AuthenticationPrincipal CustomerUserDetails userDetails) {
+
+        if (userDetails == null)
+            return ResponseEntity.status(401).body(Map.of("success", false, "message", "로그인 필요"));
+
+        try {
+            service.updateReview(orderItemId, body.get("content"));
+            return ResponseEntity.ok(Map.of("success", true));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
+        }
+    }
 }

@@ -4,8 +4,9 @@
 <mapper namespace="com.nextage.web.mapper.CustomerReviewMapper">
 
    <insert id="insertReview">
-	    INSERT INTO review (order_item_id, customer_id, business_id, content)
-	    VALUES (#{orderItemId}, #{customerId}, #{businessId}, #{content})
+	    INSERT INTO review (order_item_id, customer_id, business_id, content, image1)
+	    VALUES (#{orderItemId}, #{customerId}, #{businessId}, #{content}, 
+	            #{image1, jdbcType=VARCHAR})
 	</insert>
 	
 	<select id="existsReview" resultType="boolean">
@@ -21,4 +22,10 @@
 	    WHERE order_item_id = #{orderItemId}
 	    LIMIT 1
 	</select>
+	
+	<update id="updateReview">
+	    UPDATE review
+	    SET content = #{content}
+	    WHERE order_item_id = #{orderItemId}
+	</update>
 </mapper>

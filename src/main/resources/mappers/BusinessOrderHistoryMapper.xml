@@ -199,20 +199,24 @@
     </select>
 
     <select id="selectOrderItems" resultType="com.nextage.web.domain.OrderItemsDTO">
-        SELECT
-            oi.order_item_id,
-            oi.kit_id,
-            oi.quantity,
-            oi.price,
-            COALESCE(k.name, r.title, '개인거래 상품') AS product_name,
-            COALESCE(k.main_image1, NULL)              AS image_url
-        FROM order_items oi
-        LEFT JOIN kit k     ON k.kit_id     = oi.kit_id
-        LEFT JOIN orders o  ON o.order_id   = oi.order_id
-        LEFT JOIN bids b    ON b.bid_id     = o.bid_id
-        LEFT JOIN request r ON r.request_id = b.request_id
-        WHERE oi.order_id = #{orderId}
-    </select>
+	    SELECT
+	        oi.order_item_id,
+	        oi.kit_id,
+	        o.business_id,
+	        oi.quantity,
+	        oi.price,
+	        COALESCE(k.name, r.title, '개인거래 상품') AS product_name,
+	        COALESCE(k.main_image1, NULL) AS image_url,
+	        (SELECT COUNT(*) > 0
+	           FROM review r2
+	          WHERE r2.order_item_id = oi.order_item_id) AS reviewed
+	    FROM order_items oi
+	    JOIN orders o ON o.order_id = oi.order_id
+	    LEFT JOIN kit k ON k.kit_id = oi.kit_id
+	    LEFT JOIN bids b ON b.bid_id = o.bid_id
+	    LEFT JOIN request r ON r.request_id = b.request_id
+	    WHERE oi.order_id = #{orderId}
+	</select>
 
     <select id="selectOrdersByBusinessId" resultType="com.nextage.web.domain.OrderHistoryDTO">
         SELECT

@@ -253,11 +253,18 @@
         <div class="order-amount"
              th:text="${#numbers.formatInteger(order.totalAmount, 3, 'COMMA') + '원'}"></div>
 
-        <span class="status-badge status-checking" th:if="${order.deliveryStatus == 1}">결제확인중</span>
-        <span class="status-badge status-ready"    th:if="${order.deliveryStatus == 2}">배송준비</span>
-        <span class="status-badge status-ing"      th:if="${order.deliveryStatus == 3}">배송중</span>
-        <span class="status-badge status-done"     th:if="${order.deliveryStatus == 4}">배송완료</span>
-        <span class="status-badge status-cancel"   th:if="${order.deliveryStatus == 9}">취소</span>
+        <th:block th:if="${order.acceptStatus != 'REJECTED'}">
+		    <span class="delivery-badge delivery-checking"
+		          th:if="${order.deliveryStatus == 1}">결제확인중</span>
+		    <span class="delivery-badge delivery-ready"
+		          th:if="${order.deliveryStatus == 2}">배송준비</span>
+		    <span class="delivery-badge delivery-ing"
+		          th:if="${order.deliveryStatus == 3}">배송중</span>
+		    <span class="delivery-badge delivery-done"
+		          th:if="${order.deliveryStatus == 4}">배송완료</span>
+		    <span class="delivery-badge delivery-cancel"
+		          th:if="${order.deliveryStatus == 9}">취소</span>
+		</th:block>
 
         <span class="accept-badge accept-accepted" th:if="${order.acceptStatus == 'ACCEPTED'}">수락됨</span>
         <span class="accept-badge accept-rejected" th:if="${order.acceptStatus == 'REJECTED'}">거절됨</span>
