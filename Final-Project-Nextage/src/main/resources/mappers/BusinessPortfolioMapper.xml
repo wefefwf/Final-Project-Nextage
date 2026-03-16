@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.nextage.web.mapper.BusinessPortfolioMapper">
+
+	<!-- 포트폴리오 bizinfo 들고오기 -->
+<select id="getPortfolio" parameterType="long" resultType="BizinfoDTO">
+    SELECT 
+        bi.*, 
+        b.company_name AS companyName  FROM bizinfo bi
+  		JOIN business b ON bi.business_id = b.business_id
+    	WHERE bi.business_id = #{id}
+</select>
+	
+	<!-- 포트폴리오 review에 들어가는 내용 들고오기  -->
+<select id="getReview" resultType="ReviewDTO">
+SELECT 
+    r.review_id,
+    r.content,
+    r.image1,
+    r.image2,
+    r.image3,
+    r.status,
+    r.created_at,
+    o.order_no AS orderNo,
+    req.title AS requestTitle,
+    oi.created_at AS startDate,
+    req.requested_due_date AS endDate
+FROM review r
+JOIN order_items oi ON r.order_item_id = oi.order_item_id
+JOIN orders o ON oi.order_id = o.order_id
+JOIN bids b ON o.bid_id = b.bid_id
+JOIN request req ON b.request_id = req.request_id
+WHERE r.business_id = #{id}
+ORDER BY r.created_at DESC
+LIMIT #{size}
+OFFSET #{offset}
+</select>
+	
+	<!-- career 가져오기 -->
+	<select id="getCareer" parameterType="long" resultType="CareerDTO">
+	    SELECT 
+	        c.career_id        AS careerId,
+	        c.bizinfo_id       AS bizinfoId,
+	        c.work_description AS workDescription
+	    FROM career c
+	    JOIN bizinfo b ON c.bizinfo_id = b.bizinfo_id
+	    WHERE b.business_id = #{id}
+	    ORDER BY c.career_id ASC
+	</select>
+	
+	<!-- review 갯수가져오기  -->
+	<select id="getTotalReviewCount" resultType="long">
+	    SELECT COUNT(*) 
+	    FROM review 
+	    WHERE business_id = #{id}
+	</select>
+</mapper>

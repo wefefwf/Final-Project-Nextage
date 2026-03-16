@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.nextage.web.mapper.CustomerOrderMapper">
+
+    <!-- 주문 사전 생성 -->
+    <insert id="insertOrder">
+	    INSERT INTO orders (order_no, customer_id, business_id, total_amount, payment_status, created_at)
+	    VALUES (#{orderNo}, #{customerId}, #{businessId}, #{totalAmount}, 'READY', NOW())
+	</insert>
+
+    <!-- 결제 후 imp_uid + payment_status 업데이트 -->
+    <update id="updatePaymentStatus">
+        UPDATE orders
+           SET imp_uid        = #{impUid},
+               payment_status = #{paymentStatus}
+         WHERE order_no = #{orderNo}
+    </update>
+
+    <!-- total_amount 조회 (금액 위변조 검증용) -->
+    <select id="selectTotalAmountByOrderNo" resultType="Integer">
+        SELECT total_amount
+          FROM orders
+         WHERE order_no = #{orderNo}
+    </select>
+    
+    <select id="selectOrderIdByOrderNo" resultType="Long">
+	    SELECT order_id FROM orders WHERE order_no = #{orderNo}
+	</select>
+
+</mapper>

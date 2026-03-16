@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/business-layout}">
+<head>
+<meta charset="UTF-8">
+<title>__Nextage__*Business</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+<link rel="stylesheet" th:href="@{/css/businessMain/businessMain.css}" />
+<style>
+    /* 필터링을 위한 간단한 스타일 추가 */
+    .filter-btn { cursor: pointer; transition: all 0.3s; }
+    .filter-btn.active { background-color: #000; color: #fff; font-weight: bold; }
+    .main-request-item { display: flex; transition: opacity 0.3s ease; }
+</style>
+</head>
+<body>
+ <th:block layout:fragment="content">
+	<main class="main-content">
+	  <section class="section-top">
+	    <div class="calendar-group">
+	      <h3>Calendar</h3>
+	      <div class="box-gray cal-main"></div>
+	      <div class="box-gray cal-sub"></div>
+	      <div class="link-wrapper">
+	        <a href="#" class="view-all">전체 보러가기 →</a>
+	      </div>
+	    </div>
+
+	    <div class="side-group">
+	      <div class="order-zone">
+	        <h3>New Order</h3>
+	        <div class="box-gray order-box"></div>
+	        <div class="link-wrapper">
+	          <a href="#" class="view-all">전체 보러가기 →</a>
+	        </div>
+	      </div>
+
+	      <div class="vertical-dots">
+	        <span>●</span>
+	        <span>●</span>
+	        <span>●</span>
+	      </div>
+
+	      <div class="notice-zone">
+	        <h3>Notice</h3>
+	        <div class="box-gray notice-box"></div>
+	        <div class="link-wrapper">
+	          <a href="#" class="view-all">전체 보러가기 →</a>
+	        </div>
+	      </div>
+	    </div>
+	  </section>
+
+	  <section class="section-portfolio">
+	    <h3>My PortFolio</h3>
+	    <div class="box-gray portfolio-full"></div>
+	  </section>
+
+	  <section class="section-post">
+	    <div class="post-header">
+	      <h3>New Post</h3>
+	      <a th:href="@{/business/request/list}" class="post-view-all">전체 보러가기 <span>→</span></a>
+	    </div>
+
+	    <div class="post-nav">
+	      <button class="filter-btn active" data-category="all">전체</button>
+	      <button class="filter-btn" data-category="2D Clothes">2D</button>
+	      <button class="filter-btn" data-category="3D Clothes">3D</button>
+	      <button class="filter-btn" data-category="3D Object">Object</button>
+	      <button class="filter-btn" data-category="Metal">Metal</button>
+	    </div>
+
+	    <div class="post-full">
+	      <div class="main-request-list">
+	        <div th:if="${#lists.isEmpty(newPostList)}" class="empty-msg">
+	          <p>새로운 의뢰가 없습니다.</p>
+	        </div>
+
+	        <div class="main-request-item" th:each="post : ${newPostList}"
+	             th:data-category="${post.categoryName}"
+	             th:onclick="|location.href='/customer/request/detail/' + ${post.requestId}|"
+	             style="cursor: pointer;">
+	          <div class="item-left">
+	            <img th:src="${post.thumbnailPath ?: '/image/no-image.png'}" class="mini-thumbnail">
+	            <div class="item-text">
+	              <span class="item-cat" th:text="${post.categoryName}">Category</span>
+	              <h4 class="item-title" th:text="${post.title}">의뢰 제목</h4>
+	            </div>
+	          </div>
+	          <div class="item-right">
+	            <span class="item-price">₩<span th:text="${#numbers.formatInteger(post.hopePrice, 0, 'COMMA')}">0</span></span>
+	            <span class="item-date" th:text="${#strings.substring(post.createdAt, 0, 10)}">2026-03-12</span>
+	          </div>
+	        </div>
+	      </div>
+	    </div>
+	  </section>
+	</main>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const buttons = document.querySelectorAll('.filter-btn');
+        const items = document.querySelectorAll('.main-request-item');
+
+        buttons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                // 1. 모든 버튼에서 active 클래스 제거 후 클릭한 버튼에 추가
+                buttons.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+
+                // 클릭한 버튼의 카테고리 (소문자로 변환 + 공백 제거)
+                const targetCat = this.getAttribute('data-category').trim().toLowerCase();
+
+                // 2. 리스트 순회하며 필터링
+                items.forEach(item => {
+                    // 데이터의 카테고리 (소문자로 변환 + 공백 제거)
+                    // 데이터가 없을 경우를 대비해 기본값 '' 설정
+                    const itemCat = (item.getAttribute('data-category') || "").trim().toLowerCase();
+
+                    if (targetCat === 'all' || itemCat === targetCat) {
+                        item.style.display = 'flex';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+        });
+    });
+    </script>
+</th:block>
+</body>
+</html>

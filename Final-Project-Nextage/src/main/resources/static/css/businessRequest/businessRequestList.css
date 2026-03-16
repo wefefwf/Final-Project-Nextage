@@ -1,0 +1,232 @@
+@charset "UTF-8";
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+.request-board-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 48px 0 80px;
+    font-family: -apple-system, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+    color: #1d1d1f;
+}
+
+/* 헤더 */
+.board-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 28px;
+}
+
+.board-title {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: #1d1d1f;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* 필터 — customer 스타일 */
+.category-filters {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.filter-group {
+    display: flex;
+    align-items: center;
+    background: #f5f5f7;
+    padding: 5px 10px;
+    border-radius: 20px;
+    gap: 5px;
+}
+
+.group-label {
+    font-size: 11px;
+    font-weight: 800;
+    color: #86868b;
+    padding: 0 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.filter-btn {
+    padding: 8px 18px;
+    border-radius: 25px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: #1d1d1f;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: -apple-system, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+}
+
+.filter-btn.active {
+    background: #1d1d1f;
+    color: #ffffff;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.filter-btn:hover:not(.active) {
+    color: #1d1d1f;
+}
+
+button[data-category="all"] {
+    border: 1px solid #e5e5e7;
+    background: #ffffff;
+}
+
+/* 정렬 select */
+.sort-select {
+    appearance: none;
+    background: #ffffff;
+    border: 1px solid #d2d2d7;
+    border-radius: 8px;
+    color: #1d1d1f;
+    font-size: 13px;
+    font-family: -apple-system, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+    padding: 7px 32px 7px 14px;
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236e6e73' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.sort-select:focus {
+    border-color: #1d1d1f;
+}
+
+/* 리스트 컨테이너 */
+.request-list {
+    display: flex;
+    flex-direction: column;
+    background: #ffffff;
+    border-radius: 20px;
+    border: 1px solid #e0e0e0;
+    overflow: hidden;
+}
+
+/* 개별 아이템 */
+.request-item {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 18px 24px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.request-item:last-child {
+    border-bottom: none;
+}
+
+.request-item:hover {
+    background: #f5f5f7;
+}
+
+/* 썸네일 */
+.item-thumbnail {
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    object-fit: cover;
+    background: #f0f0f0;
+    flex-shrink: 0;
+    border: 1px solid #e8e8ed;
+}
+
+/* 정보 영역 */
+.item-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.item-top-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.item-category {
+    font-size: 11px;
+    font-weight: 700;
+    color: #1d1d1f;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-badge {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 20px;
+}
+
+.status-open {
+    background: rgba(29, 131, 72, 0.1);
+    color: #1d8348;
+}
+
+.status-selected {
+    background: #f0f0f0;
+    color: #6e6e73;
+}
+
+.item-title {
+    font-size: 15px;
+    font-weight: 500;
+    color: #1d1d1f;
+    letter-spacing: -0.2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 4px;
+}
+
+.item-meta {
+    font-size: 12px;
+    color: #6e6e73;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.meta-dot {
+    color: #b0b0b5;
+}
+
+/* 가격 */
+.item-price {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1d1d1f;
+    letter-spacing: -0.3px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* 빈 상태 */
+.empty-msg {
+    text-align: center;
+    padding: 64px 0;
+    color: #6e6e73;
+    font-size: 14px;
+}

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+			xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+    <header th:fragment="header" class="main-header-container">
+        <div class="header-inner">
+            <div class="header-logo">
+                 <a th:href="@{/customer/main}">
+                    <img th:src="@{/images/logo.png}" alt="Nextage Logo" class="logo-image">
+                </a>
+            </div>
+
+            <nav class="header-nav">
+                <ul class="nav-list">
+               		<li><a class="dropdown-item" th:href="@{/customer/shop}">SHOP</a></li>
+                	<li><a class="dropdown-item" href="#">공지사항</a></li>
+                    <li>
+                    	<div class="dropdown">
+							<button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+							  결제/배송
+							</button>
+							<ul class="dropdown-menu">
+							  <li><a class="dropdown-item" th:href="@{/customer/cart}">장바구니</a></li>
+							  <li><a class="dropdown-item" th:href="@{/customer/order/history}">주문내역</a></li>
+							</ul>
+						</div>
+					</li>
+                    <li>
+                    	<div class="dropdown">
+							<button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+							  마이페이지
+							</button>
+							<ul class="dropdown-menu">
+							  <li><a class="dropdown-item" href="#">정보수정</a></li>
+							  <li><a class="dropdown-item" href="#">내 의뢰글</a></li>
+							  <li><a class="dropdown-item" href="/chat">내 채팅</a></li>
+							</ul>
+						</div>
+					</li>
+					<li class="login-item">
+			            <a sec:authorize="isAnonymous()"    th:href="@{/customer/login}"    class="login-btn">Login</a>
+			            <a sec:authorize="isAuthenticated()"   th:href="@{/auth/customer/logoutAction}"  class="login-btn">Logout</a>
+			        </li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+</html>

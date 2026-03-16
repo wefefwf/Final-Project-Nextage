@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/business-layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>주문 관리 - Nextage</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: 'Pretendard', sans-serif; background: #fafafa; color: #333; }
+        .wrapper { max-width: 1100px; margin: 30px auto; padding: 0 20px 80px; }
+
+        .top-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 16px;
+        }
+        .top-bar-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 22px; font-weight: 900; color: #222;
+        }
+        .top-bar-right { font-size: 13px; color: #aaa; }
+        .top-bar-right strong { color: #333; }
+
+        .top-section {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 16px; margin-bottom: 36px; align-items: start;
+        }
+
+        .panel {
+            background: #fff; border: 1px solid #e0e0e0;
+            border-radius: 14px; overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .panel-header {
+            padding: 14px 20px; font-size: 13px; font-weight: 700; color: #fff;
+            background: linear-gradient(135deg, #3a3a3a, #5a5a5a);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .panel-badge {
+            background: rgba(255,255,255,0.2); color: #fff;
+            font-size: 11px; font-weight: 700;
+            padding: 2px 8px; border-radius: 10px;
+        }
+
+        .pending-list { max-height: 460px; overflow-y: auto; }
+
+        .pending-item {
+            padding: 14px 18px; border-bottom: 1px solid #f5f5f5;
+            cursor: pointer; transition: background 0.15s;
+            display: flex; align-items: center; gap: 12px;
+        }
+        .pending-item:hover { background: #f7f7f7; }
+        .pending-item.active {
+            background: #f0f0f0;
+            border-left: 4px solid #555;
+        }
+        .pending-item:last-child { border-bottom: none; }
+
+        .pending-thumb {
+            width: 42px; height: 42px; border-radius: 8px; flex-shrink: 0;
+            background: linear-gradient(135deg, #f2f6fa, #e8edf3);
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden;
+        }
+        .pending-thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .pending-thumb-placeholder {
+            width: 100%; height: 100%; background: linear-gradient(135deg, #f2f6fa, #e8edf3);
+            border-radius: 8px;
+        }
+
+        .pending-info { flex: 1; min-width: 0; }
+        .pending-name {
+            font-size: 13px; font-weight: 700; color: #222;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .pending-sub { font-size: 11px; color: #aaa; margin-top: 2px; }
+        .pending-price {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px; font-weight: 800; color: #333; flex-shrink: 0;
+        }
+
+        .list-empty {
+            padding: 40px 20px; text-align: center; color: #ccc; font-size: 13px;
+        }
+
+        .detail-panel {
+            background: #fff; border: 1px solid #e0e0e0;
+            border-radius: 14px; overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .detail-empty-msg {
+            padding: 80px 24px; text-align: center; color: #ccc; font-size: 14px;
+        }
+        .detail-body { padding: 22px 26px; }
+
+        .detail-img {
+            width: 100%; height: 180px;
+            background: linear-gradient(135deg, #f2f6fa, #e8edf3);
+            border-radius: 12px; margin-bottom: 20px; overflow: hidden;
+        }
+        .detail-img img { width: 100%; height: 100%; object-fit: cover; }
+
+        .detail-row {
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 13px; padding: 9px 0; border-bottom: 1px solid #f5f5f5;
+        }
+        .detail-row:last-of-type { border-bottom: none; }
+        .detail-label { color: #aaa; }
+        .detail-value { font-weight: 600; color: #333; }
+
+        .detail-footer {
+            padding: 16px 26px; background: #f9f9f9;
+            border-top: 1px solid #f0f0f0;
+        }
+        .detail-amount {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 24px; font-weight: 900; margin-bottom: 14px;
+            color: #222;
+            text-align: right;
+        }
+        .detail-btns { display: flex; gap: 10px; justify-content: flex-end; }
+
+        .section-header {
+            display: flex; align-items: baseline; gap: 10px; margin-bottom: 14px;
+        }
+        .section-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 18px; font-weight: 900; color: #222;
+        }
+        .section-sub { font-size: 13px; color: #aaa; }
+
+        .order-row {
+            background: #fff; border: 1px solid #e8e8e8;
+            border-radius: 12px; padding: 22px 20px;
+            display: flex; align-items: center; gap: 14px;
+            margin-bottom: 10px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+            transition: box-shadow 0.2s;
+        }
+        .order-row:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.09); }
+
+        .order-thumb {
+            width: 50px; height: 50px; border-radius: 10px; flex-shrink: 0;
+            background: linear-gradient(135deg, #f2f6fa, #e8edf3);
+            overflow: hidden;
+        }
+        .order-thumb img { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; }
+
+        .order-info { flex: 1; min-width: 0; }
+        .order-name {
+            font-size: 14px; font-weight: 700; color: #222;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .order-sub { font-size: 12px; color: #aaa; margin-top: 3px; }
+
+        .order-amount {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 15px; font-weight: 900; color: #333;
+            flex-shrink: 0; min-width: 80px; text-align: right;
+        }
+
+        .status-badge {
+            font-size: 13px; font-weight: 700;
+            padding: 7px 18px; border-radius: 20px;
+            flex-shrink: 0; white-space: nowrap;
+            display: inline-flex; align-items: center;
+        }
+        .status-checking { background: #fef3e2; color: #e67e22; border: 1px solid #fad7a0; }
+        .status-ready    { background: #eaf4fb; color: #2e86c1; border: 1px solid #aed6f1; }
+        .status-ing      { background: #e8f0fe; color: #4285f4; border: 1px solid #c5d8fd; }
+        .status-done     { background: #f0f0f0; color: #888;    border: 1px solid #e0e0e0; }
+        .status-cancel   { background: #fff5f5; color: #ff6b6b; border: 1px solid #ffc2c2; }
+
+        .order-btns { display: flex; gap: 8px; flex-shrink: 0; align-items: center; }
+
+        .btn {
+            padding: 8px 16px; font-size: 12px; font-weight: 700;
+            border-radius: 20px; cursor: pointer; border: none;
+            transition: all 0.2s; white-space: nowrap;
+            text-decoration: none; display: inline-flex; align-items: center; gap: 4px;
+        }
+
+        /* 수락 버튼 - 원래대로 */
+        .btn-purple {
+            color: #fff; background: linear-gradient(135deg, #818cf8, #60a5fa);
+            box-shadow: 0 2px 8px rgba(129,140,248,0.3);
+            padding: 10px 24px; font-size: 14px;
+        }
+        .btn-purple:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(129,140,248,0.4); color: #fff; background: linear-gradient(135deg, #6366f1, #3b82f6); }
+
+        /* 채팅 보기 버튼 - 원래대로 */
+        .btn-green {
+            color: #fff; background: linear-gradient(135deg, #6dca8a, #a8e6cf);
+            box-shadow: 0 2px 8px rgba(109,202,138,0.3);
+        }
+        .btn-green:hover { transform: translateY(-1px); color: #fff; }
+
+        /* 거절 버튼 - 레드 유지 */
+        .btn-red {
+            color: #fff; background: #f43f6e;
+            box-shadow: 0 2px 8px rgba(244,63,110,0.3);
+            border: none !important;
+            padding: 10px 24px; font-size: 14px;
+        }
+        .btn-red:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(244,63,110,0.4); color: #fff; background: #e11d48; }
+
+        /* 배송 관리 버튼 - 원래대로 */
+        .btn-blue {
+		    color: #fff;
+		    background: linear-gradient(135deg, #7c8cfb, #5aa9ff);
+		    box-shadow: 0 2px 8px rgba(124,140,251,0.35);
+		    border: none !important;
+		}
+		
+		.btn-blue:hover {
+		    transform: translateY(-1px);
+		    background: linear-gradient(135deg, #6d7df5, #4895ff);
+		    box-shadow: 0 4px 14px rgba(124,140,251,0.45);
+		}
+
+        .pagination { display: flex; justify-content: center; gap: 8px; margin-top: 24px; }
+        .page-btn {
+            width: 36px; height: 36px; border-radius: 50%;
+            border: 1.5px solid #e0e0e0; background: #fff;
+            font-size: 13px; font-weight: 600; color: #888;
+            cursor: pointer; transition: all 0.2s;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .page-btn:hover  { border-color: #555; color: #333; }
+        .page-btn.active {
+            background: linear-gradient(135deg, #333, #666);
+            border-color: transparent; color: #fff;
+        }
+        .page-btn.disabled { opacity: 0.35; pointer-events: none; }
+
+        /* 배송 관리 모달 */
+        .modal-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+            z-index: 10000; align-items: center; justify-content: center;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal-box {
+            background: #fff; border-radius: 24px; padding: 36px 32px;
+            width: 420px; max-width: 95vw;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.22);
+            position: relative; animation: slideUp 0.3s ease;
+        }
+        .modal-close {
+            position: absolute; top: 16px; right: 20px;
+            border: none; background: none;
+            font-size: 22px; color: #ccc; cursor: pointer; transition: color 0.2s;
+        }
+        .modal-close:hover { color: #555; }
+        .modal-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 20px; font-weight: 900; color: #222; margin-bottom: 4px;
+        }
+        .modal-subtitle { font-size: 13px; color: #aaa; margin-bottom: 28px; }
+
+        .delivery-options {
+            display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px;
+        }
+        .delivery-option {
+            display: flex; align-items: center; gap: 14px;
+            padding: 14px 18px; border-radius: 12px;
+            border: 2px solid #e8e8e8; cursor: pointer;
+            transition: all 0.2s; background: #fff;
+        }
+        .delivery-option:hover { border-color: #555; background: #f7f7f7; }
+        .delivery-option.selected { border-color: #333; background: #f2f2f2; }
+
+        .delivery-option-dot {
+            width: 14px; height: 14px; border-radius: 50%;
+            border: 2px solid #e0e0e0; flex-shrink: 0; transition: all 0.2s;
+        }
+        .delivery-option.selected .delivery-option-dot {
+            border-color: #333; background: #333;
+        }
+        .delivery-option-label { font-size: 14px; font-weight: 700; flex: 1; }
+        .delivery-option-badge {
+            font-size: 11px; font-weight: 700;
+            padding: 3px 10px; border-radius: 20px;
+        }
+
+        .opt-checking .delivery-option-badge { background: #fef3e2; color: #e67e22; border: 1px solid #fad7a0; }
+        .opt-ready    .delivery-option-badge { background: #eaf4fb; color: #2e86c1; border: 1px solid #aed6f1; }
+        .opt-ing      .delivery-option-badge { background: #e8f0fe; color: #4285f4; border: 1px solid #c5d8fd; }
+        .opt-done     .delivery-option-badge { background: #f0f0f0; color: #888;    border: 1px solid #e0e0e0; }
+        .opt-cancel   .delivery-option-badge { background: #fff5f5; color: #ff6b6b; border: 1px solid #ffc2c2; }
+
+        .btn-confirm {
+            width: 100%; padding: 16px;
+            font-size: 15px; font-weight: 800; color: #fff;
+            background: linear-gradient(135deg, #2c2c2c, #555);
+            border: none; border-radius: 14px; cursor: pointer;
+            transition: all 0.3s; box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+        }
+        .btn-confirm:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.25); }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+<th:block layout:fragment="content">
+<div class="wrapper">
+
+    <div class="top-bar">
+        <span class="top-bar-title">New Order</span>
+        <span class="top-bar-right">기본값은 <strong>최신 주문</strong> 순입니다</span>
+    </div>
+
+    <div class="top-section">
+
+        <!-- 왼쪽: 새 주문 목록 -->
+        <div class="panel">
+            <div class="panel-header">
+                <span>새로 들어온 주문</span>
+                <span class="panel-badge"
+                      th:text="${#lists.size(pendingOrders)} + '건'">0건</span>
+            </div>
+            <div class="pending-list">
+                <div class="list-empty" th:if="${#lists.isEmpty(pendingOrders)}">
+                    새로운 주문이 없습니다.
+                </div>
+                <div th:each="order : ${pendingOrders}"
+                     class="pending-item"
+                     th:attr="data-order-id=${order.orderId}"
+                     th:onclick="'selectOrder(' + ${order.orderId} + ')'">
+
+                    <div class="pending-thumb">
+                        <img th:if="${order.items != null and !#lists.isEmpty(order.items) and order.items[0].imageUrl != null}"
+                             th:src="${order.items[0].imageUrl}">
+                        <div class="pending-thumb-placeholder"
+                             th:if="${order.items == null or #lists.isEmpty(order.items) or order.items[0].imageUrl == null}">
+                        </div>
+                    </div>
+                    <div class="pending-info">
+                        <div class="pending-name"
+                             th:text="${order.customerNickname} + ' 님의 주문'"></div>
+                        <div class="pending-sub"
+                             th:text="${order.items != null and !#lists.isEmpty(order.items)} ? ${order.items[0].productName} : '상품 정보 없음'">
+                        </div>
+                    </div>
+                    <div class="pending-price"
+                         th:text="${#numbers.formatInteger(order.totalAmount, 3, 'COMMA') + '원'}">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 오른쪽: 상세 -->
+        <div class="detail-panel">
+            <div class="panel-header">
+                <span>Order 상세</span>
+            </div>
+
+            <div id="detailEmpty" class="detail-empty-msg">
+                왼쪽 목록에서 주문을 선택하세요.
+            </div>
+
+            <div id="detailBody" class="detail-body" style="display:none;">
+                <div class="detail-img" id="detailImg"></div>
+                <div class="detail-row">
+                    <span class="detail-label">주문번호</span>
+                    <span class="detail-value" id="dOrderNo">-</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">고객명</span>
+                    <span class="detail-value" id="dCustomer">-</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">상품명</span>
+                    <span class="detail-value" id="dProduct">-</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">수량</span>
+                    <span class="detail-value" id="dQty">-</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">결제일시</span>
+                    <span class="detail-value" id="dDate">-</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">거래유형</span>
+                    <span class="detail-value" id="dType">-</span>
+                </div>
+            </div>
+
+            <div id="detailFooter" class="detail-footer" style="display:none;">
+                <div class="detail-amount" id="dAmount">0원</div>
+                <div class="detail-btns">
+                    <button class="btn btn-purple" onclick="acceptOrder()">수락</button>
+                    <button class="btn btn-red"    onclick="rejectOrder()">거절</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 하단: 수락한 주문 목록 -->
+    <div class="section-header">
+        <span class="section-title">Order List</span>
+        <span class="section-sub">수락한 결제내역</span>
+    </div>
+
+    <div th:if="${#lists.isEmpty(acceptedOrders)}"
+         style="text-align:center; padding:40px; color:#ccc; font-size:14px;">
+        수락한 주문이 없습니다.
+    </div>
+
+    <div th:each="order : ${acceptedOrders}" class="order-row">
+
+        <div class="order-thumb">
+            <img th:if="${order.items != null and !#lists.isEmpty(order.items) and order.items[0].imageUrl != null}"
+                 th:src="${order.items[0].imageUrl}">
+        </div>
+
+        <div class="order-info">
+            <div class="order-name"
+                 th:text="${order.items != null and !#lists.isEmpty(order.items)} ? ${order.items[0].productName} : '주문'">
+            </div>
+            <div class="order-sub"
+                 th:text="${order.customerNickname} + ' · ' + ${#temporals.format(order.createdAt, 'yyyy-MM-dd HH:mm')}">
+            </div>
+        </div>
+
+        <div class="order-amount"
+             th:text="${#numbers.formatInteger(order.totalAmount, 3, 'COMMA') + '원'}">
+        </div>
+
+        <span class="status-badge status-checking"
+              th:if="${order.deliveryStatus == 1}">결제확인중</span>
+        <span class="status-badge status-ready"
+              th:if="${order.deliveryStatus == 2}">배송준비</span>
+        <span class="status-badge status-ing"
+              th:if="${order.deliveryStatus == 3}">배송중</span>
+        <span class="status-badge status-done"
+              th:if="${order.deliveryStatus == 4}">배송완료</span>
+        <span class="status-badge status-cancel"
+              th:if="${order.deliveryStatus == 9}">취소</span>
+
+        <div class="order-btns">
+            <button class="btn btn-blue"
+                    th:data-order-id="${order.orderId}"
+                    th:data-delivery-status="${order.deliveryStatus}"
+                    onclick="openDeliveryModal(this)">
+                배송 관리
+            </button>
+            <a class="btn btn-green"
+               th:if="${order.roomId != null}"
+               th:href="'/chat?roomId=' + ${order.roomId}">
+                채팅 보기
+            </a>
+        </div>
+    </div>
+
+    <!-- 페이징 -->
+    <div class="pagination" th:if="${totalPages > 1}">
+        <button class="page-btn"
+                th:classappend="${currentPage == 1} ? 'disabled'"
+                th:onclick="'location.href=\'/business/order/history?page=\' + ' + ${currentPage - 1}">&lsaquo;</button>
+
+        <button class="page-btn"
+                th:each="i : ${#numbers.sequence(1, totalPages)}"
+                th:text="${i}"
+                th:classappend="${i == currentPage} ? ' active' : ''"
+                th:onclick="'location.href=\'/business/order/history?page=\' + ' + ${i}">
+        </button>
+
+        <button class="page-btn"
+                th:classappend="${currentPage == totalPages} ? 'disabled'"
+                th:onclick="'location.href=\'/business/order/history?page=\' + ' + ${currentPage + 1}">&rsaquo;</button>
+    </div>
+
+</div>
+
+<!-- 배송 관리 모달 -->
+<div class="modal-overlay" id="deliveryModalOverlay">
+    <div class="modal-box">
+        <button class="modal-close" onclick="closeDeliveryModal()">&times;</button>
+        <div class="modal-title">배송 관리</div>
+        <div class="modal-subtitle">변경할 배송 상태를 선택하세요.</div>
+
+        <div class="delivery-options">
+            <div class="delivery-option opt-checking" data-value="1" onclick="selectDeliveryOption(this)">
+                <div class="delivery-option-dot"></div>
+                <span class="delivery-option-label">결제확인중</span>
+                <span class="delivery-option-badge">결제확인중</span>
+            </div>
+            <div class="delivery-option opt-ready" data-value="2" onclick="selectDeliveryOption(this)">
+                <div class="delivery-option-dot"></div>
+                <span class="delivery-option-label">배송준비</span>
+                <span class="delivery-option-badge">배송준비</span>
+            </div>
+            <div class="delivery-option opt-ing" data-value="3" onclick="selectDeliveryOption(this)">
+                <div class="delivery-option-dot"></div>
+                <span class="delivery-option-label">배송중</span>
+                <span class="delivery-option-badge">배송중</span>
+            </div>
+            <div class="delivery-option opt-done" data-value="4" onclick="selectDeliveryOption(this)">
+                <div class="delivery-option-dot"></div>
+                <span class="delivery-option-label">배송완료</span>
+                <span class="delivery-option-badge">배송완료</span>
+            </div>
+        </div>
+
+        <button class="btn-confirm" onclick="confirmDelivery()">변경 저장</button>
+    </div>
+</div>
+
+<script th:inline="javascript">
+/*<![CDATA[*/
+    var pendingOrders  = /*[[${pendingOrders}]]*/ [];
+    var _selected      = null;
+    var _deliveryOrderId = null;
+    var _selectedStatus  = null;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        if (pendingOrders && pendingOrders.length > 0) {
+            selectOrder(pendingOrders[0].orderId);
+        }
+        document.getElementById('deliveryModalOverlay')
+            .addEventListener('click', function(e) {
+                if (e.target === this) closeDeliveryModal();
+            });
+    });
+
+    function selectOrder(orderId) {
+        _selected = pendingOrders.find(function(o) { return o.orderId == orderId; });
+        if (!_selected) return;
+
+        document.querySelectorAll('.pending-item').forEach(function(el) {
+            el.classList.toggle('active', el.dataset.orderId == orderId);
+        });
+
+        var o     = _selected;
+        var items = o.items || [];
+        var first = items[0] || {};
+
+        var imgEl = document.getElementById('detailImg');
+        if (first.imageUrl) {
+            imgEl.innerHTML = '<img src="' + first.imageUrl + '" style="width:100%;height:100%;object-fit:cover;">';
+        } else {
+            imgEl.innerHTML = '';
+        }
+
+        document.getElementById('dOrderNo').textContent  = o.orderNo          || '-';
+        document.getElementById('dCustomer').textContent = o.customerNickname || '-';
+        document.getElementById('dProduct').textContent  = first.productName  || '-';
+        document.getElementById('dQty').textContent      = first.quantity ? first.quantity + '개' : '-';
+        document.getElementById('dDate').textContent     = o.createdAt ? o.createdAt.substring(0, 16).replace('T', ' ') : '-';
+        document.getElementById('dType').textContent     = o.bidId ? '개인거래' : 'Kit 구매';
+        document.getElementById('dAmount').textContent   = Number(o.totalAmount).toLocaleString('ko-KR') + '원';
+
+        document.getElementById('detailEmpty').style.display  = 'none';
+        document.getElementById('detailBody').style.display   = '';
+        document.getElementById('detailFooter').style.display = '';
+    }
+
+    function openDeliveryModal(btn) {
+        _deliveryOrderId = btn.dataset.orderId;
+        _selectedStatus  = parseInt(btn.dataset.deliveryStatus);
+
+        document.querySelectorAll('.delivery-option').forEach(function(el) {
+            el.classList.toggle('selected', parseInt(el.dataset.value) === _selectedStatus);
+        });
+
+        document.getElementById('deliveryModalOverlay').classList.add('show');
+    }
+
+    function closeDeliveryModal() {
+        document.getElementById('deliveryModalOverlay').classList.remove('show');
+    }
+
+    function selectDeliveryOption(el) {
+        document.querySelectorAll('.delivery-option').forEach(function(opt) {
+            opt.classList.remove('selected');
+        });
+        el.classList.add('selected');
+        _selectedStatus = parseInt(el.dataset.value);
+    }
+
+    function confirmDelivery() {
+        if (!_deliveryOrderId || _selectedStatus === null) return;
+
+        fetch('/business/order/delivery/' + _deliveryOrderId, {
+            method : 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body   : JSON.stringify({ deliveryStatus: _selectedStatus })
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (data.success) {
+                closeDeliveryModal();
+                location.reload();
+            } else {
+                alert(data.message || '처리에 실패했습니다.');
+            }
+        })
+        .catch(function() { alert('오류가 발생했습니다.'); });
+    }
+
+    function acceptOrder() {
+        if (!_selected) return;
+        if (!confirm(_selected.customerNickname + ' 님의 주문을 수락하시겠습니까?')) return;
+
+        fetch('/business/order/accept/' + _selected.orderId, { method: 'POST' })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (data.success) {
+                alert('주문을 수락했습니다.');
+                location.reload();
+            } else {
+                alert(data.message || '처리에 실패했습니다.');
+            }
+        })
+        .catch(function() { alert('오류가 발생했습니다.'); });
+    }
+
+    function rejectOrder() {
+        if (!_selected) return;
+        if (!confirm(_selected.customerNickname + ' 님의 주문을 거절하시겠습니까?')) return;
+
+        fetch('/business/order/reject/' + _selected.orderId, { method: 'POST' })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (data.success) {
+                alert('주문을 거절했습니다.');
+                location.reload();
+            } else {
+                alert(data.message || '처리에 실패했습니다.');
+            }
+        })
+        .catch(function() { alert('오류가 발생했습니다.'); });
+    }
+/*]]>*/
+</script>
+
+</th:block>
+</body>
+</html>

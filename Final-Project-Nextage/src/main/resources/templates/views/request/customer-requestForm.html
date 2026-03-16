@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/customer-layout}">
+<head>
+  <meta charset="UTF-8">
+  <title>Nextage | 의뢰 작성</title>
+  <style>
+    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
+    :root {
+      --bg: #f5f5f7;
+      --border: rgba(0,0,0,0.08);
+      --text-primary: #1d1d1f;
+      --text-secondary: #6e6e73;
+      --text-tertiary: #aeaeb2;
+      --accent: #ff79c6;
+      --accent-soft: rgba(255,121,198,0.12);
+      --radius-xl: 22px;
+      --radius-lg: 16px;
+      --radius-pill: 999px;
+      --shadow-card: 0 2px 16px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
+      --shadow-card-hover: 0 8px 40px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.06);
+      --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+      --ease-apple: cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); font-family: 'Pretendard', -apple-system, sans-serif; color: var(--text-primary); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+
+    .progress-wrap { position: sticky; top: 0; z-index: 200; padding: 16px 24px; background: rgba(245,245,247,0.82); backdrop-filter: saturate(180%) blur(20px); border-bottom: 1px solid var(--border); }
+    .progress-inner { max-width: 600px; margin: 0 auto; display: flex; align-items: center; gap: 14px; }
+    .step-dots { display: flex; gap: 6px; }
+    .step-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text-tertiary); transition: all 0.4s var(--ease-apple); }
+    .step-dot.done { background: var(--text-primary); }
+    .step-dot.active { width: 20px; border-radius: 3px; background: var(--text-primary); }
+    .progress-label { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.04em; color: var(--text-tertiary); text-transform: uppercase; margin-left: auto; }
+
+    .page { max-width: 680px; margin: 0 auto; padding: 60px 24px 180px; }
+    .step-section { display: none; }
+    .step-section.active { display: block; animation: stepIn 0.5s var(--ease-apple) both; }
+    @keyframes stepIn { from { opacity: 0; transform: translateY(24px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+    .section-header { margin-bottom: 40px; }
+    .section-eyebrow { display: inline-block; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
+    .section-header h2 { font-size: clamp(1.8rem, 5vw, 2.6rem); font-weight: 800; letter-spacing: -0.05em; line-height: 1.15; }
+    .section-header p { margin-top: 10px; font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6; }
+
+    .category-group { margin-bottom: 36px; }
+    .group-label { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 14px; padding-left: 2px; }
+    .category-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .category-card { position: relative; height: 300px; border-radius: var(--radius-xl); overflow: hidden; cursor: pointer; border: 2px solid transparent; box-shadow: var(--shadow-card); background: #e0e0e5; transition: transform 0.4s var(--spring), box-shadow 0.4s var(--ease-apple), border-color 0.3s var(--ease-apple); }
+    .category-card:hover { transform: translateY(-4px) scale(1.01); box-shadow: var(--shadow-card-hover); }
+    .category-card.active { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft), var(--shadow-card-hover); }
+    .category-card.active::after { content: '✓'; position: absolute; top: 14px; right: 14px; width: 28px; height: 28px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 0.8rem; font-weight: 700; display: flex; align-items: center; justify-content: center; animation: checkPop 0.35s var(--spring) both; }
+    @keyframes checkPop { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .card-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s var(--ease-apple); }
+    .category-card:hover .card-img { transform: scale(1.06); }
+    .card-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.62) 0%, rgba(0,0,0,0.1) 55%, transparent 100%); padding: 22px; display: flex; flex-direction: column; justify-content: flex-end; }
+    .card-title { color: #fff; font-size: 1.15rem; font-weight: 700; margin-bottom: 3px; letter-spacing: -0.02em; }
+    .card-desc { color: rgba(255,255,255,0.72); font-size: 0.78rem; line-height: 1.4; }
+
+    .tag-search-wrap { position: relative; margin-bottom: 24px; }
+    .tag-search-input { width: 100%; padding: 16px 50px 16px 20px; border-radius: var(--radius-lg); border: 1.5px solid var(--border); background: rgba(255,255,255,0.85); backdrop-filter: blur(12px); font-size: 0.95rem; font-family: inherit; color: var(--text-primary); outline: none; transition: all 0.25s var(--ease-apple); }
+    .tag-search-input::placeholder { color: var(--text-tertiary); }
+    .tag-search-input:focus { background: #fff; border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
+    .tag-search-btn { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text-tertiary); padding: 4px; transition: color 0.2s; display: flex; align-items: center; }
+    .tag-search-btn:hover { color: var(--accent); }
+    .ai-suggest-box { background: rgba(255,255,255,0.75); backdrop-filter: blur(16px); border: 1.5px solid var(--border); border-radius: var(--radius-lg); padding: 18px 20px; margin-bottom: 24px; display: none; animation: stepIn 0.35s var(--ease-apple) both; }
+    .ai-suggest-box.visible { display: block; }
+    .ai-suggest-header { display: flex; align-items: center; gap: 8px; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent); margin-bottom: 14px; }
+    .ai-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: aiPulse 1.2s ease-in-out infinite; }
+    @keyframes aiPulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.7); } }
+    .ai-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .tag-chip { display: inline-flex; align-items: center; gap: 6px; padding: 10px 18px; border-radius: var(--radius-pill); font-size: 0.88rem; font-weight: 600; cursor: pointer; border: 1.5px solid var(--border); background: rgba(255,255,255,0.8); color: var(--text-primary); transition: all 0.25s var(--spring); user-select: none; animation: chipIn 0.3s var(--spring) both; }
+    @keyframes chipIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+    .tag-chip:hover { background: #fff; box-shadow: var(--shadow-card); transform: translateY(-2px); }
+    .tag-chip.selected { background: var(--text-primary); color: #fff; border-color: transparent; box-shadow: 0 4px 14px rgba(0,0,0,0.18); }
+    .tag-chip.ai-chip { border-color: var(--accent-soft); background: var(--accent-soft); color: var(--accent); }
+    .tag-chip.ai-chip.selected { background: var(--accent); color: #fff; border-color: transparent; }
+    .tag-section-label { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 12px; }
+    .tag-cloud { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; }
+    .selected-preview { background: rgba(255,255,255,0.6); backdrop-filter: blur(12px); border: 1.5px solid var(--border); border-radius: var(--radius-lg); padding: 16px 20px; margin-top: 8px; display: none; }
+    .selected-preview.visible { display: block; }
+    .selected-preview-label { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 10px; }
+    .selected-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .selected-chip { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: var(--radius-pill); background: var(--text-primary); color: #fff; font-size: 0.82rem; font-weight: 600; animation: chipIn 0.3s var(--spring) both; }
+    .selected-chip .x-btn { cursor: pointer; opacity: 0.6; font-size: 0.72rem; transition: opacity 0.2s; }
+    .selected-chip .x-btn:hover { opacity: 1; }
+    .shimmer-wrap { display: flex; gap: 8px; }
+    .shimmer { height: 38px; border-radius: var(--radius-pill); background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: shimmer 1.2s infinite; }
+    @keyframes shimmer { to { background-position: -200% 0; } }
+
+    .form-group { display: flex; flex-direction: column; gap: 12px; }
+    .form-label { font-size: 0.78rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-secondary); margin-bottom: -4px; padding-left: 2px; }
+    .apple-input { width: 100%; padding: 18px 20px; background: rgba(255,255,255,0.8); backdrop-filter: blur(12px); border: 1.5px solid var(--border); border-radius: var(--radius-lg); font-size: 0.95rem; font-family: inherit; color: var(--text-primary); outline: none; transition: all 0.25s var(--ease-apple); -webkit-appearance: none; }
+    .apple-input::placeholder { color: var(--text-tertiary); }
+    .apple-input:focus { background: #fff; border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
+    .apple-input.textarea { resize: none; line-height: 1.6; }
+
+    /* 캘린더 인풋 스타일 */
+    .apple-input[type="date"] { cursor: pointer; }
+    .apple-input[type="date"]::-webkit-calendar-picker-indicator {
+      opacity: 0.4;
+      cursor: pointer;
+      filter: invert(0);
+      transition: opacity 0.2s;
+    }
+    .apple-input[type="date"]::-webkit-calendar-picker-indicator:hover { opacity: 0.8; }
+
+    .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .input-col { display: flex; flex-direction: column; gap: 8px; }
+    .input-prefix-wrap { position: relative; }
+    .input-prefix { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); font-size: 0.95rem; font-weight: 700; color: var(--text-secondary); pointer-events: none; }
+    .input-prefix-wrap .apple-input { padding-left: 34px; }
+
+    /* ✅ 인라인 에러 메시지 */
+    .input-error { display: none; font-size: 0.75rem; color: #ff3b30; padding-left: 4px; margin-top: -4px; }
+
+    .file-label { display: flex; align-items: center; gap: 12px; padding: 18px 20px; border-radius: var(--radius-lg); background: rgba(255,255,255,0.8); border: 1.5px dashed var(--border); cursor: pointer; color: var(--text-secondary); font-size: 0.9rem; font-weight: 500; transition: all 0.25s var(--ease-apple); }
+    .file-label:hover { background: #fff; border-color: var(--accent); color: var(--accent); }
+    input[type="file"] { display: none; }
+
+    .action-bar { position: fixed; bottom: 0; left: 0; width: 100%; padding: 16px 24px 28px; background: rgba(245,245,247,0.82); backdrop-filter: saturate(180%) blur(24px); border-top: 1px solid var(--border); z-index: 100; }
+    .action-bar-inner { max-width: 400px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+    .cta-btn { width: 100%; padding: 18px; border-radius: var(--radius-lg); border: none; background: var(--text-primary); color: #fff; font-size: 1rem; font-weight: 700; font-family: inherit; cursor: pointer; letter-spacing: -0.01em; transition: all 0.3s var(--spring); }
+    .cta-btn:hover { background: var(--accent); transform: scale(1.02); box-shadow: 0 8px 24px rgba(255,121,198,0.3); }
+    .cta-btn:active { transform: scale(0.97); }
+    .cta-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    .back-link { font-size: 0.85rem; font-weight: 500; color: var(--text-secondary); cursor: pointer; transition: color 0.2s; }
+    .back-link:hover { color: var(--text-primary); }
+
+    @keyframes shake { 0%,100% { transform: translateX(0); } 20% { transform: translateX(-6px); } 40% { transform: translateX(6px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(4px); } }
+  </style>
+</head>
+<body>
+<th:block layout:fragment="content">
+
+  <div class="progress-wrap">
+    <div class="progress-inner">
+      <div class="step-dots">
+        <div class="step-dot active" id="dot1"></div>
+        <div class="step-dot" id="dot2"></div>
+        <div class="step-dot" id="dot3"></div>
+      </div>
+      <div class="progress-label" id="stepLabel">Step 1 of 3</div>
+    </div>
+  </div>
+
+  <div class="page">
+
+    <div class="step-section active" id="step1">
+      <div class="section-header">
+        <div class="section-eyebrow">의뢰 시작하기</div>
+        <h2>어떤 분야의<br>도움이 필요하신가요?</h2>
+        <p>Nextage 전문가가 당신의 아이디어를 완성해 드립니다.</p>
+      </div>
+      <div class="category-group">
+        <div class="group-label">Clothes</div>
+        <div class="category-grid">
+          <div class="category-card" onclick="selectCategory(this, 1)">
+            <img src="/2d1.jpg" class="card-img">
+            <div class="card-overlay">
+              <div class="card-title">2D Clothes</div>
+              <div class="card-desc">2D 캐릭터/애니 리폼</div>
+            </div>
+          </div>
+          <div class="category-card" onclick="selectCategory(this, 2)">
+            <img src="/3d1.jpg" class="card-img">
+            <div class="card-overlay">
+              <div class="card-title">3D Clothes</div>
+              <div class="card-desc">아이돌 무대 의상 스타일로 커스텀</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="category-group">
+        <div class="group-label">Accessories</div>
+        <div class="category-grid">
+          <div class="category-card" onclick="selectCategory(this, 3)">
+            <img src="/object1.jpg" class="card-img">
+            <div class="card-overlay">
+              <div class="card-title">3D Object</div>
+              <div class="card-desc">굿즈 제작, 오브젝트 모델링</div>
+            </div>
+          </div>
+          <div class="category-card" onclick="selectCategory(this, 4)">
+            <img src="/metal.jpg" class="card-img">
+            <div class="card-overlay">
+              <div class="card-title">Metal</div>
+              <div class="card-desc">금속 액세서리, 파츠 커스텀</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-section" id="step2">
+      <div class="section-header">
+        <div class="section-eyebrow">스타일 선택</div>
+        <h2>어떤 무드를<br>원하시나요?</h2>
+        <p>태그를 선택하거나 직접 입력하면 관련 태그를 추천해 드려요.</p>
+      </div>
+      <div class="tag-search-wrap">
+        <input class="tag-search-input" id="tagInput" placeholder="예: 레트로, 스트릿, 블랙 계열…" autocomplete="off" onkeydown="handleTagInputKey(event)">
+        <button class="tag-search-btn" onclick="fetchSuggestions()" title="태그 추천">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        </button>
+      </div>
+      <div class="ai-suggest-box" id="aiSuggestBox">
+        <div class="ai-suggest-header">
+          <div class="ai-dot" id="aiDot"></div>
+          <span id="aiSuggestTitle">추천 태그</span>
+        </div>
+        <div class="ai-chips" id="aiChips"></div>
+      </div>
+      <div class="tag-section-label">자주 쓰는 태그</div>
+      <div class="tag-cloud" id="defaultTags">
+        <div class="tag-chip">#심플한</div><div class="tag-chip">#화려한</div>
+        <div class="tag-chip">#사이버펑크</div><div class="tag-chip">#빈티지</div>
+        <div class="tag-chip">#미니멀</div><div class="tag-chip">#아방가르드</div>
+        <div class="tag-chip">#Y2K</div><div class="tag-chip">#트렌디한</div>
+        <div class="tag-chip">#스트릿</div><div class="tag-chip">#로맨틱</div>
+        <div class="tag-chip">#고스</div><div class="tag-chip">#캐주얼</div>
+      </div>
+      <div class="selected-preview" id="selectedPreview">
+        <div class="selected-preview-label">선택된 태그</div>
+        <div class="selected-chips" id="selectedChips"></div>
+      </div>
+    </div>
+
+    <div class="step-section" id="step3">
+      <div class="section-header">
+        <div class="section-eyebrow">상세 내용</div>
+        <h2>의뢰 내용을<br>알려주세요</h2>
+        <p>상세할수록 더 정확한 매칭이 가능합니다.</p>
+      </div>
+      <div class="form-group">
+        <div class="form-label">의뢰 제목</div>
+        <input type="text" id="reqTitle" class="apple-input" placeholder="예: 빈티지 자수 리폼">
+        <div class="form-label" style="margin-top:8px;">요청사항</div>
+        <textarea id="reqDetail" class="apple-input textarea" rows="5" placeholder="작업자에게 전달할 내용을 자유롭게 적어주세요."></textarea>
+        <div class="input-row" style="margin-top:8px;">
+          <div class="input-col">
+            <div class="form-label">희망 가격</div>
+            <div class="input-prefix-wrap">
+              <span class="input-prefix">₩</span>
+              <input type="number" id="reqBudget" class="apple-input" placeholder="금액 입력" step="1000" min="0">
+            </div>
+            <!-- ✅ 인라인 에러 메시지 -->
+            <div class="input-error" id="budgetError">1원 이상의 금액을 입력해 주세요.</div>
+          </div>
+          <div class="input-col">
+            <div class="form-label">희망 마감일</div>
+            <input type="date" id="reqDeadline" class="apple-input">
+          </div>
+        </div>
+        <div class="form-label" style="margin-top:8px;">참고 파일 첨부 <span style="color:var(--text-tertiary);font-weight:400;">(선택)</span></div>
+        <label class="file-label" for="fileInput">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <span id="fileText">이미지 또는 파일 업로드</span>
+        </label>
+        <input type="file" id="fileInput" onchange="updateFileName(this)">
+      </div>
+    </div>
+  </div>
+
+  <div class="action-bar">
+    <div class="action-bar-inner">
+      <button class="cta-btn" id="mainBtn" onclick="handleNext()">계속하기</button>
+      <span class="back-link" id="backBtn" style="display:none;" onclick="handlePrev()">이전 단계로</span>
+    </div>
+  </div>
+
+  <script>
+    let currentStep = 1;
+    let selectedCategory = null;
+    const selectedTags = new Set();
+
+    (function setMinDate() {
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('reqDeadline').setAttribute('min', today);
+    })();
+
+    function selectCategory(el, val) {
+      document.querySelectorAll('.category-card').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+      selectedCategory = val;
+    }
+
+    function toggleTag(el, tag) {
+      if (selectedTags.has(tag)) { selectedTags.delete(tag); el.classList.remove('selected'); }
+      else { selectedTags.add(tag); el.classList.add('selected'); }
+      renderSelectedPreview();
+    }
+
+    function removeTag(tag) {
+      selectedTags.delete(tag);
+      document.querySelectorAll('.tag-chip').forEach(el => { if (el.dataset.tag === tag) el.classList.remove('selected'); });
+      renderSelectedPreview();
+    }
+
+    function renderSelectedPreview() {
+      const preview = document.getElementById('selectedPreview');
+      const container = document.getElementById('selectedChips');
+      if (selectedTags.size === 0) { preview.classList.remove('visible'); return; }
+      preview.classList.add('visible');
+      container.innerHTML = '';
+      [...selectedTags].forEach((tag, i) => {
+        const chip = document.createElement('div');
+        chip.className = 'selected-chip';
+        chip.style.animationDelay = (i * 0.04) + 's';
+        chip.innerHTML = `${tag} <span class="x-btn" onclick="removeTag('${tag}')">✕</span>`;
+        container.appendChild(chip);
+      });
+    }
+
+    const tagDictionary = {
+        '심플':['#심플한','#미니멀','#클린','#베이직','#모노톤','#뉴트럴'],
+        '미니멀':['#미니멀','#심플한','#클린','#모노크롬'],
+        '화려':['#화려한','#글램','#맥시멀','#볼드','#컬러풀'],
+        '빈티지':['#빈티지','#레트로','#90년대','#워싱','#클래식','#올드스쿨'],
+        '레트로':['#레트로','#빈티지','#복고풍','#80년대','#90년대','#필름감성'],
+        '사이버':['#사이버펑크','#테크웨어','#미래적인','#네온','#디지털'],
+        '펑크':['#사이버펑크','#펑크','#스터드','#체인','#엣지있는','#다크'],
+        '로맨틱':['#로맨틱','#페미닌','#플로럴','#핑크톤','#드레시','#우아한'],
+        '귀여운':['#귀여운','#키치','#파스텔','#러블리','#달달한'],
+        '캐주얼':['#캐주얼','#데일리','#편안한','#릴렉스핏'],
+        '스트릿':['#스트릿','#어반','#힙합','#스케이터','#그래픽','#오버핏'],
+        '고스':['#고스','#다크','#블랙','#엣지있는','#미스터리','#올블랙'],
+        'y2k':['#Y2K','#2000년대','#버터플라이','#글리터','#베이비블루','#로우라이즈'],
+        '아방':['#아방가르드','#실험적인','#비대칭','#예술적인','#독창적인'],
+        '자수':['#핸드메이드','#자수','#아트워크','#수공예','#디테일','#유니크'],
+        '리폼':['#리폼','#업사이클','#커스텀','#유니크','#DIY'],
+        '블랙':['#올블랙','#블랙온블랙','#다크톤','#모노크롬'],
+        '화이트':['#올화이트','#클린','#화이트톤','#청량한'],
+        '베이지':['#베이지','#뉴트럴','#어스톤','#내추럴','#따뜻한'],
+        '파스텔':['#파스텔','#소프트','#연한톤','#봄느낌','#포근한'],
+        '오버핏':['#오버핏','#루즈핏','#빅사이즈','#여유로운'],
+        '슬림':['#슬림핏','#타이트','#바디컨','#핏한','#세련된'],
+        '데님':['#데님','#청바지','#워싱','#캐주얼','#아메카지'],
+        '가죽':['#레더','#가죽','#엣지있는','#펑크','#바이커'],
+        '니트':['#니트','#코지','#따뜻한','#겨울감성','#포근한'],
+        '봄':['#봄코디','#플로럴','#파스텔','#상큼한'],
+        '여름':['#여름코디','#청량한','#시원한','#린넨','#비치'],
+        '가을':['#가을코디','#어스톤','#레이어드','#따뜻한','#브라운'],
+        '겨울':['#겨울코디','#코지','#두꺼운','#롱코트','#니트']
+    };
+
+    function findRelatedTags(query) {
+      const q = query.toLowerCase().replace(/\s/g, '');
+      const result = new Set();
+      for (const [keyword, tags] of Object.entries(tagDictionary)) {
+        if (q.includes(keyword) || keyword.includes(q)) tags.forEach(t => result.add(t));
+      }
+      result.add('#' + query.trim());
+      return [...result].slice(0, 8);
+    }
+
+    function fetchSuggestions() {
+      const query = document.getElementById('tagInput').value.trim();
+      if (!query) return;
+      const box = document.getElementById('aiSuggestBox');
+      const chipsEl = document.getElementById('aiChips');
+      const titleEl = document.getElementById('aiSuggestTitle');
+      const dot = document.getElementById('aiDot');
+      box.classList.add('visible');
+      dot.style.animationPlayState = 'running';
+      titleEl.textContent = '관련 태그를 찾는 중…';
+      chipsEl.innerHTML = `<div class="shimmer-wrap"><div class="shimmer" style="width:80px"></div><div class="shimmer" style="width:60px"></div><div class="shimmer" style="width:100px"></div><div class="shimmer" style="width:70px"></div></div>`;
+      setTimeout(() => {
+        const tags = findRelatedTags(query);
+        chipsEl.innerHTML = '';
+        titleEl.textContent = `"${query}" 관련 추천 태그`;
+        dot.style.animationPlayState = 'paused';
+        tags.forEach((tag, i) => {
+          const chip = document.createElement('div');
+          chip.className = 'tag-chip ai-chip';
+          chip.dataset.tag = tag;
+          chip.style.animationDelay = (i * 0.06) + 's';
+          chip.textContent = tag;
+          chip.onclick = () => {
+            if (selectedTags.has(tag)) { selectedTags.delete(tag); chip.classList.remove('selected'); }
+            else { selectedTags.add(tag); chip.classList.add('selected'); }
+            renderSelectedPreview();
+          };
+          chipsEl.appendChild(chip);
+        });
+      }, 400);
+    }
+
+    function handleTagInputKey(e) { if (e.key === 'Enter') { e.preventDefault(); fetchSuggestions(); } }
+
+    document.querySelectorAll('#defaultTags .tag-chip').forEach(el => {
+      el.dataset.tag = el.textContent.trim();
+      el.onclick = () => toggleTag(el, el.dataset.tag);
+    });
+
+    function handleNext() {
+      if (currentStep === 1 && !selectedCategory) { shakeCta(); return; }
+      if (currentStep < 3) { currentStep++; updateUI(); }
+      else { submitRequest(); }
+    }
+
+    function handlePrev() { if (currentStep > 1) { currentStep--; updateUI(); } }
+
+    function updateUI() {
+      document.querySelectorAll('.step-section').forEach(s => s.classList.remove('active'));
+      document.getElementById('step' + currentStep).classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      for (let i = 1; i <= 3; i++) {
+        const d = document.getElementById('dot' + i);
+        d.classList.remove('active', 'done');
+        if (i < currentStep) d.classList.add('done');
+        if (i === currentStep) d.classList.add('active');
+      }
+      document.getElementById('stepLabel').innerText = `Step ${currentStep} of 3`;
+      const btn = document.getElementById('mainBtn');
+      btn.innerText = currentStep === 3 ? '의뢰 제출하기' : '계속하기';
+      btn.style.background = '';
+      btn.disabled = false;
+      document.getElementById('backBtn').style.display = currentStep === 1 ? 'none' : 'inline';
+    }
+
+    function submitRequest() {
+        const title   = document.getElementById('reqTitle').value.trim();
+        const detail  = document.getElementById('reqDetail').value.trim();
+        const budget  = document.getElementById('reqBudget').value;
+        const selectedDate = document.getElementById('reqDeadline').value;
+        const btn = document.getElementById('mainBtn');
+        const budgetError = document.getElementById('budgetError');
+
+        if (!title) { alert('의뢰 제목을 입력해 주세요.'); return; }
+        if (!selectedCategory) { alert('카테고리를 선택해 주세요.'); return; }
+
+        // ✅ 가격 검증: 빈값이거나 1 미만이면 인라인 에러 표시
+        if (!budget || Number(budget) < 1) {
+            budgetError.style.display = 'block';
+            return;
+        }
+        budgetError.style.display = 'none';
+
+        let finalDueDate = selectedDate;
+        if (!finalDueDate) {
+            const fallback = new Date();
+            fallback.setFullYear(fallback.getFullYear() + 1);
+            finalDueDate = fallback.toISOString().split('T')[0];
+        }
+
+        const formData = new FormData();
+        formData.append('categoryId', selectedCategory);
+        formData.append('title', title);
+        formData.append('description', detail);
+        formData.append('hopePrice', budget);
+        formData.append('requestedDueDate', finalDueDate);
+
+        const tagsString = [...selectedTags].map(tag => tag.replace('#', '').trim()).join(',');
+        formData.append('tags', tagsString);
+
+        const file = document.getElementById('fileInput').files[0];
+        if (file) formData.append('files', file);
+
+        btn.innerText = '제출 중…';
+        btn.disabled = true;
+
+        fetch('/customer/request/insert', {
+            method: 'POST',
+            body: formData
+        })
+        .then(res => {
+            if (res.ok) {
+                btn.innerText = '✓ 접수 완료';
+                btn.style.background = '#34c759';
+                setTimeout(() => window.location.href = '/customer/request/list', 1000);
+            } else {
+                throw new Error();
+            }
+        })
+        .catch(() => {
+            btn.innerText = '의뢰 제출하기';
+            btn.disabled = false;
+            btn.style.background = '';
+            alert('제출 중 오류가 발생했어요. 다시 시도해 주세요.');
+        });
+    }
+
+    function shakeCta() {
+      const btn = document.getElementById('mainBtn');
+      btn.style.animation = 'none'; btn.offsetHeight;
+      btn.style.animation = 'shake 0.4s ease';
+    }
+
+    function updateFileName(input) {
+      document.getElementById('fileText').innerText = input.files[0]?.name || '이미지 또는 파일 업로드';
+    }
+  </script>
+
+</th:block>
+</body>
+</html>

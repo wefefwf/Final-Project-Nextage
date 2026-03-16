@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/customer-layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>장바구니 - Nextage</title>
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Pretendard', sans-serif;
+            background-color: #fafafa;
+            color: #333;
+        }
+
+        .cart-page-wrapper {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding-bottom: 80px;
+        }
+
+        .cart-page-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 32px;
+            font-weight: 900;
+            letter-spacing: -1px;
+            color: #222;
+            margin-bottom: 6px;
+        }
+
+        .cart-page-subtitle {
+            font-size: 14px;
+            color: #aaa;
+            margin-bottom: 36px;
+        }
+
+        .cart-action-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 28px;
+            background: #fff;
+            border: 1px solid #ebebeb;
+            border-radius: 14px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        .cart-action-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .cart-check-all-label {
+            font-size: 15px;
+            font-weight: 600;
+            color: #333;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .cart-action-bar-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .custom-checkbox {
+            width: 20px;
+            height: 20px;
+            accent-color: #bd93f9;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .btn-cart-action {
+            font-size: 13px;
+            font-weight: 600;
+            padding: 9px 20px;
+            border-radius: 50px;
+            border: 1.5px solid #e0e0e0;
+            background: #fff;
+            color: #555;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .btn-cart-action:hover {
+            border-color: #bd93f9;
+            color: #bd93f9;
+            background: rgba(189, 147, 249, 0.05);
+        }
+
+        .btn-cart-action.danger:hover {
+            border-color: #ff6b6b;
+            color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.05);
+        }
+
+        .cart-item-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 32px;
+        }
+
+        .cart-item-card {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 22px 28px;
+            background: #fff;
+            border: 1px solid #ebebeb;
+            border-radius: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cart-item-card::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 3px;
+            background: linear-gradient(to bottom, #fbc2eb, #a6c1ee);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .cart-item-card:hover {
+            border-color: #d8c4f8;
+            box-shadow: 0 6px 20px rgba(189, 147, 249, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .cart-item-card:hover::before { opacity: 1; }
+
+        .cart-item-img {
+            width: 90px;
+            height: 90px;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 1px solid #eee;
+            flex-shrink: 0;
+        }
+
+        .cart-item-img-placeholder {
+            width: 90px;
+            height: 90px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #f5f0ff, #ede9fe);
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+
+        .cart-item-info { flex: 1; min-width: 0; }
+
+        .cart-item-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: #222;
+            margin-bottom: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .cart-item-option { font-size: 13px; color: #999; margin-bottom: 8px; }
+
+        .cart-item-badge {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 4px;
+            background: linear-gradient(to right, #fbc2eb, #a6c1ee);
+            color: #fff;
+            margin-right: 4px;
+        }
+
+        .cart-qty-control {
+            display: flex;
+            align-items: center;
+            border: 1.5px solid #e8e8e8;
+            border-radius: 10px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .qty-btn {
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: #f8f8f8;
+            font-size: 16px;
+            font-weight: 600;
+            color: #555;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .qty-btn:hover { background: #ede9fe; color: #bd93f9; }
+
+        .qty-display {
+            width: 44px;
+            height: 36px;
+            text-align: center;
+            border: none;
+            border-left: 1.5px solid #e8e8e8;
+            border-right: 1.5px solid #e8e8e8;
+            font-size: 15px;
+            font-weight: 600;
+            color: #333;
+            background: #fff;
+            outline: none;
+        }
+
+        .cart-item-price-wrap { text-align: right; flex-shrink: 0; min-width: 110px; }
+
+        .cart-item-price {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 20px;
+            font-weight: 900;
+            color: #222;
+        }
+
+        .cart-item-price-label { font-size: 12px; color: #bbb; margin-top: 2px; }
+
+        .cart-item-delete {
+            width: 32px; height: 32px;
+            border: none; background: none;
+            color: #ccc; font-size: 18px;
+            cursor: pointer; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; transition: all 0.2s;
+        }
+
+        .cart-item-delete:hover { background: #fff0f0; color: #ff6b6b; }
+
+        .cart-empty {
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            padding: 80px 0; color: #bbb;
+        }
+
+        .cart-empty-icon { font-size: 60px; margin-bottom: 20px; }
+        .cart-empty-text { font-size: 16px; font-weight: 500; }
+
+        .cart-summary-panel {
+            background: #fff;
+            border: 1px solid #ebebeb;
+            border-radius: 20px;
+            padding: 32px 36px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            position: sticky;
+            top: 20px;
+        }
+
+        .summary-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 18px; font-weight: 900;
+            color: #222; margin-bottom: 24px;
+        }
+
+        .summary-row {
+            display: flex; justify-content: space-between;
+            align-items: center; margin-bottom: 16px;
+        }
+
+        .summary-label { font-size: 14px; color: #888; }
+        .summary-value { font-size: 15px; font-weight: 600; color: #333; }
+
+        .summary-divider { border: none; border-top: 1px solid #f0f0f0; margin: 20px 0; }
+
+        .summary-total-label { font-size: 16px; font-weight: 700; color: #333; }
+
+        .summary-total-value {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 26px; font-weight: 900;
+            background: linear-gradient(to right, #a78bfa, #a6c1ee);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .summary-note { font-size: 12px; color: #bbb; text-align: center; margin-bottom: 20px; }
+
+        .selected-count-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            font-size: 13px; color: #bd93f9; font-weight: 600;
+            background: rgba(189, 147, 249, 0.1);
+            border-radius: 20px; padding: 5px 12px; margin-bottom: 20px;
+        }
+
+        .btn-checkout {
+            width: 100%; padding: 18px;
+            font-size: 16px; font-weight: 800; color: #fff;
+            background: linear-gradient(135deg, #bd93f9, #a6c1ee);
+            border: none; border-radius: 14px; cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(189, 147, 249, 0.35);
+        }
+
+        .btn-checkout:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 28px rgba(189, 147, 249, 0.45);
+        }
+
+        .btn-continue-shopping {
+            width: 100%; padding: 14px;
+            font-size: 14px; font-weight: 600; color: #999;
+            background: transparent; border: 1.5px solid #ebebeb;
+            border-radius: 14px; cursor: pointer; margin-top: 10px; transition: all 0.25s;
+        }
+
+        .btn-continue-shopping:hover { border-color: #bd93f9; color: #bd93f9; }
+
+        .cart-layout {
+            display: grid;
+            grid-template-columns: 1fr 360px;
+            gap: 32px;
+            align-items: start;
+        }
+
+        .cart-toast {
+            position: fixed; bottom: 30px; left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: #333; color: #fff;
+            padding: 12px 28px; border-radius: 50px;
+            font-size: 14px; font-weight: 500;
+            opacity: 0; transition: all 0.35s ease;
+            z-index: 9999; pointer-events: none;
+        }
+
+        .cart-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        @media (max-width: 1220px) {
+            .cart-page-wrapper { width: 100%; padding: 20px; }
+            .cart-layout { grid-template-columns: 1fr; }
+        }
+
+        .cart-item-card.soldout {
+            background: #fafafa;
+            border-color: #f0f0f0;
+        }
+
+        .cart-item-card.soldout .cart-item-name { color: #aaa; }
+        .cart-item-card.soldout .cart-item-img  { opacity: 0.5; }
+
+        a.cart-item-name:hover {
+            color: #bd93f9;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<th:block layout:fragment="content">
+
+    <div class="cart-page-wrapper">
+
+        <h2 class="cart-page-title">장바구니</h2>
+        <p class="cart-page-subtitle">선택한 상품을 확인하고 결제를 진행하세요.</p>
+
+        <div class="cart-layout">
+
+            <!-- 왼쪽: 상품 목록 -->
+            <div>
+                <!-- 액션바 -->
+                <div class="cart-action-bar">
+                    <div class="cart-action-bar-left">
+                        <input type="checkbox" class="custom-checkbox" id="checkAll" onchange="toggleAll(this)">
+                        <label for="checkAll" class="cart-check-all-label">전체 선택</label>
+                        <span style="font-size:13px; color:#ccc;">|</span>
+                        <span style="font-size:13px; color:#aaa;" id="selectedCountText">0개 선택됨</span>
+                    </div>
+                    <div class="cart-action-bar-right">
+                        <button class="btn-cart-action" onclick="selectAll()">전체 선택</button>
+                        <button class="btn-cart-action" onclick="deselectAll()">선택 해제</button>
+                        <button class="btn-cart-action danger" onclick="deleteSelected()">선택 삭제</button>
+                    </div>
+                </div>
+
+                <!-- 상품 리스트 -->
+                <div class="cart-item-list" id="cartItemList">
+
+                    <div th:each="item : ${cartItems}"
+                         class="cart-item-card"
+                         th:attr="data-id=${item.cartItemId},
+                                  data-price=${item.price},
+                                  data-kit-id=${item.kitId},
+                                  data-name=${item.productName}"
+                         th:classappend="${item.soldOut} ? ' soldout' : ''">
+
+                        <input type="checkbox" class="custom-checkbox item-checkbox"
+                               th:attr="data-id=${item.cartItemId}, data-price=${item.price}"
+                               th:disabled="${item.soldOut}"
+                               onchange="updateSummary()">
+
+                        <!-- 이미지 -->
+                        <div class="cart-item-img-placeholder" th:if="${item.imageUrl == null}">🛍️</div>
+                        <img class="cart-item-img"
+                             th:if="${item.imageUrl != null}"
+                             th:src="${item.imageUrl}"
+                             th:alt="${item.productName}">
+
+                        <!-- 상품 정보 -->
+                        <div class="cart-item-info">
+                            <a class="cart-item-name"
+                               th:href="@{/customer/shop/detail(id=${item.kitId}, page=1)}"
+                               th:text="${item.productName}"
+                               style="text-decoration:none; color:inherit; cursor:pointer;">
+                                상품명
+                            </a>
+                            <div class="cart-item-option">기본 옵션</div>
+                            <div th:if="${item.soldOut}"
+                                 style="display:inline-block; font-size:11px; font-weight:700;
+                                        padding:3px 10px; border-radius:4px;
+                                        background:#c0c0c0; color:#fff; margin-top:4px;">
+                                품절
+                            </div>
+                        </div>
+
+                        <!-- 수량 조절 -->
+                        <div class="cart-qty-control"
+                             th:style="${item.soldOut} ? 'opacity:0.4; pointer-events:none;' : ''">
+                            <button class="qty-btn" onclick="changeQty(this, -1)">−</button>
+                            <input type="number" class="qty-display"
+                                   th:value="${item.quantity}"
+                                   min="1" max="99"
+                                   onchange="onQtyInput(this)"
+                                   th:attr="data-id=${item.cartItemId}"
+                                   th:disabled="${item.soldOut}">
+                            <button class="qty-btn" onclick="changeQty(this, 1)">+</button>
+                        </div>
+
+                        <!-- 가격 -->
+                        <div class="cart-item-price-wrap"
+                             th:style="${item.soldOut} ? 'opacity:0.4;' : ''">
+                            <div class="cart-item-price"
+                                 th:text="${#numbers.formatInteger(item.price * item.quantity, 3, 'COMMA') + '원'}"></div>
+                            <div class="cart-item-price-label"
+                                 th:text="${#numbers.formatInteger(item.price, 3, 'COMMA') + '원 / 개'}"></div>
+                        </div>
+
+                        <!-- 삭제 버튼 -->
+                        <button class="cart-item-delete"
+                                th:onclick="'deleteItem(' + ${item.cartItemId} + ')'"
+                                title="삭제">✕</button>
+                    </div>
+
+                    <!-- 빈 장바구니 -->
+                    <div class="cart-empty" id="cartEmpty" th:if="${#lists.isEmpty(cartItems)}">
+                        <div class="cart-empty-icon">🛒</div>
+                        <div class="cart-empty-text">장바구니가 비어 있어요.</div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- 오른쪽: 결제 요약 -->
+            <div>
+                <div class="cart-summary-panel">
+                    <div class="summary-title">ORDER SUMMARY</div>
+
+                    <div class="selected-count-badge">
+                        <span>✓</span>
+                        <span id="summarySelectedCount">0개 선택</span>
+                    </div>
+
+                    <div class="summary-row">
+                        <span class="summary-label">상품 금액</span>
+                        <span class="summary-value" id="summaryProductPrice">0원</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-label">배송비</span>
+                        <span class="summary-value" id="summaryShipping">3,000원</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-label">할인</span>
+                        <span class="summary-value" style="color:#ff79c6;" id="summaryDiscount">- 0원</span>
+                    </div>
+
+                    <hr class="summary-divider">
+
+                    <div class="summary-row" style="align-items: flex-end;">
+                        <span class="summary-total-label">총 결제 금액</span>
+                        <span class="summary-total-value" id="summaryTotal">0원</span>
+                    </div>
+
+                    <p class="summary-note">* 50,000원 이상 무료배송</p>
+
+                    <button class="btn-checkout" onclick="goCheckout()">결제하기</button>
+                    <button class="btn-continue-shopping"
+                            onclick="location.href='/customer/shop'">쇼핑 계속하기</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="cart-toast" id="cartToast"></div>
+
+    <script th:inline="javascript">
+    /*<![CDATA[*/
+        const CART_SHIPPING_FEE = 3000;
+        const CART_FREE_SHIPPING_THRESHOLD = 50000;
+
+        function toggleAll(master) {
+            document.querySelectorAll('.item-checkbox').forEach(cb => {
+                if (!cb.closest('.cart-item-card').classList.contains('soldout')) {
+                    cb.checked = master.checked;
+                }
+            });
+            updateSummary();
+        }
+
+        function selectAll() {
+            document.querySelectorAll('.item-checkbox').forEach(cb => {
+                if (!cb.closest('.cart-item-card').classList.contains('soldout')) {
+                    cb.checked = true;
+                }
+            });
+            document.getElementById('checkAll').checked = true;
+            updateSummary();
+        }
+
+        function deselectAll() {
+            document.querySelectorAll('.item-checkbox').forEach(cb => cb.checked = false);
+            document.getElementById('checkAll').checked = false;
+            updateSummary();
+        }
+
+        function changeQty(btn, delta) {
+            const input = btn.parentElement.querySelector('.qty-display');
+            let val = Math.max(1, Math.min(99, parseInt(input.value) + delta));
+            input.value = val;
+            updateItemPrice(input);
+            updateSummary();
+            syncQty(input.dataset.id, val);
+        }
+
+        function onQtyInput(input) {
+            let val = parseInt(input.value);
+            if (isNaN(val) || val < 1) val = 1;
+            if (val > 99) val = 99;
+            input.value = val;
+            updateItemPrice(input);
+            updateSummary();
+            syncQty(input.dataset.id, val);
+        }
+
+        function updateItemPrice(qtyInput) {
+            const card = qtyInput.closest('.cart-item-card');
+            if (!card) return;
+            const unitPrice = parseInt(card.dataset.price);
+            const qty = parseInt(qtyInput.value);
+            card.querySelector('.cart-item-price').textContent = fmt(unitPrice * qty) + '원';
+            card.querySelector('.cart-item-price-label').textContent = fmt(unitPrice) + '원 / 개';
+        }
+
+        function updateSummary() {
+            const checked = document.querySelectorAll('.item-checkbox:checked');
+            let total = 0;
+            checked.forEach(cb => {
+                const card = cb.closest('.cart-item-card');
+                total += parseInt(card.dataset.price) * parseInt(card.querySelector('.qty-display').value);
+            });
+            const shipping = (total > 0 && total < CART_FREE_SHIPPING_THRESHOLD) ? CART_SHIPPING_FEE : 0;
+            document.getElementById('summarySelectedCount').textContent = checked.length + '개 선택';
+            document.getElementById('selectedCountText').textContent    = checked.length + '개 선택됨';
+            document.getElementById('summaryProductPrice').textContent  = fmt(total) + '원';
+            document.getElementById('summaryShipping').textContent      = (!shipping && total > 0) ? '무료' : fmt(shipping) + '원';
+            document.getElementById('summaryDiscount').textContent      = '- 0원';
+            document.getElementById('summaryTotal').textContent         = fmt(total + shipping) + '원';
+
+            const allAvailable = document.querySelectorAll('.item-checkbox:not(:disabled)');
+            const allChecked   = document.querySelectorAll('.item-checkbox:not(:disabled):checked');
+            document.getElementById('checkAll').checked = allAvailable.length > 0 && allChecked.length === allAvailable.length;
+        }
+
+        function deleteItem(id) {
+            if (!confirm('해당 상품을 삭제할까요?')) return;
+            fetch('/customer/cart/delete/' + id, { method: 'DELETE' }).then(res => {
+                if (res.ok) {
+                    const card = document.querySelector('.cart-item-card[data-id="' + id + '"]');
+                    if (card) card.remove();
+                    updateSummary();
+                    checkEmptyCart();
+                    showToast('상품이 삭제되었습니다.');
+                } else {
+                    showToast('삭제 중 오류가 발생했습니다.');
+                }
+            });
+        }
+
+        function deleteSelected() {
+            const checked = document.querySelectorAll('.item-checkbox:checked');
+            if (!checked.length) { showToast('삭제할 상품을 선택해주세요.'); return; }
+            if (!confirm(checked.length + '개 상품을 삭제할까요?')) return;
+            const ids = Array.from(checked).map(cb => cb.dataset.id);
+            fetch('/customer/cart/delete-selected', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ids })
+            }).then(res => {
+                if (res.ok) {
+                    ids.forEach(id => {
+                        const card = document.querySelector('.cart-item-card[data-id="' + id + '"]');
+                        if (card) card.remove();
+                    });
+                    updateSummary();
+                    checkEmptyCart();
+                    showToast(ids.length + '개 상품이 삭제되었습니다.');
+                }
+            });
+        }
+
+        function syncQty(id, qty) {
+            fetch('/customer/cart/update', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ cartItemId: id, quantity: qty })
+            });
+        }
+
+        function checkEmptyCart() {
+            const list  = document.getElementById('cartItemList');
+            const items = list.querySelectorAll('.cart-item-card');
+            const empty = document.getElementById('cartEmpty');
+            if (items.length === 0) {
+                if (!empty) {
+                    const div = document.createElement('div');
+                    div.id        = 'cartEmpty';
+                    div.className = 'cart-empty';
+                    div.innerHTML = '<div class="cart-empty-icon">🛒</div>'
+                                  + '<div class="cart-empty-text">장바구니가 비어 있어요.</div>';
+                    list.appendChild(div);
+                }
+            } else {
+                if (empty) empty.remove();
+            }
+        }
+
+        function goCheckout() {
+            const checked = document.querySelectorAll('.item-checkbox:checked');
+            if (!checked.length) { showToast('결제할 상품을 선택해주세요.'); return; }
+
+            const validChecked = Array.from(checked).filter(cb => {
+                return !cb.closest('.cart-item-card').classList.contains('soldout');
+            });
+            if (!validChecked.length) { showToast('품절 상품은 결제할 수 없습니다.'); return; }
+
+            const items = validChecked.map(cb => {
+                const card = cb.closest('.cart-item-card');
+                return {
+                    kitId   : card.dataset.kitId,    // ✅ 추가
+                    name    : card.dataset.name,      // ✅ data-name 에서 가져옴
+                    price   : parseInt(card.dataset.price),
+                    quantity: parseInt(card.querySelector('.qty-display').value)
+                };
+            });
+
+            const cartItemIds  = validChecked.map(cb => cb.dataset.id);
+            const productTotal = items.reduce((sum, it) => sum + it.price * it.quantity, 0);
+            openPaymentModal(items, productTotal, cartItemIds);
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('cartToast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2500);
+        }
+
+        function fmt(n) { return n.toLocaleString('ko-KR'); }
+
+        document.addEventListener('DOMContentLoaded', updateSummary);
+    /*]]>*/
+    </script>
+
+    <th:block th:replace="~{views/shop/customer-payment :: customerPayment}"></th:block>
+
+</th:block>
+</body>
+</html>

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nextage.web.mapper.CustomerOrderHistoryMapper">
+
+    <select id="selectOrdersByCustomerId" resultType="com.nextage.web.domain.OrderHistoryDTO">
+	    SELECT
+	        o.order_id,
+	        o.order_no,
+	        o.business_id,
+	        o.bid_id,
+	        o.total_amount,
+	        o.payment_status,
+	        o.accept_status,
+	        o.delivery_status,
+	        o.created_at
+	    FROM orders o
+	    WHERE o.customer_id    = #{customerId}
+	      AND o.payment_status = 'PAID'
+	      AND o.customer_deleted = 0
+	    ORDER BY o.created_at DESC
+	    LIMIT #{limit} OFFSET #{offset}
+	</select>
+	
+	<select id="countOrdersByCustomerId" resultType="int">
+	    SELECT COUNT(*)
+	    FROM orders
+	    WHERE customer_id      = #{customerId}
+	      AND payment_status   = 'PAID'
+	      AND customer_deleted = 0
+	</select>
+	
+	<select id="selectOrderDetail" resultType="com.nextage.web.domain.OrderHistoryDTO">
+	    SELECT
+	        o.order_id,
+	        o.order_no,
+	        o.business_id,
+	        o.bid_id,
+	        o.total_amount,
+	        o.payment_status,
+	        o.accept_status,
+	        o.delivery_status,
+	        o.created_at
+	    FROM orders o
+	    WHERE o.order_id       = #{orderId}
+	      AND o.customer_deleted = 0
+	</select>
+
+    <select id="selectOrderItems" resultType="com.nextage.web.domain.OrderItemsDTO">
+        SELECT
+            oi.order_item_id,
+            oi.order_id,
+            oi.kit_id,
+            o.business_id,
+            oi.quantity,
+            oi.price,
+            COALESCE(k.name, '개인거래 상품') AS product_name,
+            k.main_image1                    AS image_url,
+            (SELECT COUNT(*) > 0
+               FROM review r
+              WHERE r.order_item_id = oi.order_item_id) AS reviewed
+        FROM order_items oi
+        JOIN orders o ON o.order_id = oi.order_id
+        LEFT JOIN kit k ON k.kit_id = oi.kit_id
+        WHERE oi.order_id = #{orderId}
+    </select>
+
+    <insert id="insertOrderItems">
+        INSERT INTO order_items (order_id, kit_id, quantity, price)
+        VALUES (#{orderId}, #{kitId}, #{quantity}, #{price})
+    </insert>
+
+    <delete id="deleteReviewsByOrderId">
+        DELETE FROM review
+        WHERE order_item_id IN (
+            SELECT order_item_id FROM order_items WHERE order_id = #{orderId}
+        )
+    </delete>
+
+    <delete id="deleteOrderItemsByOrderId">
+        DELETE FROM order_items WHERE order_id = #{orderId}
+    </delete>
+
+    <update id="deleteOrderByOrderId">
+	    UPDATE orders
+	    SET customer_deleted = 1
+	    WHERE order_id = #{orderId}
+	</update>
+
+    <delete id="deleteSettlementsByOrderId">
+        DELETE FROM business_settlement WHERE order_id = #{orderId}
+    </delete>
+
+</mapper>

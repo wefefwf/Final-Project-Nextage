@@ -1,0 +1,150 @@
+/* Nextage 의뢰 게시판 메인 컨테이너 */
+.request-board-container {
+    max-width: 1100px;
+    margin: 50px auto;
+    padding: 20px;
+    font-family: 'Pretendard', -apple-system, sans-serif;
+}
+
+/* 상단 헤더 (필터 + 작성 버튼) */
+.board-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 25px;
+    border-bottom: 2px solid #f5f5f7;
+}
+
+/* --- [추가/수정] 그룹형 카테고리 필터 영역 --- */
+.category-filters {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.filter-group {
+    display: flex;
+    align-items: center;
+    background: #f5f5f7; /* 그룹 배경색 */
+    padding: 5px 10px;
+    border-radius: 20px;
+    gap: 5px;
+}
+
+.group-label {
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: #86868b;
+    padding: 0 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* 공통 버튼 스타일 (기존 스타일 유지) */
+.filter-btn {
+    padding: 8px 18px;
+    border-radius: 25px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: #1d1d1f;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 활성화된 버튼 (검은색 배경) */
+.filter-btn.active {
+    background: #1d1d1f !important;
+    color: #fff !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* 단독으로 있는 '전체' 버튼 전용 */
+button[data-category="all"] {
+    border: 1px solid #e5e5e7;
+    background: #fff;
+}
+
+/* --- [추가] 상태 배지 디자인 (3번 기능) --- */
+.item-top-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+}
+
+.status-badge {
+    font-size: 0.7rem;
+    padding: 2px 10px;
+    border-radius: 6px;
+    font-weight: 700;
+}
+
+.status-open {
+    background: #e3f2fd;
+    color: #1976d2;
+    border: 1px solid #bbdefb;
+}
+
+.status-selected {
+    background: #f5f5f7;
+    color: #86868b;
+    border: 1px solid #e5e5e7;
+}
+
+/* --- 나머지 기존 스타일 유지 --- */
+.header-right { display: flex; align-items: center; gap: 15px; }
+
+.sort-select {
+    padding: 8px 12px; border-radius: 10px; border: 1px solid #e5e5e7;
+    font-size: 0.9rem; color: #424245; outline: none; cursor: pointer;
+}
+
+.write-btn {
+    background: #1d1d1f; color: #fff !important; padding: 12px 24px;
+    border-radius: 14px; text-decoration: none; font-weight: 700;
+    font-size: 0.95rem; transition: 0.3s; border: none;
+}
+
+.write-btn:hover {
+    background: #ff79c6; transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 121, 198, 0.3);
+}
+
+.request-item {
+    display: flex; align-items: center; padding: 25px;
+    background: #fff; border-radius: 24px; margin-bottom: 20px;
+    transition: all 0.3s ease; border: 1px solid #f5f5f7; cursor: pointer;
+}
+
+.request-item:hover {
+    transform: translateY(-5px); box-shadow: 0 15px 35px rgba(0, 0, 0, 0.06);
+    border-color: #e5e5e7;
+}
+
+.item-thumbnail {
+    width: 90px; height: 90px; border-radius: 18px;
+    background: #f5f5f7; margin-right: 30px; object-fit: cover;
+}
+
+.item-info { flex: 1; }
+
+.item-category {
+    font-size: 0.8rem; color: #ff79c6; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.5px;
+}
+
+.item-title {
+    font-size: 1.25rem; font-weight: 700; color: #1d1d1f; margin-bottom: 10px;
+}
+
+.item-meta { font-size: 0.9rem; color: #86868b; }
+
+.item-price {
+    font-weight: 800; color: #1d1d1f; font-size: 1.2rem; margin-left: 20px;
+}
+
+.empty-msg {
+    text-align: center; padding: 120px 0; color: #a1a1a6; font-size: 1.1rem;
+}
