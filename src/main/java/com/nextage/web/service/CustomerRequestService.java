@@ -60,10 +60,8 @@ public class CustomerRequestService {
     // ✅ 수정
     @Transactional
     public void updateRequest(RequestDTO dto, MultipartFile[] files) {
-        // 1. 기본 정보 수정
         requestMapper.updateRequest(dto);
 
-        // 2. 태그 수정 (기존 삭제 후 재등록)
         requestMapper.deleteTagsByRequestId(dto.getRequestId());
         if (dto.getTags() != null && !dto.getTags().isEmpty()) {
             for (String tag : dto.getTags().split(",")) {
@@ -74,7 +72,6 @@ public class CustomerRequestService {
             }
         }
 
-        // 3. 새 파일이 있을 때만 기존 삭제 후 재등록
         if (files != null && files.length > 0 && !files[0].isEmpty()) {
             requestMapper.deleteAttachmentsByRequestId(dto.getRequestId());
             for (int i = 0; i < files.length; i++) {
@@ -110,7 +107,25 @@ public class CustomerRequestService {
         return requestMapper.selectRequestsByCustomerId(customerId);
     }
 
-    public void updateRequestStatus(Long requestId, String status) {
+    // ✅ 고객용 상태 변경 (본인 확인 포함)
+    @Transactional
+    public void updateRequestStatus(Long requestId, String status, Long currentCustomerId) {
+        RequestDTO request = requestMapper.selectRequestDetail(requestId);
+
+        if (request != null && request.getCustomerId().equals(currentCustomerId)) {
+            requestMapper.updateStatus(requestId, status);
+        } else {
+            throw new RuntimeException("해당 의뢰의 상태를 변경할 권한이 없습니다.");
+        }
+    }
+
+    // ✅ 업체용 상태 변경 (수락/거절/완료)
+    @Transactional
+    public void updateRequestStatusByBusiness(Long requestId, String status) {
+        RequestDTO request = requestMapper.selectRequestDetail(requestId);
+        if (request == null) {
+            throw new RuntimeException("존재하지 않는 의뢰입니다.");
+        }
         requestMapper.updateStatus(requestId, status);
     }
 

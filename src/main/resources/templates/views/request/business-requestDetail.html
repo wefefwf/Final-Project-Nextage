@@ -88,10 +88,16 @@
 
       <div class="meta-row">
         <div class="badge"
-             th:classappend="${request.status == 'OPEN' ? 'b-open' : (request.status == 'SELECTED' ? 'b-selected' : (request.status == 'PAID' ? 'b-paid' : 'b-done'))}">
-          <span class="bdot"></span>
-          <span th:text="${request.status == 'OPEN' ? '의뢰 받는 중' : (request.status == 'SELECTED' ? '낙찰 완료' : (request.status == 'PAID' ? '결제 완료' : '작업 완료'))}">상태</span>
-        </div>
+			     th:classappend="${request.status == 'OPEN' ? 'b-open' :
+			                      (request.status == 'PAID' ? 'b-paid' :
+			                      (request.status == 'SELECTED' ? 'b-selected' :
+			                      (request.status == 'COMPLETED' ? 'b-done' : '')))}">
+			  <span class="bdot"></span>
+			  <span th:text="${request.status == 'OPEN' ? '의뢰 받는 중' :
+			                  (request.status == 'PAID' ? '결제 완료' :
+			                  (request.status == 'SELECTED' ? '낙찰 완료' :
+			                  (request.status == 'COMPLETED' ? '작업 완료' : request.status)))}">상태</span>
+			</div>
         <span class="cat" th:text="${request.categoryName}">카테고리</span>
       </div>
 

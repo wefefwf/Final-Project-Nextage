@@ -127,5 +127,23 @@ public class CustomerRequestController {
             e.printStackTrace();
             return ResponseEntity.internalServerError().body("fail");
         }
+        
     }
+ // ✅ 8. 의뢰 상태 변경 (본인 확인 포함)
+    @PostMapping("/status/{requestId}")
+    public String updateStatus(@PathVariable("requestId") Long requestId,
+                               @RequestParam("status") String status,
+                               @AuthenticationPrincipal CustomerUserDetails userDetails) {
+        
+        // 로그인 정보를 서비스로 넘깁니다.
+        try {
+            requestService.updateRequestStatus(requestId, status, userDetails.getCustomerId());
+        } catch (RuntimeException e) {
+            // 권한이 없는 경우 등에 대한 처리 (예: 리스트로 리다이렉트)
+            return "redirect:/customer/request/list";
+        }
+        
+        return "redirect:/customer/request/detail/" + requestId;
+    }
+    
 }

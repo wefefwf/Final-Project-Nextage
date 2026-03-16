@@ -59,9 +59,15 @@
                     <div class="item-top-row">
                         <div class="item-category" th:text="${request.categoryName}">Category</div>
                         <span class="status-badge" 
-                              th:classappend="${request.status == 'OPEN' ? 'status-open' : 'status-selected'}"
-                              th:text="${request.status == 'OPEN' ? '의뢰중' : '낙찰완료'}">
-                        </span>
+						      th:classappend="${request.status == 'OPEN' ? 'status-open' :
+						                       (request.status == 'PAID' ? 'status-paid' :
+						                       (request.status == 'SELECTED' ? 'status-selected' :
+						                       (request.status == 'COMPLETED' ? 'status-done' : '')))}"
+						      th:text="${request.status == 'OPEN' ? '의뢰중' :
+						                (request.status == 'PAID' ? '결제완료' :
+						                (request.status == 'SELECTED' ? '낙찰완료' :
+						                (request.status == 'COMPLETED' ? '작업완료' : request.status)))}">
+						</span>
                     </div>
                     
                     <div class="item-title" th:text="${request.title}">의뢰 제목</div>

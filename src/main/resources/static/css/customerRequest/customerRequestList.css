@@ -93,6 +93,18 @@ button[data-category="all"] {
     border: 1px solid #e5e5e7;
 }
 
+.status-paid {
+    background: rgba(0,122,255,.1);
+    color: #007aff;
+    border: 1px solid rgba(0,122,255,.2);
+}
+
+.status-done {
+    background: rgba(0,0,0,.05);
+    color: #888;
+    border: 1px solid #e5e5e7;
+}
+
 /* --- 나머지 기존 스타일 유지 --- */
 .header-right { display: flex; align-items: center; gap: 15px; }
 

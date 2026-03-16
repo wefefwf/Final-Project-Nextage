@@ -190,6 +190,16 @@ button[data-category="all"] {
     color: #6e6e73;
 }
 
+.status-paid {
+    background: rgba(0,122,255,.1);
+    color: #007aff;
+}
+
+.status-done {
+    background: rgba(0,0,0,.05);
+    color: #888;
+}
+
 .item-title {
     font-size: 15px;
     font-weight: 500;
