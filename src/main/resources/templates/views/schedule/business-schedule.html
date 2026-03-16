@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/business-layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>Nextage Schedule</title>
+    <link rel="stylesheet" th:href="@{/css/schedule/schedule.css}" />
+</head>
+<body>
+
+<th:block layout:fragment="content">
+    <div class="schedule-wrapper">
+        <div class="calendar-card">
+            <div id="calendar"></div>
+        </div>
+    
+        <div class="status-section">
+            <h3>날짜 상 진행 중인 작업</h3>
+            <div class="status-box">
+                <div th:if="${#lists.isEmpty(todayWork)}" class="empty-msg">
+                    <p>오늘 날짜 상 작업 중인 내역이 없습니다.</p>
+                </div>
+                <div th:unless="${#lists.isEmpty(todayWork)}" th:each="tw : ${todayWork}" class="work-ing">
+                    <span class="badge-blue">진행중</span>
+                    <strong th:text="${tw.requestTitle}">의뢰 제목</strong>
+                </div>
+            </div>
+        </div>
+    
+        <div class="list-section">
+            <h3>내 일정</h3>
+            <div class="scroll-container">
+                <div class="schedule-row" th:each="order : ${scheduleList}">
+                    <div class="row-left">
+                        <div class="d-day-area">
+                            <span class="d-day-text" 
+                                  th:if="${order.dueDate != null}"
+                                  th:with="today=${T(java.time.LocalDate).now()}, 
+                                           due=${order.dueDate.toLocalDate()},
+                                           days=${T(java.time.temporal.ChronoUnit).DAYS.between(today, due)}"
+                                  th:text="${days == 0 ? 'D-Day' : 'D-' + days}">D-7</span>
+                            <span class="date-small" th:if="${order.dueDate != null}" th:text="${#temporals.format(order.dueDate, 'MM/dd')}">03/20</span>
+                        </div>
+                        <div class="info-area">
+                            <p class="meta" th:text="'주문번호: ' + ${order.orderNo} + ' | 주문자: ' + ${order.customerNickname} + '님'"></p>
+                            <h4 th:text="${order.requestTitle}">의뢰 제목</h4>
+                            <p class="order-date" th:if="${order.createdAt != null}" 
+                               th:text="'주문일: ' + ${#temporals.format(order.createdAt, 'yy.MM.dd')}"></p>
+                        </div>
+                    </div>
+                    <div class="row-right">
+                        <a th:href="@{/business/order/detail/{id}(id=${order.orderId})}" class="btn-link">주문내역 보러가기</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+    <script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        const calendarEl = document.getElementById('calendar');
+        if (!calendarEl) return;
+
+        const eventsData = /*[[${scheduleList}]]*/ [];
+        
+        const calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            locale: 'ko',
+            // ★ 수정: 빈 줄 생기게 하는 주차 고정 옵션을 false로!
+            fixedWeekCount: false,      
+            showNonCurrentDates: false, 
+            headerToolbar: {
+                left: 'today',
+                center: 'title',
+                right: 'prev,next'
+            },
+            events: (eventsData || []).map(item => ({
+                title: item.requestTitle,
+                start: item.dueDate,
+                url: '/business/order/detail/' + item.orderId,
+                color: '#000000'
+            }))
+        });
+        calendar.render();
+    });
+    </script>
+</th:block>
+</body>
+</html>

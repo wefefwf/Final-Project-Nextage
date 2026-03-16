@@ -1,6 +1,8 @@
 package com.nextage.web.controller;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,6 +20,7 @@ import com.nextage.web.domain.BusinessDTO;
 import com.nextage.web.domain.CareerDTO;
 import com.nextage.web.domain.KitDTO;
 import com.nextage.web.domain.ReviewDTO;
+import com.nextage.web.domain.ScheduleOrderDTO;
 import com.nextage.web.service.BusinessOrderHistoryService;
 import com.nextage.web.service.BusinessPortfolioService;
 import com.nextage.web.service.CustomerShopService;
@@ -31,15 +34,27 @@ public class BusinessScheduleController {
 	@Autowired
 	public BusinessOrderHistoryService bohService;
 
-	/*
-	 * //portfolio페이지 가기 -business
-	 * 
-	 * @PreAuthorize("hasAnyRole('BUSER','BADMIN')")
-	 * 
-	 * @GetMapping("/business/schedule") public String
-	 * goSchedule(@AuthenticationPrincipal BusinessUserDetails user,Model model){
-	 * 
-	 * 
-	 * return ss; }
-	 */
+	
+	  //portfolio페이지 가기 -business
+	  
+	 @PreAuthorize("hasAnyRole('BUSER','BADMIN')") 
+	 @GetMapping("/business/schedule")
+	 public String goSchedule(@AuthenticationPrincipal BusinessUserDetails user,Model model){
+		 
+		 Long businessId = user.getBusiness().getBusinessId();
+		 List<ScheduleOrderDTO> scheduleList = bohService.getScheduleOrders(businessId);
+		 
+		 //오늘거 필터링
+		 LocalDate today = LocalDate.now();
+		 List<ScheduleOrderDTO> todayWork = scheduleList.stream().filter(order -> order.getDueDate().toLocalDate().isEqual(today))
+		            .collect(Collectors.toList());
+
+		     // 4. 모델에 담아서 뷰(HTML)로 보내기
+		     model.addAttribute("scheduleList", scheduleList); // 전체 일정 리스트 & 달력용
+		     model.addAttribute("todayWork", todayWork);   // 오늘 작업 섹션용
+		     model.addAttribute("companyName", user.getBusiness().getCompanyName());
+
+		     return "views/schedule/business-schedule"; // 실제 HTML 파일 경로 (사장님 설정에 맞게)
+		 }
+	 
 }
