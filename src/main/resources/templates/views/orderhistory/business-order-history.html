@@ -275,7 +275,7 @@
 		            onclick="openDeliveryModal(event, this)">배송관리</button>
 		    <a class="btn btn-green"
 		       th:if="${order.roomId != null}"
-		       th:href="@{/business/chat(roomId=${order.roomId})}"
+		       th:href="@{/chat(roomId=${order.roomId})}"
 		       onclick="event.stopPropagation()">채팅보기</a>
 		</div>
     </div>

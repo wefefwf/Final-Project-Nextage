@@ -129,17 +129,14 @@
     <!-- 주문 상세 -->
     <select id="selectOrderDetail" resultType="com.nextage.web.domain.OrderHistoryDTO">
 	    SELECT
-	        o.order_id      AS orderId,
-	        o.order_no      AS orderNo,
-	        o.customer_id   AS customerId,
-	        o.business_id   AS businessId,
-	        o.bid_id        AS bidId,
-	        o.total_amount  AS totalAmount,
-	        o.payment_status AS paymentStatus,
-	        o.accept_status  AS acceptStatus,
-	        o.delivery_status AS deliveryStatus,
-	        o.created_at    AS createdAt
+	        o.order_id, o.order_no, o.customer_id, o.business_id,
+	        o.bid_id, o.total_amount, o.payment_status,
+	        o.accept_status, o.delivery_status, o.created_at,
+	        cr.room_id
 	    FROM orders o
+	    LEFT JOIN chat_room cr ON cr.bid_id      = o.bid_id
+	                           AND cr.customer_id = o.customer_id
+	                           AND cr.business_id = o.business_id
 	    WHERE o.order_id       = #{orderId}
 	      AND o.customer_deleted = 0
 	</select>
