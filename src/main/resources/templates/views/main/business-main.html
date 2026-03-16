@@ -7,6 +7,8 @@
 <title>__Nextage__*Business</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
 <link rel="stylesheet" th:href="@{/css/businessMain/businessMain.css}" />
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
 <style>
     /* 필터링을 위한 간단한 스타일 추가 */
     .filter-btn { cursor: pointer; transition: all 0.3s; }
@@ -52,10 +54,34 @@
 	    </div>
 	  </section>
 
-	  <section class="section-portfolio">
-	    <h3>My PortFolio</h3>
-	    <div class="box-gray portfolio-full"></div>
-	  </section>
+	<!-- 포트폴리오 -->
+	 <section class="section-portfolio">
+		  <div class="portfolio-header">
+		    <h3>My PortFolio</h3>
+		    <a th:href="@{/business/my-portfolio}" class="post-view-all">전체 보러가기 <span>→</span></a>
+		  </div>
+		  
+		  <div class="portfolio-full">
+		    <div class="portfolio-slider" th:if="${!#lists.isEmpty(portfolioList)}" 
+		         th:classappend="${#lists.size(portfolioList) < 4} ? 'no-slider' : ''">
+		      
+		      <div class="portfolio-card" th:each="pf : ${portfolioList}">
+		        <div class="card-img-wrap">
+		          <img th:src="${pf.image1 ?: '/image/no-image.png'}" alt="포트폴리오">
+		        </div>
+		        <div class="card-info">
+		          <p class="card-title" th:text="${pf.requestTitle}">작업 제목</p>
+		        </div>
+		      </div>
+		      
+		    </div>
+		
+		    <div class="portfolio-empty" th:unless="${!#lists.isEmpty(portfolioList)}">
+		      <p>아직 등록된 포트폴리오가 없습니다. 작업을 완료하고 채워보세요!</p>
+		      <a th:href="@{/business/request/list}" class="btn-go-list">의뢰 리스트 보기</a>
+		    </div>
+		  </div>
+		</section>
 
 	  <section class="section-post">
 	    <div class="post-header">
@@ -127,6 +153,33 @@
             });
         });
     });
+    //포폴 카드 슬라이딩
+// 포폴 카드 슬라이딩
+(function($) { // jQuery 충돌 방지 래퍼
+    $(function() {
+        const slider = $('.portfolio-slider');
+        
+        // Slick이 로드되었는지 체크
+        if (typeof $.fn.slick !== 'undefined' && slider.find('.portfolio-card').length >= 4) {
+            slider.slick({
+                infinite: true,
+                slidesToShow: 4,
+                slidesToScroll: 1,
+                autoplay: true,
+                autoplaySpeed: 0,
+                speed: 4000,
+                cssEase: 'linear',
+                arrows: false,
+                dots: false,
+                variableWidth: true,
+                pauseOnHover: false,
+                draggable: true // 마우스로 끌어볼 수 있게 추가
+            });
+        } else {
+            console.log("Slick 로드 실패 혹은 카드 부족");
+        }
+    });
+})(jQuery);
     </script>
 </th:block>
 </body>
