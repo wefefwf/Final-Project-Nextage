@@ -1,6 +1,4 @@
-<div th:fragment="bidCommentsFragment" id="bid-comments-wrapper"
-	class="bid-comments-container" xmlns:th="http://www.thymeleaf.org"
-	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<div th:fragment="bidCommentsFragment" id="bid-comments-wrapper" class="bid-comments-container" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 	<link rel="stylesheet" th:href="@{/css/customerRequest/customerRequestDetailBids.css}" />
 
 	<!-- 업체 제안 등록 폼 -->
@@ -313,13 +311,15 @@
 							<span class="select-info-icon">⚠️</span>
 							<div class="select-info-text">
 								<strong>결제 후 업체 수락이 필요합니다.</strong>
-								<p>결제 완료 후 업체가 치수·개인정보를 확인하고 수락해야 거래가 확정됩니다. 업체 거절 시 자동 환불됩니다.</p>
+								<p>결제 완료 후 업체가 치수·개인정보를 확인하고 수락해야 거래가 확정됩니다. 업체 거절 시 자동
+									환불됩니다.</p>
 							</div>
 						</div>
-						
+
 						<div class="select-agree-row">
 							<label class="select-agree-label"> <input type="checkbox"
-								id="select-modal-agree" /> 위 내용을 확인하였으며, 결제 후 업체 수락 시 거래가 확정됨에 동의합니다.
+								id="select-modal-agree" /> 위 내용을 확인하였으며, 결제 후 업체 수락 시 거래가 확정됨에
+								동의합니다.
 							</label>
 						</div>
 						<p class="field-error" id="err-select-agree">결제 동의가 필요합니다.</p>
@@ -343,19 +343,18 @@
 
 
 	<!-- 인증 정보 주입용 hidden -->
-	<input type="hidden" id="auth-is-logged-in" value="false" /> <input
-		type="hidden" id="auth-is-business-user" value="false" /> <input
-		type="hidden" id="auth-current-business-id" value="0" /> <input
-		type="hidden" id="auth-current-customer-id" value="0" /> <input
-		type="hidden" sec:authorize="isAuthenticated()"
-		id="auth-is-logged-in-auth" value="true" /> <input type="hidden"
-		sec:authorize="hasRole('CUSER')" id="auth-current-customer-id-auth"
-		th:value="${#authentication.principal.customerId}" /> <input
-		type="hidden" sec:authorize="hasRole('BUSER')"
-		id="auth-is-business-user-auth" value="true" /> <input type="hidden"
-		sec:authorize="hasRole('BUSER')" id="auth-current-business-id-auth"
-		th:value="${#authentication.principal.businessId}" />
+	<input type="hidden" id="auth-is-logged-in" value="false" /> 
+	<input type="hidden" id="auth-is-business-user" value="false" />
+	<input type="hidden" id="auth-is-customer-admin" value="false" /> 
+	<input type="hidden" id="auth-current-business-id" value="0" /> 
+	<input type="hidden" id="auth-current-customer-id" value="0" /> 
 	
+	<input type="hidden" sec:authorize="isAuthenticated()" id="auth-is-logged-in-auth" value="true" /> 
+	<input type="hidden" sec:authorize="hasRole('CUSER')" id="auth-current-customer-id-auth" th:value="${#authentication.principal.customerId}" /> 
+	<input type="hidden" sec:authorize="hasRole('BUSER')" id="auth-is-business-user-auth" value="true" /> 
+	<input type="hidden" sec:authorize="hasRole('BUSER')" id="auth-current-business-id-auth" th:value="${#authentication.principal.businessId}" />
+	<input type="hidden" sec:authorize="hasRole('CADMIN')" id="auth-is-customer-admin-auth" value="true" />
+
 	<!-- 포트원 v2 SDK -->
 	<script src="https://cdn.portone.io/v2/browser-sdk.js"></script>
 	<script th:src="@{/js/customerRequest/customerRequestDetailBids.js}"></script>
@@ -365,6 +364,7 @@
 			const hopePrice = /*[[${request.hopePrice}]]*/ 0;
 			const requestStatus = /*[[${request.status}]]*/ '';
 			const requestCustomerId = /*[[${request.customerId}]]*/ 0;
+			const isCustomerAdmin = document.getElementById('auth-is-customer-admin-auth') !== null;
 
 			const isLoggedIn =
 				document.getElementById('auth-is-logged-in-auth') !== null;
@@ -392,7 +392,8 @@
 				requestCustomerId,
 				isBusinessUser,
 				currentBusinessId,
-				currentCustomerId
+				currentCustomerId,
+				isCustomerAdmin
 			});
 		});
 	</script>

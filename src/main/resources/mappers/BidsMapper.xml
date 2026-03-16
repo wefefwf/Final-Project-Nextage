@@ -26,12 +26,12 @@
 	<!-- 업체/유저(페이지): 특정 request_id에 달린 모든 bids 조회 -->
 	<select id="selectBidsByRequestId" parameterType="long"
 		resultType="com.nextage.web.domain.BidDTO">
-		SELECT *
-		FROM bids
-		WHERE request_id = #{requestId}
-		AND status
-		!= 'HIDDEN'
-		ORDER BY created_at DESC
+		SELECT b.*, bs.login_id AS businessLoginId
+		FROM bids b
+		LEFT JOIN business bs ON bs.business_id = b.business_id
+		WHERE b.request_id = #{requestId}
+		AND b.status != 'HIDDEN'
+		ORDER BY b.created_at DESC
 	</select>
 
 	<!-- 업체(페이지): 내가 작성한 제안 목록 조회 -->
@@ -47,9 +47,10 @@
 
 	<select id="selectBidById" parameterType="long"
 		resultType="com.nextage.web.domain.BidDTO">
-		SELECT *
-		FROM bids
-		WHERE bid_id = #{bidId}
+		SELECT b.*, bs.login_id AS businessLoginId
+		FROM bids b
+		LEFT JOIN business bs ON bs.business_id = b.business_id
+		WHERE b.bid_id = #{bidId}
 	</select>
 
 	<update id="updateBidStatus">
@@ -131,6 +132,14 @@
 	</insert>
 	<select id="selectOrderIdByOrderNo" resultType="Long">
 		SELECT order_id FROM orders WHERE order_no = #{orderNo}
+	</select>
+	
+	<!-- 회원정보조회 (최종확인페이지) -->
+	<select id="selectCustomerInfoByRequestId" resultType="map">
+		SELECT c.address, c.phone_number AS phoneNumber
+		FROM customer c
+		JOIN request r ON r.customer_id = c.customer_id
+		WHERE r.request_id = #{requestId}
 	</select>
 
 </mapper>

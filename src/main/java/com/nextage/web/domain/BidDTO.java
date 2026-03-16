@@ -21,5 +21,7 @@ public class BidDTO {
 	private LocalDateTime selectedAt;
 	private LocalDateTime createdAt;
 	private LocalDateTime updatedAt;
+	
+	private String businessLoginId;
 
 }

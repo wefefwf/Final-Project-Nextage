@@ -23,6 +23,7 @@ public class BidService {
 
 	private final BidsMapper bidsMapper;
 	private final CustomerRequestMapper requestMapper;
+	private final CustomerRequestService customerRequestService;
 
 	public List<BidDTO> getBidsByRequestId(Long requestId) {
 		return bidsMapper.selectBidsByRequestId(requestId);
@@ -125,8 +126,7 @@ public class BidService {
         if (bid == null) throw new IllegalArgumentException("제안 정보를 찾을 수 없습니다.");
         
         RequestDTO requestInfo = requestMapper.selectRequestDetail(bid.getRequestId());
-//        CustomerDTO customerInfo = customerMapper.findAddressAndPhoneByRequestId(bid.getRequestId());
-        Map<String, Object> customerInfo = null;
+        Map<String, Object> customerInfo = bidsMapper.selectCustomerInfoByRequestId(bid.getRequestId());
         
         info.put("bid", bid);
         info.put("request", requestInfo);
@@ -135,7 +135,7 @@ public class BidService {
         return info;
     }
 
-    // select: 트랜잭션으로 치수 저장 + bid 상태 SELECTED 동시 처리
+    // 트랜잭션으로 치수 저장 + bid 상태변경 SELECTED + request 상태변경 PAID
     @Transactional
     public void selectBidWithDimensions(Long bidId, Object dimensions) {
     	BidDTO bid = bidsMapper.selectBidById(bidId);
@@ -152,6 +152,10 @@ public class BidService {
     	// 2. bid 상태 SELECTED
     	bidsMapper.updateBidStatus(bidId, "SELECTED");  // ← updateStatus → updateBidStatus
     	bidsMapper.resetOtherBidsToRejected(bid.getRequestId(), bidId);
+    	
+    	// 3. 의뢰글 상태 PAID로 변경
+    	customerRequestService.updateRequestStatusByBusiness(bid.getRequestId(), "PAID");
+    	
     }
     
     // 주문 사전 생성
