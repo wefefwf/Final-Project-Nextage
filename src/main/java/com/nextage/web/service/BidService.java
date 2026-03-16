@@ -169,8 +169,8 @@ public class BidService {
     		+ LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"))
     		+ "_" + (int)(Math.random() * 9000 + 1000);
 
-    	// DB에 orderNo + totalAmount 저장 (검증용)
-    	bidsMapper.insertBidOrder(orderNo, request.getCustomerId(), bid.getBusinessId(), bidId, totalAmount);
+    	// DB에 orderNo + totalAmount(제안가격) 저장
+    	bidsMapper.insertBidOrder(orderNo, request.getCustomerId(), bid.getBusinessId(), bidId, totalAmount, bid.getExpectedDueDate());
     	return orderNo;
     }
 
@@ -184,11 +184,11 @@ public class BidService {
     	bidsMapper.updateBidOrderStatus(orderNo, impUid, "PAID");
 
     	Long orderId = bidsMapper.selectOrderIdByOrderNo(orderNo);
-    	System.out.println("orderId: " + orderId);
+//    	System.out.println("orderId: " + orderId);
     	
     	if (orderId != null) {
     		bidsMapper.insertBidOrderItem(orderId, paidAmount);
-    		System.out.println("insertBidOrderItem 완료");
+//    		System.out.println("insertBidOrderItem 완료");
     	}
 
     	return true;

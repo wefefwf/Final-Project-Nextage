@@ -102,10 +102,8 @@
 
 	<!-- 입찰 결제 주문 사전 생성 -->
 	<insert id="insertBidOrder">
-		INSERT INTO orders (order_no, customer_id, business_id, bid_id,
-		total_amount, payment_status, accept_status, created_at)
-		VALUES (#{orderNo}, #{customerId}, #{businessId}, #{bidId}, #{totalAmount},
-		'READY', 'PENDING', NOW())
+		INSERT INTO orders (order_no, customer_id, business_id, bid_id, total_amount, payment_status, accept_status, due_date, created_at)
+		VALUES (#{orderNo}, #{customerId}, #{businessId}, #{bidId}, #{totalAmount}, 'READY', 'PENDING', #{dueDate}, NOW())
 	</insert>
 
 	<!-- 금액 검증용 조회 -->

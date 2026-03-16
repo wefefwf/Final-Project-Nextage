@@ -1,5 +1,6 @@
 package com.nextage.web.mapper;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -29,7 +30,7 @@ public interface BidsMapper {
 			@Param("businessId") Long businessId);
 
 	void insertBidOrder(@Param("orderNo") String orderNo, @Param("customerId") Long customerId,
-			@Param("businessId") Long businessId, @Param("bidId") Long bidId, @Param("totalAmount") int totalAmount);
+			@Param("businessId") Long businessId, @Param("bidId") Long bidId, @Param("totalAmount") int totalAmount, @Param("dueDate") LocalDate dueDate);
 
 	Integer selectTotalAmountByOrderNo(@Param("orderNo") String orderNo);
 
