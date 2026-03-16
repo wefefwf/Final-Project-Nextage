@@ -2,6 +2,7 @@ package com.nextage.web.service;
 
 import com.nextage.web.domain.OrderHistoryDTO;
 import com.nextage.web.domain.OrderSearchDTO;
+import com.nextage.web.domain.ScheduleOrderDTO;
 import com.nextage.web.mapper.BusinessOrderHistoryMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -99,5 +100,12 @@ public class BusinessOrderHistoryService {
             order.setItems(mapper.selectOrderItems(orderId));
         }
         return order;
+    }
+    
+    @Transactional(readOnly = true) 
+    public List<ScheduleOrderDTO> getScheduleOrders(Long businessId) {
+    List<ScheduleOrderDTO> orders = mapper.selectScheduleOrders(businessId);
+     return orders; 
+     
     }
 }

@@ -3,6 +3,7 @@ package com.nextage.web.mapper;
 import com.nextage.web.domain.OrderHistoryDTO;
 import com.nextage.web.domain.OrderItemsDTO;
 import com.nextage.web.domain.OrderSearchDTO;
+import com.nextage.web.domain.ScheduleOrderDTO;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -62,4 +63,6 @@ public interface BusinessOrderHistoryMapper {
     void insertChatFunction(@Param("roomId")     Long roomId,
                             @Param("businessId") Long businessId,
                             @Param("customerId") Long customerId);
+    
+    List<ScheduleOrderDTO> selectScheduleOrders(@Param("businessId") Long businessId);
 }

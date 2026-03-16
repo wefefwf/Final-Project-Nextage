@@ -268,5 +268,21 @@
         UPDATE orders SET accept_status = #{acceptStatus}
         WHERE order_id = #{orderId}
     </update>
+    
+    <select id="selectScheduleOrders" resultType="com.nextage.web.domain.ScheduleOrderDTO">
+	    SELECT 
+	        o.order_id        AS orderId,
+	        o.order_no        AS orderNo,
+	        o.due_date        AS dueDate,
+	        oi.created_at     AS createdAt,    r.title           AS requestTitle, c.nickname        AS customerNickname FROM order_items oi
+	    JOIN orders o ON oi.order_id = o.order_id
+	    JOIN bids b ON o.bid_id = b.bid_id
+	    JOIN request r ON b.request_id = r.request_id
+	    JOIN customer c ON o.customer_id = c.customer_id WHERE o.business_id = #{businessId}
+	      AND o.bid_id IS NOT NULL 
+	      AND o.payment_status = 'PAID'
+	    ORDER BY o.due_date ASC
+	</select>
+    
 
 </mapper>

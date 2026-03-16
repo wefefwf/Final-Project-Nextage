@@ -3,6 +3,7 @@ package com.nextage.web.service;
 import com.nextage.web.domain.OrderHistoryDTO;
 import com.nextage.web.domain.OrderSearchDTO;
 import com.nextage.web.domain.ReviewDTO;
+import com.nextage.web.domain.ScheduleOrderDTO;
 import com.nextage.web.mapper.CustomerOrderHistoryMapper;
 import com.nextage.web.mapper.CustomerReviewMapper;
 import lombok.RequiredArgsConstructor;
@@ -133,5 +134,5 @@ public class CustomerOrderHistoryService {
         customerOrderHistoryMapper.deleteOrderByOrderId(orderId);
         log.info("주문 삭제 - orderId: {}, customerId: {}", orderId, customerId);
     }
-    
+
 }
