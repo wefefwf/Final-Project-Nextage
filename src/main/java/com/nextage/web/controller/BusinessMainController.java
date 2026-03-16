@@ -45,6 +45,7 @@ public class BusinessMainController {
             portfolioList = pfService.getReview(businessId, 8, 0, true);
         }
         
+        model.addAttribute("businessId", businessId);
         model.addAttribute("newPostList", newPostList);
         model.addAttribute("portfolioList", portfolioList);
         return "views/main/business-main";

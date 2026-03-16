@@ -96,7 +96,8 @@
 		                 data-bs-toggle="modal" data-bs-target="#workModal" 
 		                 th:onclick="fillModal(this)"
 		                 th:data-id="${review.reviewId}"
-		                 th:data-status="${review.status}">
+		                 th:data-status="${review.status}"
+		                 th:data-review-id="${review.reviewId}">
 		                 
 		                <div class="card-img-holder">
 		                    <img th:src="${review.image1}">

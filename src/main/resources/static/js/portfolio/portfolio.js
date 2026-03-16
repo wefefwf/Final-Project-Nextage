@@ -308,3 +308,25 @@ function toggleStatus() {
 	        }
 	    });
 	}
+	//메인에서 포폴 눌렀을떄
+	
+	$(document).ready(function() {
+	    // 1. URL에서 ?reviewId=123 파라미터가 있는지 확인
+	    const urlParams = new URLSearchParams(window.location.search);
+	    const reviewId = urlParams.get('reviewId');
+
+	    if (reviewId) {
+	        // 2. 상세 페이지의 카드들 중 th:data-id="${review.reviewId}"가 일치하는 녀석 찾기
+	        // 사장님 상세페이지 HTML을 보니 .work-card 클래스에 data-id 속성이 있네요.
+	        const $targetCard = $(`.work-card[data-id="${reviewId}"]`);
+	        
+	        if ($targetCard.length > 0) {
+	            // 3. 페이지 로딩 후 0.5초 뒤에 강제로 클릭 발생
+	            setTimeout(function() {
+	                // 부트스트랩 모달을 띄우는 이벤트를 트리거합니다.
+	                $targetCard.get(0).click(); 
+	                console.log(reviewId + "번 포트폴리오 모달을 자동으로 엽니다.");
+	            }, 500);
+	        }
+	    }
+	});

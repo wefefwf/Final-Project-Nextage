@@ -65,12 +65,14 @@
 		    <div class="portfolio-slider" th:if="${!#lists.isEmpty(portfolioList)}" 
 		         th:classappend="${#lists.size(portfolioList) < 4} ? 'no-slider' : ''">
 		      
-		      <div class="portfolio-card" th:each="pf : ${portfolioList}">
+		      <div class="portfolio-card" th:each="pf : ${portfolioList}"
+		     th:onclick="|location.href='/business/my-portfolio?reviewId=' + ${pf.reviewId}|">
 		        <div class="card-img-wrap">
 		          <img th:src="${pf.image1 ?: '/image/no-image.png'}" alt="포트폴리오">
 		        </div>
 		        <div class="card-info">
-		          <p class="card-title" th:text="${pf.requestTitle}">작업 제목</p>
+		        <p class="card-title" th:text="${pf.requestTitle}">작업 제목</p>
+		        <span class="card-no" th:text="'No. ' + ${pf.orderNo}">No. 00</span>
 		        </div>
 		      </div>
 		      
@@ -180,6 +182,7 @@
         }
     });
 })(jQuery);
+ 
     </script>
 </th:block>
 </body>
