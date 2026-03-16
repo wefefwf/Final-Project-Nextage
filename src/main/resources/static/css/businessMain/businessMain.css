@@ -44,14 +44,14 @@ h3 { margin-bottom: 20px; font-size: 20px; font-family: sans-serif; }
 /* ────────────────────────────────────
    My PortFolio Section — 중복 제거 및 간격 수정
 ──────────────────────────────────── */
-.section-portfolio { margin-bottom: 60px; }
+.section-portfolio { margin-bottom: 40px; }
 
 /* ★ 제목과 카드 사이 간격 조절 (40px) ★ */
 .portfolio-header {
     display: flex;
     justify-content: space-between;
     align-items: baseline;
-    margin-bottom: 40px !important;
+    margin-bottom: 20px !important;
 }
 
 .section-portfolio h3 {
@@ -90,9 +90,14 @@ h3 { margin-bottom: 20px; font-size: 20px; font-family: sans-serif; }
 }
 
 /* 250px 정사각형 카드 디자인 */
+/* [수정] 250px 정사각형 카드 디자인 */
 .portfolio-card {
     width: 250px !important;
     height: 250px !important;
+    
+    /* ★ 핵심: 카드 윗부분에 10px 정도 빈 공간을 만듭니다 ★ */
+    margin-top: 10px; 
+    
     background: #ffffff;
     border-radius: 16px;
     border: 1px solid rgba(0,0,0,0.08);
@@ -105,8 +110,10 @@ h3 { margin-bottom: 20px; font-size: 20px; font-family: sans-serif; }
     transition: transform 0.3s ease;
 }
 
+/* [수정] 카드 hover 효과 */
 .portfolio-card:hover {
-    transform: translateY(-8px);
+    /* 이제 위로 5px을 올라가도 아까 만든 margin-top 10px 공간 덕분에 안 잘립니다! */
+    transform: translateY(-5px); 
 }
 
 .card-img-wrap {
@@ -341,3 +348,32 @@ h3 { margin-bottom: 20px; font-size: 20px; font-family: sans-serif; }
 
 .link-wrapper { text-align: right; margin-top: 10px; } 
 .view-all { color: #333; text-decoration: none; font-size: 12px; }
+.card-info {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px; /* 요소들 사이 간격 */
+}
+
+/* 주문번호: 작고 진하게 */
+.card-no {
+    font-size: 11px;
+    font-weight: 700;
+    color: #c0c0c0; /* 애플 블루 포인트 */
+    text-transform: uppercase;
+}
+
+/* 제목: 중간 크기, 두 줄까지 허용 */
+.card-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1d1d1f;
+    margin: 0;
+    line-height: 1.4;
+    /* 두 줄 넘어가면 ... 처리 */
+    display: -webkit-box;
+    -webkit-line-clamp: 1; 
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}

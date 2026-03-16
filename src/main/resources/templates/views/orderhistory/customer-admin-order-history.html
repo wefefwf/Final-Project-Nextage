@@ -178,8 +178,15 @@
                     </div>
                     <div class="pending-info">
                         <div class="pending-name" th:text="${order.customerNickname} + ' 님의 주문'"></div>
-                        <div class="pending-sub"
-                             th:text="${order.items != null and !#lists.isEmpty(order.items)} ? ${order.items[0].productName} : '상품 정보 없음'"></div>
+					<div class="pending-sub"
+					     th:if="${order.items != null and !#lists.isEmpty(order.items)}"
+					     th:text="${order.items[0].productName} + 
+					              (${#lists.size(order.items)} > 1 
+					               ? ' 외 ' + (${#lists.size(order.items)} - 1) + '건' 
+					               : '')">
+					</div>
+					<div class="pending-sub"
+					     th:if="${order.items == null or #lists.isEmpty(order.items)}">상품 정보 없음</div>
                     </div>
                     <div class="pending-price"
                          th:text="${#numbers.formatInteger(order.totalAmount, 3, 'COMMA') + '원'}"></div>
@@ -213,7 +220,7 @@
     <!-- 수락된 주문 목록 -->
     <div class="section-header">
         <span class="section-title">Order List</span>
-        <span class="section-sub">수락한 결제내역</span>
+        <span class="section-sub">수락한 판매내역</span>
     </div>
 
     <div th:if="${#lists.isEmpty(orders)}"
@@ -225,14 +232,21 @@
     <div th:each="order : ${orders}"
          class="order-row"
          th:classappend="${order.acceptStatus == 'REJECTED'} ? 'rejected'"
-         th:onclick="|location.href='/customer/admin/order/detail/[[${order.orderId}]]'|">
+         th:onclick="'location.href=\'/customer/admin/order/detail/' + ${order.orderId} + '\''">
         <div class="order-thumb">
             <img th:if="${order.items != null and !#lists.isEmpty(order.items) and order.items[0].imageUrl != null}"
                  th:src="${order.items[0].imageUrl}">
         </div>
         <div class="order-info">
-            <div class="order-name"
-                 th:text="${order.items != null and !#lists.isEmpty(order.items)} ? ${order.items[0].productName} : '주문'"></div>
+		<div class="order-name"
+		     th:if="${order.items != null and !#lists.isEmpty(order.items)}"
+		     th:text="${order.items[0].productName} + 
+		              (${#lists.size(order.items)} > 1 
+		               ? ' 외 ' + (${#lists.size(order.items)} - 1) + '건' 
+		               : '')">
+		</div>
+		<div class="order-name"
+		     th:if="${order.items == null or #lists.isEmpty(order.items)}">주문</div>
             <div class="order-sub"
                  th:text="${order.customerNickname} + ' · ' + ${#temporals.format(order.createdAt, 'yyyy-MM-dd HH:mm')}"></div>
         </div>
@@ -248,15 +262,16 @@
         <span class="accept-badge accept-accepted" th:if="${order.acceptStatus == 'ACCEPTED'}">수락됨</span>
         <span class="accept-badge accept-rejected" th:if="${order.acceptStatus == 'REJECTED'}">거절됨</span>
 
-        <div class="order-btns" onclick="event.stopPropagation()">
-            <button class="btn btn-blue"
-                    th:attr="data-order-id=${order.orderId},data-delivery-status=${order.deliveryStatus}"
-                    onclick="openDeliveryModal(this)">배송 관리</button>
-            <!-- ✅ th:href Thymeleaf 문법 수정 -->
-            <a class="btn btn-green"
-               th:if="${order.roomId != null}"
-               th:href="@{/chat(roomId=${order.roomId})}">채팅 보기</a>
-        </div>
+        <!-- 수정: business처럼 event 전달 방식으로 변경 -->
+		<div class="order-btns">
+		    <button class="btn btn-blue"
+		            th:attr="data-order-id=${order.orderId},data-delivery-status=${order.deliveryStatus}"
+		            onclick="openDeliveryModal(event, this)">배송 관리</button>
+		    <a class="btn btn-green"
+		       th:if="${order.roomId != null}"
+		       th:href="@{/chat(roomId=${order.roomId})}"
+		       onclick="event.stopPropagation()">채팅 보기</a>
+		</div>
     </div>
 
     <!-- 페이징 -->
@@ -335,8 +350,20 @@
             : '';
         document.getElementById('dOrderNo').textContent  = o.orderNo          || '-';
         document.getElementById('dCustomer').textContent = o.customerNickname || '-';
-        document.getElementById('dProduct').textContent  = first.productName  || '-';
-        document.getElementById('dQty').textContent      = first.quantity ? first.quantity + '개' : '-';
+        var productHtml = items.map(function(it) {
+            return '<div style="display:flex; justify-content:space-between; '
+                 + 'padding:4px 0; font-size:13px; border-bottom:1px solid #f5f5f5;">'
+                 + '<span style="color:#444;">' + it.productName + '</span>'
+                 + '<span style="color:#222; font-weight:600; margin-left:12px;">'
+                 + it.quantity + '개</span>'
+                 + '</div>';
+        }).join('');
+        document.getElementById('dProduct').innerHTML = productHtml || '-';
+
+        // 수량 행은 전체 합계로
+        var totalQty = items.reduce(function(sum, it) { return sum + (it.quantity || 0); }, 0);
+        document.getElementById('dQty').textContent = totalQty ? '총 ' + totalQty + '개' : '-';
+        document.getElementById('dQty').textContent = totalQty ? totalQty + '개' : '-';
         document.getElementById('dDate').textContent     = o.createdAt ? o.createdAt.substring(0,16).replace('T',' ') : '-';
         document.getElementById('dType').textContent     = o.bidId ? '개인거래' : 'Kit 구매';
         document.getElementById('dAmount').textContent   = Number(o.totalAmount).toLocaleString('ko-KR') + '원';
@@ -345,7 +372,8 @@
         document.getElementById('detailFooter').style.display = '';
     }
 
-    function openDeliveryModal(btn) {
+    function openDeliveryModal(event, btn) {
+        event.stopPropagation();  // ← row 클릭 이벤트 전파 차단
         _deliveryOrderId = btn.dataset.orderId;
         _selectedStatus  = parseInt(btn.dataset.deliveryStatus);
         document.querySelectorAll('.delivery-option').forEach(function(el) {

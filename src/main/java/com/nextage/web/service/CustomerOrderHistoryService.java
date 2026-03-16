@@ -88,13 +88,15 @@ public class CustomerOrderHistoryService {
     @Transactional
     public void acceptOrder(Long orderId) {
         customerOrderHistoryMapper.updateAcceptStatus(orderId, "ACCEPTED");
+        customerOrderHistoryMapper.updateDeliveryStatus(orderId, 2);
         log.info("주문 수락 - orderId: {}", orderId);
     }
 
     @Transactional
     public void rejectOrder(Long orderId) {
         customerOrderHistoryMapper.updateAcceptStatus(orderId, "REJECTED");
-        log.info("주문 거절 - orderId: {}", orderId);
+        customerOrderHistoryMapper.updateDeliveryStatus(orderId, 9);  // ← 취소 상태
+        log.info("주문 취소 - orderId: {}", orderId);
     }
 
     /* ─────────────────────────────────────────

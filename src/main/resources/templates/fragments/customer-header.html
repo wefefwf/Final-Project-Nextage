@@ -26,7 +26,7 @@
                               </li>
                               <!-- 일반 유저: 주문내역 -->
                               <li sec:authorize="!hasRole('CADMIN')">
-                                  <a class="dropdown-item" th:href="@{/customer/order/history}">주문내역</a>
+                                  <a class="dropdown-item" th:href="@{/customer/order/history}">구매내역</a>
                               </li>
                             </ul>
                         </div>
