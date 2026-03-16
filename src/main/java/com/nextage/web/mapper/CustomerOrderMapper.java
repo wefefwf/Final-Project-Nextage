@@ -1,5 +1,7 @@
 package com.nextage.web.mapper;
 
+import java.time.LocalDateTime;
+
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -10,7 +12,8 @@ public interface CustomerOrderMapper {
 	void insertOrder(@Param("orderNo")     String orderNo,
             @Param("customerId")  Long   customerId,
             @Param("businessId")  Long   businessId,
-            @Param("totalAmount") int    totalAmount);
+            @Param("totalAmount") int    totalAmount,
+            @Param("dueDate")  LocalDateTime dueDate);
 
     // 결제 완료 후 imp_uid + payment_status 업데이트
     void updatePaymentStatus(@Param("orderNo")       String orderNo,
