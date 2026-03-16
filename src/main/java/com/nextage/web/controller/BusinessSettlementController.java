@@ -21,7 +21,7 @@ public class BusinessSettlementController {
     // BUSER: 본인 정산 내역
     @GetMapping
     public String settlementPage(
-            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(name = "page", defaultValue = "1") int page,
             @AuthenticationPrincipal BusinessUserDetails userDetails,
             Model model) {
 
@@ -58,7 +58,7 @@ public class BusinessSettlementController {
     @GetMapping("/detail/{businessId}")
     public String detailPage(
             @PathVariable("businessId") Long businessId,
-            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(name = "page", defaultValue = "1") int page,
             @AuthenticationPrincipal BusinessUserDetails userDetails,
             Model model) {
 

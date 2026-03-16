@@ -4,19 +4,12 @@
       layout:decorate="~{layouts/business-layout}">
 <head>
     <meta charset="UTF-8">
-    <title>업체 정산 상세 - Nextage</title>
+    <title>수익/정산 - Nextage</title>
     <style>
         * { box-sizing: border-box; }
         body { font-family: 'Pretendard', sans-serif; background: #fafafa; color: #333; }
         .wrapper { max-width: 900px; margin: 40px auto; padding: 0 20px 80px; }
-        .back-btn {
-            display: inline-flex; align-items: center; gap: 6px;
-            font-size: 13px; color: #7c8cfb; font-weight: 600;
-            text-decoration: none; margin-bottom: 24px; transition: gap 0.2s;
-        }
-        .back-btn:hover { gap: 10px; }
-        .page-title { font-family: 'Montserrat', sans-serif; font-size: 28px; font-weight: 900; color: #222; margin-bottom: 6px; }
-        .page-subtitle { font-size: 14px; color: #aaa; margin-bottom: 32px; }
+        .page-title { font-family: 'Montserrat', sans-serif; font-size: 28px; font-weight: 900; color: #222; margin-bottom: 32px; }
 
         .settlement-row {
             background: #fff; border: 1px solid #e8e8e8; border-radius: 12px;
@@ -43,15 +36,29 @@
             padding: 28px 32px; margin-bottom: 32px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         }
-        .summary-title { font-size: 14px; font-weight: 700; color: #aaa; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; }
-        .summary-formula { font-family: 'Montserrat', sans-serif; font-size: 18px; font-weight: 700; color: #333; text-align: center; margin-bottom: 12px; }
+        .summary-title {
+            font-size: 14px; font-weight: 700; color: #aaa;
+            text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px;
+        }
+        .summary-formula {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 18px; font-weight: 700; color: #333;
+            text-align: center; margin-bottom: 12px;
+        }
         .summary-total {
-            font-family: 'Montserrat', sans-serif; font-size: 32px; font-weight: 900; text-align: center;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 32px; font-weight: 900; text-align: center;
             background: linear-gradient(135deg, #7c8cfb, #5aa9ff);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
-        .summary-note { font-size: 12px; color: #aaa; text-align: center; margin-top: 12px; }
-        .section-title { font-family: 'Montserrat', sans-serif; font-size: 18px; font-weight: 900; color: #222; margin-bottom: 16px; }
+        .summary-note {
+            font-size: 12px; color: #aaa; text-align: center; margin-top: 12px;
+        }
+
+        .section-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 18px; font-weight: 900; color: #222; margin-bottom: 16px;
+        }
         .empty-state { text-align: center; padding: 60px 0; color: #ccc; font-size: 14px; }
         .pagination { display: flex; justify-content: center; gap: 6px; margin-top: 24px; }
         .page-btn {
@@ -70,30 +77,28 @@
 <body>
 <th:block layout:fragment="content">
 <div class="wrapper">
-    <a href="/business/settlement" class="back-btn">&larr; 업체 목록으로</a>
-
-    <h2 class="page-title" th:text="${companyName} + ' 정산 내역'">업체명 정산 내역</h2>
-    <p class="page-subtitle" th:text="${#temporals.format(#temporals.createNow(), 'yyyy년 M월')} + ' 기준'"></p>
+    <h2 class="page-title">수익/정산</h2>
 
     <!-- 이번 달 요약 -->
     <div class="summary-card">
         <div class="summary-title">이번 달 총 판매 금액</div>
         <div class="summary-formula"
              th:if="${summary != null and summary.salesAmount > 0}"
-             th:text="${'순수액 ' + #numbers.formatInteger(summary.salesAmount, 3, 'COMMA') + '원 - 수수료 ' + #numbers.formatInteger(summary.commissionAmount, 3, 'COMMA') + '원 = 총'}">
+             th:text="${'매출액 ' + #numbers.formatInteger(summary.salesAmount, 3, 'COMMA') + '원 - 수수료 ' + #numbers.formatInteger(summary.commissionAmount, 3, 'COMMA') + '원 = 총'}">
         </div>
         <div class="summary-total"
              th:text="${summary != null ? #numbers.formatInteger(summary.settlementAmount, 3, 'COMMA') + '원' : '0원'}">
         </div>
         <div class="summary-note">
-            EX) <span th:text="${#temporals.format(#temporals.createNow(), 'yyyy년 M월')}"></span>
-            4일에 입금 예정입니다.<br>
-            계좌 설정은 → 내 정보수정에 있고<br>
-            수수료 계산에 대한 안내문 및 입금에 대한 사항
-        </div>
+		    <span th:with="nextMonth=${#temporals.createNow().plusMonths(1)}"
+		          th:text="${#temporals.format(nextMonth, 'yyyy년 M월')} + ' 4일 입금 예정입니다.'">
+		    </span><br>
+		    계좌 정보는 내 정보수정에서 변경할 수 있습니다.<br>
+		    수수료(10%)는 매출액 기준으로 자동 차감됩니다.
+		</div>
     </div>
 
-    <!-- 정산 내역 -->
+    <!-- 정산 내역 리스트 -->
     <div class="section-title">수익</div>
 
     <div class="empty-state" th:if="${#lists.isEmpty(settlements)}">
@@ -116,18 +121,15 @@
 
     <!-- 페이징 -->
     <div class="pagination" th:if="${totalPages > 1}">
-        <a class="page-btn"
-           th:classappend="${currentPage == 1} ? 'disabled'"
-           th:href="@{/business/settlement/detail/{id}(id=${targetBusinessId}, page=${currentPage - 1})}">&lsaquo;</a>
+        <a class="page-btn" th:classappend="${currentPage == 1} ? 'disabled'"
+           th:href="@{/business/settlement(page=${currentPage - 1})}">&lsaquo;</a>
         <th:block th:each="i : ${#numbers.sequence(1, totalPages)}">
-            <a class="page-btn"
-               th:classappend="${i == currentPage} ? 'active'"
-               th:href="@{/business/settlement/detail/{id}(id=${targetBusinessId}, page=${i})}"
+            <a class="page-btn" th:classappend="${i == currentPage} ? 'active'"
+               th:href="@{/business/settlement(page=${i})}"
                th:text="${i}">1</a>
         </th:block>
-        <a class="page-btn"
-           th:classappend="${currentPage == totalPages} ? 'disabled'"
-           th:href="@{/business/settlement/detail/{id}(id=${targetBusinessId}, page=${currentPage + 1})}">&rsaquo;</a>
+        <a class="page-btn" th:classappend="${currentPage == totalPages} ? 'disabled'"
+           th:href="@{/business/settlement(page=${currentPage + 1})}">&rsaquo;</a>
     </div>
 </div>
 </th:block>
