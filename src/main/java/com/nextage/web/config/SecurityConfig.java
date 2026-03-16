@@ -56,7 +56,7 @@ public WebSecurityCustomizer webSecurityCustomizer() {
             .securityMatcher("/business/**", "/auth/business/**") // 기업 경로만 담당
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/business/login", "/auth/business/loginProc","/business/main","/business/request","/business/request/list","/business/portfolio/**").permitAll()
+                .requestMatchers("/business/login", "/auth/business/loginProc","/business/main","/business/request","/business/request/list","/business/portfolio/**","").permitAll()
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
