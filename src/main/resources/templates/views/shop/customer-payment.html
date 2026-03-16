@@ -175,15 +175,27 @@
             headers: { 'Content-Type': 'application/json' },
             body   : JSON.stringify({ totalAmount: _totalAmount })
         })
-        .then(function(r) { return r.json(); })
+        .then(function(r) {
+            // ← 여기에 추가
+            if (r.status === 401) {
+                document.getElementById('paymentStatusMsg').innerHTML
+                    = '<span style="color:#ff6b6b;">로그인 후 이용해주세요.</span>';
+                setTimeout(function() {
+                    location.href = '/customer/login';
+                }, 1500);
+                return;
+            }
+            return r.json();
+        })
         .then(function(data) {
+            if (!data) return; // ← 401 처리 후 undefined 방지
             _orderNo = data.orderNo;
             document.getElementById('modalOrderNo').textContent = _orderNo;
             document.getElementById('modalPayBtn').disabled = false;
         })
         .catch(function() {
             document.getElementById('paymentStatusMsg').innerHTML
-                = '<span style="color:#ff6b6b;">\u274C \uC8FC\uBB38 \uC0DD\uC131\uC5D0 \uC2E4\uD328\uD588\uC2B5\uB2C8\uB2E4. \uB2E4\uC2DC \uC2DC\uB3C4\uD574\uC8FC\uC138\uC694.<\/span>';
+                = '<span style="color:#ff6b6b;">주문 생성에 실패했습니다. 다시 시도해주세요.</span>';
         });
     }
 

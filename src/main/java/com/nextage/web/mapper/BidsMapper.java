@@ -1,6 +1,7 @@
 package com.nextage.web.mapper;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -38,5 +39,7 @@ public interface BidsMapper {
 	// 결제 시 주문내역에서 order_items 필요
 	void insertBidOrderItem(@Param("orderId") Long orderId, @Param("totalAmount") int totalAmount);
 	Long selectOrderIdByOrderNo(@Param("orderNo") String orderNo);
+	
+	Map<String, Object> selectCustomerInfoByRequestId(@Param("requestId") Long requestId);
 
 }

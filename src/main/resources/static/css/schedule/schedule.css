@@ -1,11 +1,10 @@
 @charset "UTF-8";
 
-/* [1] 배경 및 기본 설정 - 무조건 흰 배경 */
+/* [1] 배경 및 기본 설정 */
 body {
     background-color: #ffffff !important;
     font-family: 'Pretendard', -apple-system, sans-serif;
     color: #000000;
-    margin: 0;
 }
 
 .schedule-wrapper {
@@ -13,101 +12,343 @@ body {
     margin: 40px auto;
 }
 
-/* [2] 섹션 공통 - 깔끔한 테두리만 있는 화이트 박스 */
-.calendar-card, .status-box, .scroll-container {
+/* [2] 섹션 공통 */
+.calendar-card,
+.status-box,
+.scroll-container {
     background: #ffffff;
     border: 1px solid #eeeeee;
     border-radius: 16px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.03);
 }
 
-/* [3] 달력 영역 - 격자 크기 고정 및 다른 달 날짜 완전 삭제 */
+/* [3] 달력 */
 .calendar-card {
-    padding: 20px;
+    padding: 25px;
     margin-bottom: 30px;
 }
 
-/* ★ FullCalendar 이번 달만 남기기 ★ */
-/* 1. 다른 달 날짜(회색칸 등) 아예 보이지 않게 처리 */
 .fc-day-other {
-    visibility: hidden !important;
-    pointer-events: none; /* 클릭도 안 되게 */
-}
-
-/* 2. 이번 달 날짜 격자 테두리만 남기고 배경은 무조건 화이트 */
-.fc-td, .fc-daygrid-day {
     background-color: #ffffff !important;
 }
 
-/* 모든 날짜 칸의 높이를 동일하게 고정 */
-.fc .fc-daygrid-day-frame {
-    min-height: 120px !important; 
-    height: 120px !important;
+.fc-day-other .fc-daygrid-day-top {
+    visibility: hidden !important;
 }
 
-/* 밑줄 및 텍스트 데코레이션 전면 금지 (블랙 고정) */
-#calendar a, .schedule-row a {
+.fc .fc-day-disabled {
+    background-color: #ffffff !important;
+}
+
+.fc .fc-day-today {
+    background-color: #ffffff !important;
+}
+
+.fc .fc-day-today .fc-daygrid-day-number {
+    color: #0071e3 !important;
+    font-weight: 800;
+}
+
+.fc .fc-daygrid-day-top {
+    flex-direction: row !important;
+    padding: 10px 0 0 10px !important;
+}
+
+.fc .fc-daygrid-day-frame {
+    height: 140px !important;
+    min-height: 140px !important;
+}
+
+/* 캘린더 일정 */
+.fc-event {
+    background: rgba(0, 0, 0, 0.05) !important;
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    border-radius: 4px !important;
+    padding: 2px 6px !important;
+}
+
+
+.schedule-row a {
     text-decoration: none !important;
     color: #000000 !important;
 }
+.fc-event-title,
+.fc-event-time {
+    color: #000000 !important;
+}
+/* 캘린더 이동 버튼 */
+.fc .fc-button {
+    background-color: #ffffff !important;
+    border: 1px solid #eeeeee !important;
+    color: #000000 !important;
+}
 
-.fc .fc-toolbar-title { font-size: 22px; font-weight: 700; color: #000; }
-.fc .fc-button-primary { background-color: #fff; border: 1px solid #ddd; color: #000; }
-.fc .fc-button-primary:hover { background-color: #000; color: #fff; }
-
-/* [4] 진행 중인 작업 & 리스트 헤더 */
-.status-section h3, .list-section h3 {
+.fc .fc-button:hover {
+    background-color: #f5f5f5 !important;
+}
+.fc-daygrid-day-number {
+    color: #000000 !important;
+    text-decoration: none !important;
+}
+.fc-col-header-cell-cushion {
+    color: #000000 !important;
+    text-decoration: none !important;
+    font-weight: 600;
+}
+/* [4] 제목 */
+.status-section h3,
+.list-section h3 {
     font-size: 20px;
     font-weight: 700;
     margin-bottom: 15px;
 }
 
+/* [5] 진행중 작업 박스 */
 .status-box {
-    padding: 20px 30px;
+    height: auto;
     margin-bottom: 30px;
     display: flex;
     align-items: center;
+    overflow: hidden;   /* 이 줄 추가 */
 }
 
-.badge-blue {
-    background: #000; 
-    color: #fff;
-    padding: 4px 10px;
-    border-radius: 6px;
-    font-size: 12px;
-    margin-right: 15px;
+.status-box .schedule-row {
+    border-bottom: none !important;
 }
 
-/* [5] 내 일정 리스트 (5개 고정 스크롤) */
+/* [6] 일정 리스트 스크롤 */
 .scroll-container {
-    max-height: 480px; /* 카드 5개 높이 기준 */
+    max-height: 450px; /* 일정 5개 높이 */
     overflow-y: auto;
 }
 
+.scroll-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.scroll-container::-webkit-scrollbar-thumb {
+    background: #ddd;
+    border-radius: 10px;
+}
+
+.scroll-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+/* [7] 일정 행 */
 .schedule-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px;
+    padding: 18px 30px;
+    height: 90px;
     border-bottom: 1px solid #f5f5f7;
+    background: #ffffff;
+    width: 100%;
 }
 
-.schedule-row:hover { background-color: #fafafa; }
+.scroll-container .schedule-row:last-child {
+    border-bottom: none;
+}
 
-.row-left { display: flex; align-items: center; gap: 40px; }
-.d-day-text { font-size: 18px; font-weight: 800; color: #000; } 
-.date-small { font-size: 12px; color: #888; }
+/* [8] 내부 정렬 */
+.row-left {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    flex: 1;
+}
 
-.info-area h4 { font-size: 16px; font-weight: 600; margin: 2px 0; }
-.meta, .order-date { font-size: 12px; color: #888; }
+.info-area {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
 
+.info-area h4 {
+    font-size: 17px;
+    font-weight: 700;
+    margin: 0 0 4px 0 !important;
+    line-height: 1.2;
+}
+
+.info-area p {
+    margin: 0 !important;
+    line-height: 1.2;
+}
+
+.period-text {
+    font-size: 13px;
+    color: #888;
+}
+
+.d-day-text {
+    font-size: 20px;
+    font-weight: 800;
+    min-width: 80px;
+}
+
+.badge-blue {
+    background: #000;
+    color: #fff;
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.customer-info {
+    margin-left: auto;
+    margin-right: 40px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+}
+
+/* [9] 버튼 */
 .btn-link {
     border: 1px solid #000;
-    padding: 8px 16px;
-    border-radius: 8px;
+    padding: 10px 20px;
+    border-radius: 10px;
     font-size: 13px;
-    font-weight: 500;
-    transition: all 0.2s;
+    font-weight: 700;
+    color: #000 !important;
 }
 
-.btn-link:hover { background: #000; color: #fff !important; }
+.btn-link:hover {
+    background: #000;
+    color: #fff !important;
+}
+.past-work {
+    opacity: 0.45;
+}
+
+.past-work .btn-link {
+    border-color: #ccc;
+    color: #888 !important;
+}
+/* 캘린더 헤더 툴바 레이아웃 교정 */
+.fc .fc-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* 제목(center) 영역을 절대 위치처럼 정중앙에 배치 */
+.fc .fc-toolbar-title {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 22px;
+    font-weight: 700;
+    color: #000;
+}
+
+/* 툴바 컨테이너에 상대 위치 부여 */
+.fc-header-toolbar {
+    position: relative;
+    margin-bottom: 25px !important;
+}
+/* 캘린더 헤더 툴바 레이아웃 */
+.fc-header-toolbar {
+    display: flex !important;
+    justify-content: center !important; /* 가로 중앙 정렬 */
+    align-items: flex-start !important; /* 제목을 위로 붙임 */
+    
+    height: 80px !important;            /* 헤더 자체 높이를 확보 */
+    margin-top:20px;
+    margin-bottom: 0px !important;    /* ★ 제목 글자 아래 여백 (달력과의 간격) ★ */
+    position: relative;
+}
+
+/* 제목 스타일 */
+.fc .fc-toolbar-title {
+    font-size: 24px;
+    font-weight: 800;
+    color: #000;
+    
+    /* 혹시 모를 기본 마진 제거 */
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* 좌우 버튼(prev, next) 위치 조정 */
+.fc .fc-toolbar-chunk:last-child {
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+.empty-msg {
+    height: 90px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.empty-msg {
+    height: 90px;
+    display: flex;
+    align-items: center;
+    padding-left: 30px;
+}
+.empty-msg p {
+    margin: 0;
+}
+
+.empty-schedule-box {
+    height: 400px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.empty-text-box {
+    text-align: center;
+}
+
+.btn-go-list {
+    display: inline-block;
+    padding: 12px 30px;
+    border-radius: 10px;
+    border: 1px solid #000;
+    font-weight: 600;
+    color: #000;
+    text-decoration: none;
+}
+
+.btn-go-list:hover {
+    background: #000;
+    color: #fff;
+}
+/* [3] 달력 - 일정(이벤트) 글자색 및 더보기 수정 */
+
+/* 1. 일정 막대기 내부 글자색 (가장 중요) */
+.fc-event-title, 
+.fc-event-time, 
+.fc-daygrid-event .fc-event-main,
+.fc-daygrid-event-harness a {
+    color: #000000 !important; /* 강제 검정색 */
+    font-weight: 600 !important;
+    text-decoration: none !important;
+}
+
+/* 2. 더보기 (+N개) 링크 - 회색으로 죽어있던거 검정색으로 복구 */
+.fc-daygrid-more-link {
+    color: #000000 !important;
+    text-decoration: none !important;
+    font-weight: 700 !important;
+}
+
+/* 3. 일정에 마우스 올렸을 때도 글자색 유지 */
+.fc-event:hover .fc-event-title,
+.fc-event:hover .fc-event-main {
+    color: #000000 !important;
+}
+
+/* 4. 팝업창(더보기 클릭시) 내부 일정들도 검정색 */
+.fc-popover {
+    z-index: 9999 !important; /* 다른 요소에 가려지지 않게 */
+}
+.fc-popover-body .fc-daygrid-event {
+    color: #000000 !important;
+}

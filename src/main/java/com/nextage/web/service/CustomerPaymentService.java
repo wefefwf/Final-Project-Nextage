@@ -28,8 +28,8 @@ public class CustomerPaymentService {
         String orderNo = "ORDER_"
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"))
                 + "_" + (int)(Math.random() * 9000 + 1000);
-        Long businessId = 1L;
-        orderMapper.insertOrder(orderNo, customerId, totalAmount);
+
+        orderMapper.insertOrder(orderNo, customerId, null, totalAmount); // ← businessId null
         log.info("주문 생성 - orderNo: {}, customerId: {}, totalAmount: {}",
                 orderNo, customerId, totalAmount);
         return orderNo;

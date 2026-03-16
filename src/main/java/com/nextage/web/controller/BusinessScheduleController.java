@@ -43,12 +43,17 @@ public class BusinessScheduleController {
 		 
 		 Long businessId = user.getBusiness().getBusinessId();
 		 List<ScheduleOrderDTO> scheduleList = bohService.getScheduleOrders(businessId);
+		 //정렬
+		 scheduleList.sort((a, b) -> a.getDueDate().compareTo(b.getDueDate()));
 		 
 		 //오늘거 필터링
 		 LocalDate today = LocalDate.now();
-		 List<ScheduleOrderDTO> todayWork = scheduleList.stream().filter(order -> order.getDueDate().toLocalDate().isEqual(today))
-		            .collect(Collectors.toList());
-
+		 List<ScheduleOrderDTO> todayWork = scheduleList.stream()
+				    .filter(order -> 
+				        !order.getCreatedAt().toLocalDate().isAfter(today) &&
+				        !order.getDueDate().toLocalDate().isBefore(today)
+				    )
+				    .collect(Collectors.toList());
 		     // 4. 모델에 담아서 뷰(HTML)로 보내기
 		     model.addAttribute("scheduleList", scheduleList); // 전체 일정 리스트 & 달력용
 		     model.addAttribute("todayWork", todayWork);   // 오늘 작업 섹션용
