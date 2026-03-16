@@ -107,7 +107,7 @@
 
 	        <div class="main-request-item" th:each="post : ${newPostList}"
 	             th:data-category="${post.categoryName}"
-	             th:onclick="|location.href='/customer/request/detail/' + ${post.requestId}|"
+	             th:onclick="|location.href='/business/request/detail/' + ${post.requestId}|"
 	             style="cursor: pointer;">
 	          <div class="item-left">
 	            <img th:src="${post.thumbnailPath ?: '/image/no-image.png'}" class="mini-thumbnail">
