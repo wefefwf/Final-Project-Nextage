@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nextage.web.mapper.BusinessSettlementMapper">
+
+    <!-- BUSER: 본인 정산 내역 -->
+    <select id="selectSettlementsByBusinessId" resultType="com.nextage.web.domain.SettlementDTO">
+        SELECT
+            bs.settlement_id, bs.business_id, bs.order_id,
+            bs.sales_amount, bs.commission_amount, bs.settlement_amount,
+            bs.settlement_status, bs.created_at,
+            o.order_no, c.nickname AS customer_nickname
+        FROM business_settlement bs
+        JOIN orders o  ON o.order_id    = bs.order_id
+        JOIN customer c ON c.customer_id = o.customer_id
+        WHERE bs.business_id = #{businessId}
+        ORDER BY bs.created_at DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="countSettlementsByBusinessId" resultType="int">
+        SELECT COUNT(*)
+        FROM business_settlement
+        WHERE business_id = #{businessId}
+    </select>
+
+    <!-- BUSER: 이번 달 요약 -->
+    <select id="selectMonthSummaryByBusinessId" resultType="com.nextage.web.domain.SettlementDTO">
+        SELECT
+            SUM(sales_amount)      AS salesAmount,
+            SUM(commission_amount) AS commissionAmount,
+            SUM(settlement_amount) AS settlementAmount
+        FROM business_settlement
+        WHERE business_id = #{businessId}
+          AND YEAR(created_at)  = YEAR(NOW())
+          AND MONTH(created_at) = MONTH(NOW())
+    </select>
+
+    <!-- BADMIN: 업체별 정산 합계 목록 -->
+    <select id="selectBusinessSummaryList" resultType="com.nextage.web.domain.SettlementDTO">
+        SELECT
+            bs.business_id,
+            b.company_name,
+            SUM(bs.sales_amount)      AS salesAmount,
+            SUM(bs.commission_amount) AS commissionAmount,
+            SUM(bs.settlement_amount) AS settlementAmount,
+            COUNT(*)                  AS orderId
+        FROM business_settlement bs
+        JOIN business b ON b.business_id = bs.business_id
+        GROUP BY bs.business_id, b.company_name
+        ORDER BY bs.business_id
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="countBusinessSummaryList" resultType="int">
+        SELECT COUNT(DISTINCT business_id)
+        FROM business_settlement
+    </select>
+
+    <!-- BADMIN: 특정 업체 정산 상세 -->
+    <select id="selectSettlementsByBusinessIdForAdmin" resultType="com.nextage.web.domain.SettlementDTO">
+        SELECT
+            bs.settlement_id, bs.business_id, bs.order_id,
+            bs.sales_amount, bs.commission_amount, bs.settlement_amount,
+            bs.settlement_status, bs.created_at,
+            o.order_no, c.nickname AS customer_nickname,
+            b.company_name
+        FROM business_settlement bs
+        JOIN orders o   ON o.order_id    = bs.order_id
+        JOIN customer c ON c.customer_id = o.customer_id
+        JOIN business b ON b.business_id = bs.business_id
+        WHERE bs.business_id = #{businessId}
+        ORDER BY bs.created_at DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="countSettlementsByBusinessIdForAdmin" resultType="int">
+        SELECT COUNT(*)
+        FROM business_settlement
+        WHERE business_id = #{businessId}
+    </select>
+
+    <!-- BADMIN: 특정 업체 이번 달 요약 -->
+    <select id="selectMonthSummaryByBusinessIdForAdmin" resultType="com.nextage.web.domain.SettlementDTO">
+        SELECT
+            SUM(sales_amount)      AS salesAmount,
+            SUM(commission_amount) AS commissionAmount,
+            SUM(settlement_amount) AS settlementAmount
+        FROM business_settlement
+        WHERE business_id = #{businessId}
+          AND YEAR(created_at)  = YEAR(NOW())
+          AND MONTH(created_at) = MONTH(NOW())
+    </select>
+
+</mapper>

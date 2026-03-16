@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/business-layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>수익/정산 - Nextage</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: 'Pretendard', sans-serif; background: #fafafa; color: #333; }
+        .wrapper { max-width: 900px; margin: 40px auto; padding: 0 20px 80px; }
+        .page-title { font-family: 'Montserrat', sans-serif; font-size: 28px; font-weight: 900; color: #222; margin-bottom: 32px; }
+
+        .settlement-row {
+            background: #fff; border: 1px solid #e8e8e8; border-radius: 12px;
+            padding: 20px 24px; display: flex; align-items: center;
+            gap: 16px; margin-bottom: 10px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        }
+        .settlement-info { flex: 1; min-width: 0; }
+        .settlement-order-no {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 13px; font-weight: 700; color: #7c8cfb; margin-bottom: 4px;
+        }
+        .settlement-customer { font-size: 13px; color: #aaa; }
+        .settlement-date { font-size: 12px; color: #ccc; margin-top: 4px; }
+        .settlement-amount {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 18px; font-weight: 900; color: #222;
+            flex-shrink: 0; text-align: right;
+        }
+        .settlement-amount span { font-size: 12px; color: #aaa; font-weight: 400; }
+
+        .summary-card {
+            background: #fff; border: 1px solid #e8e8e8; border-radius: 16px;
+            padding: 28px 32px; margin-bottom: 32px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .summary-title {
+            font-size: 14px; font-weight: 700; color: #aaa;
+            text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px;
+        }
+        .summary-formula {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 18px; font-weight: 700; color: #333;
+            text-align: center; margin-bottom: 12px;
+        }
+        .summary-total {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 32px; font-weight: 900; text-align: center;
+            background: linear-gradient(135deg, #7c8cfb, #5aa9ff);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .summary-note {
+            font-size: 12px; color: #aaa; text-align: center; margin-top: 12px;
+        }
+
+        .section-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 18px; font-weight: 900; color: #222; margin-bottom: 16px;
+        }
+        .empty-state { text-align: center; padding: 60px 0; color: #ccc; font-size: 14px; }
+        .pagination { display: flex; justify-content: center; gap: 6px; margin-top: 24px; }
+        .page-btn {
+            width: 36px; height: 36px; border-radius: 50%;
+            border: 1.5px solid #e0e0e0; background: #fff;
+            font-size: 13px; font-weight: 600; color: #888;
+            cursor: pointer; transition: all 0.2s;
+            display: flex; align-items: center; justify-content: center;
+            text-decoration: none;
+        }
+        .page-btn:hover { border-color: #7c8cfb; color: #7c8cfb; }
+        .page-btn.active { background: linear-gradient(135deg, #7c8cfb, #5aa9ff); border-color: transparent; color: #fff; }
+        .page-btn.disabled { opacity: 0.35; pointer-events: none; }
+    </style>
+</head>
+<body>
+<th:block layout:fragment="content">
+<div class="wrapper">
+    <h2 class="page-title">수익/정산</h2>
+
+    <!-- 이번 달 요약 -->
+    <div class="summary-card">
+        <div class="summary-title">이번 달 총 판매 금액</div>
+        <div class="summary-formula"
+             th:if="${summary != null and summary.salesAmount > 0}"
+             th:text="${'순수액 ' + #numbers.formatInteger(summary.salesAmount, 3, 'COMMA') + '원 - 수수료 ' + #numbers.formatInteger(summary.commissionAmount, 3, 'COMMA') + '원 = 총'}">
+        </div>
+        <div class="summary-total"
+             th:text="${summary != null ? #numbers.formatInteger(summary.settlementAmount, 3, 'COMMA') + '원' : '0원'}">
+        </div>
+        <div class="summary-note">
+            EX) <span th:text="${#temporals.format(#temporals.createNow(), 'yyyy년 M월')}"></span>
+            4일에 입금 예정입니다.<br>
+            계좌 설정은 → 내 정보수정에 있고<br>
+            수수료 계산에 대한 안내문 및 입금에 대한 사항
+        </div>
+    </div>
+
+    <!-- 정산 내역 리스트 -->
+    <div class="section-title">수익</div>
+
+    <div class="empty-state" th:if="${#lists.isEmpty(settlements)}">
+        정산 내역이 없습니다.
+    </div>
+
+    <div th:each="s : ${settlements}" class="settlement-row">
+        <div class="settlement-info">
+            <div class="settlement-order-no" th:text="${s.orderNo}"></div>
+            <div class="settlement-customer"
+                 th:text="${s.customerNickname} + ' (주문자)'"></div>
+            <div class="settlement-date"
+                 th:text="${#temporals.format(s.createdAt, 'yyyy-MM-dd HH:mm')}"></div>
+        </div>
+        <div class="settlement-amount">
+            <span>정산금액</span><br>
+            <span th:text="${#numbers.formatInteger(s.settlementAmount, 3, 'COMMA') + '원'}"></span>
+        </div>
+    </div>
+
+    <!-- 페이징 -->
+    <div class="pagination" th:if="${totalPages > 1}">
+        <a class="page-btn" th:classappend="${currentPage == 1} ? 'disabled'"
+           th:href="@{/business/settlement(page=${currentPage - 1})}">&lsaquo;</a>
+        <th:block th:each="i : ${#numbers.sequence(1, totalPages)}">
+            <a class="page-btn" th:classappend="${i == currentPage} ? 'active'"
+               th:href="@{/business/settlement(page=${i})}"
+               th:text="${i}">1</a>
+        </th:block>
+        <a class="page-btn" th:classappend="${currentPage == totalPages} ? 'disabled'"
+           th:href="@{/business/settlement(page=${currentPage + 1})}">&rsaquo;</a>
+    </div>
+</div>
+</th:block>
+</body>
+</html>

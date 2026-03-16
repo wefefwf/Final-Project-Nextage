@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/business-layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>수익/정산 관리 - Nextage</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: 'Pretendard', sans-serif; background: #fafafa; color: #333; }
+        .wrapper { max-width: 900px; margin: 40px auto; padding: 0 20px 80px; }
+        .page-title { font-family: 'Montserrat', sans-serif; font-size: 28px; font-weight: 900; color: #222; margin-bottom: 32px; }
+
+        .business-row {
+            background: #fff; border: 1px solid #e8e8e8; border-radius: 12px;
+            padding: 20px 24px; display: flex; align-items: center;
+            gap: 16px; margin-bottom: 10px; cursor: pointer;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+            transition: box-shadow 0.2s;
+            text-decoration: none; color: inherit;
+        }
+        .business-row:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.09); }
+        .business-info { flex: 1; }
+        .business-name { font-size: 15px; font-weight: 700; color: #222; margin-bottom: 4px; }
+        .business-sub { font-size: 13px; color: #aaa; }
+        .business-amount {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 18px; font-weight: 900; color: #222;
+            flex-shrink: 0; text-align: right;
+        }
+        .arrow { font-size: 16px; color: #7c8cfb; flex-shrink: 0; }
+
+        .pagination { display: flex; justify-content: center; gap: 6px; margin-top: 24px; }
+        .page-btn {
+            width: 36px; height: 36px; border-radius: 50%;
+            border: 1.5px solid #e0e0e0; background: #fff;
+            font-size: 13px; font-weight: 600; color: #888;
+            cursor: pointer; transition: all 0.2s;
+            display: flex; align-items: center; justify-content: center;
+            text-decoration: none;
+        }
+        .page-btn:hover { border-color: #7c8cfb; color: #7c8cfb; }
+        .page-btn.active { background: linear-gradient(135deg, #7c8cfb, #5aa9ff); border-color: transparent; color: #fff; }
+        .page-btn.disabled { opacity: 0.35; pointer-events: none; }
+    </style>
+</head>
+<body>
+<th:block layout:fragment="content">
+<div class="wrapper">
+    <h2 class="page-title">수익/정산 관리</h2>
+
+    <div class="empty-state" th:if="${#lists.isEmpty(summaryList)}"
+         style="text-align:center; padding:60px 0; color:#ccc; font-size:14px;">
+        정산 내역이 없습니다.
+    </div>
+
+    <a th:each="s : ${summaryList}"
+       class="business-row"
+       th:href="@{/business/settlement/detail/{id}(id=${s.businessId})}">
+        <div class="business-info">
+            <div class="business-name" th:text="${s.companyName}"></div>
+            <div class="business-sub"
+                 th:text="'누적 정산액: ' + ${#numbers.formatInteger(s.settlementAmount, 3, 'COMMA') + '원'}"></div>
+        </div>
+        <div class="business-amount"
+             th:text="${#numbers.formatInteger(s.salesAmount, 3, 'COMMA') + '원'}"></div>
+        <div class="arrow">&rsaquo;</div>
+    </a>
+
+    <!-- 페이징 -->
+    <div class="pagination" th:if="${totalPages > 1}">
+        <a class="page-btn" th:classappend="${currentPage == 1} ? 'disabled'"
+           th:href="@{/business/settlement(page=${currentPage - 1})}">&lsaquo;</a>
+        <th:block th:each="i : ${#numbers.sequence(1, totalPages)}">
+            <a class="page-btn" th:classappend="${i == currentPage} ? 'active'"
+               th:href="@{/business/settlement(page=${i})}"
+               th:text="${i}">1</a>
+        </th:block>
+        <a class="page-btn" th:classappend="${currentPage == totalPages} ? 'disabled'"
+           th:href="@{/business/settlement(page=${currentPage + 1})}">&rsaquo;</a>
+    </div>
+</div>
+</th:block>
+</body>
+</html>
