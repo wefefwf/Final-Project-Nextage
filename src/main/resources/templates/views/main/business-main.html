@@ -67,46 +67,45 @@
 						<div th:if="${businessId != null and !#lists.isEmpty(pendingOrders)}"
 						     style="width:100%;">
 						    <div th:each="order : ${pendingOrders}"
-						         style="padding:12px 16px; border-bottom:1px solid #f0f0f0;
-						                cursor:pointer; transition:background 0.15s;
-						                display:flex; align-items:center; gap:12px;"
+						         style="padding:16px; cursor:pointer; transition:background 0.15s;"
 						         th:onclick="|location.href='/business/order/history'|"
 						         onmouseover="this.style.background='#f7f7f7'"
 						         onmouseout="this.style.background='#fff'">
 						
-						        <!-- 썸네일 -->
-						        <div style="width:42px; height:42px; border-radius:8px; flex-shrink:0;
-						                    background:linear-gradient(135deg,#f2f6fa,#e8edf3); overflow:hidden;">
-						            <img th:if="${order.items != null and !#lists.isEmpty(order.items) and order.items[0].imageUrl != null}"
+						        <!-- 썸네일 크게 -->
+						        <div style="width:100%; height:120px; border-radius:12px; overflow:hidden;
+						                    background:linear-gradient(135deg,#f2f6fa,#e8edf3);
+						                    margin-bottom:12px;">
+						            <img th:if="${order.items != null and !#lists.isEmpty(order.items)
+						                          and order.items[0].imageUrl != null}"
 						                 th:src="${order.items[0].imageUrl}"
 						                 style="width:100%; height:100%; object-fit:cover;" alt="">
 						        </div>
 						
 						        <!-- 내용 -->
-						        <div style="flex:1; min-width:0;">
-						            <div style="font-size:13px; font-weight:700; color:#222;
-						                        white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"
-						                 th:text="${order.customerNickname} + ' 님의 주문'"></div>
-						            <div style="font-size:11px; color:#aaa; margin-top:2px;
-						                        white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"
-						                 th:text="${order.items != null and !#lists.isEmpty(order.items)}
-						                           ? ${order.items[0].productName} +
-						                             (${#lists.size(order.items)} > 1
-						                              ? ' 외 ' + (${#lists.size(order.items)} - 1) + '건'
-						                              : '')
-						                           : '상품 정보 없음'">
+						        <div style="display:flex; justify-content:space-between; align-items:center;">
+						            <div style="flex:1; min-width:0;">
+						                <div style="font-size:13px; font-weight:700; color:#222;
+						                            white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"
+						                     th:text="${order.customerNickname} + ' 님의 주문'"></div>
+						                <div style="font-size:11px; color:#aaa; margin-top:3px;
+						                            white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"
+						                     th:text="${order.items != null and !#lists.isEmpty(order.items)}
+						                               ? ${order.items[0].productName} +
+						                                 (${#lists.size(order.items)} > 1
+						                                  ? ' 외 ' + (${#lists.size(order.items)} - 1) + '건'
+						                                  : '')
+						                               : '상품 정보 없음'">
+						                </div>
 						            </div>
-						        </div>
-						
-						        <!-- 금액 -->
-						        <div style="font-size:13px; font-weight:800; color:#333; flex-shrink:0;"
-						             th:text="${#numbers.formatInteger(order.totalAmount, 3, 'COMMA')} + '원'">
+						            <div style="font-size:14px; font-weight:800; color:#333;
+						                        flex-shrink:0; margin-left:12px;"
+						                 th:text="${#numbers.formatInteger(order.totalAmount, 3, 'COMMA')} + '원'">
+						            </div>
 						        </div>
 						
 						    </div>
 						</div>
-
-                    </div>
                     <div class="link-wrapper">
                         <a th:href="@{/business/order/history}" class="view-all">전체 보러가기 →</a>
                     </div>

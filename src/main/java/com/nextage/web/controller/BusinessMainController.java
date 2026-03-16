@@ -56,8 +56,8 @@ public class BusinessMainController {
         List<OrderHistoryDTO> pendingOrders = List.of();
         if (businessId != null) {
             pendingOrders = businessOrderHistoryService.getPendingOrders(businessId, role); // ← 소문자
-            if (pendingOrders.size() > 5) {
-                pendingOrders = pendingOrders.subList(0, 5);
+            if (pendingOrders.size() > 1) {
+                pendingOrders = pendingOrders.subList(0, 1);
             }
         }
 
