@@ -57,11 +57,18 @@ public class CustomerRequestController {
         return "redirect:/customer/request/list";
     }
     
-    // 4. 의뢰 상세 보기
+ // 4. 의뢰 상세 보기
     @GetMapping("/detail/{requestId}")
-    public String requestDetail(@PathVariable("requestId") Long requestId, Model model) {
+    public String requestDetail(@PathVariable("requestId") Long requestId,
+                                @AuthenticationPrincipal CustomerUserDetails userDetails,
+                                Model model) {
         RequestDTO request = requestService.getRequestDetail(requestId); 
         model.addAttribute("request", request);
+
+        boolean isOwner = userDetails != null 
+                          && request != null 
+                          && request.getCustomerId().equals(userDetails.getCustomerId());
+        model.addAttribute("isOwner", isOwner);
         
         return "views/request/customer-requestDetail"; 
     }

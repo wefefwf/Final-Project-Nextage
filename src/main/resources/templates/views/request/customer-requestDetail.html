@@ -122,10 +122,10 @@
 
     </div>
 
-    <div class="title-actions" th:if="${request.status == 'OPEN'}">
-      <a class="btn" th:href="@{/customer/request/edit/{id}(id=${request.requestId})}">수정</a>
-      <button class="btn btn-del" onclick="openModal()">삭제</button>
-    </div>
+    <div class="title-actions" th:if="${request.status == 'OPEN' and isOwner}">
+    <a class="btn" th:href="@{/customer/request/edit/{id}(id=${request.requestId})}">수정</a>
+    <button class="btn btn-del" onclick="openModal()">삭제</button>
+</div>
   </div>
 
   <div class="content-layout">
