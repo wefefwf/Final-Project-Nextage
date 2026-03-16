@@ -320,3 +320,35 @@ body {
     background: #000;
     color: #fff;
 }
+/* [3] 달력 - 일정(이벤트) 글자색 및 더보기 수정 */
+
+/* 1. 일정 막대기 내부 글자색 (가장 중요) */
+.fc-event-title, 
+.fc-event-time, 
+.fc-daygrid-event .fc-event-main,
+.fc-daygrid-event-harness a {
+    color: #000000 !important; /* 강제 검정색 */
+    font-weight: 600 !important;
+    text-decoration: none !important;
+}
+
+/* 2. 더보기 (+N개) 링크 - 회색으로 죽어있던거 검정색으로 복구 */
+.fc-daygrid-more-link {
+    color: #000000 !important;
+    text-decoration: none !important;
+    font-weight: 700 !important;
+}
+
+/* 3. 일정에 마우스 올렸을 때도 글자색 유지 */
+.fc-event:hover .fc-event-title,
+.fc-event:hover .fc-event-main {
+    color: #000000 !important;
+}
+
+/* 4. 팝업창(더보기 클릭시) 내부 일정들도 검정색 */
+.fc-popover {
+    z-index: 9999 !important; /* 다른 요소에 가려지지 않게 */
+}
+.fc-popover-body .fc-daygrid-event {
+    color: #000000 !important;
+}
