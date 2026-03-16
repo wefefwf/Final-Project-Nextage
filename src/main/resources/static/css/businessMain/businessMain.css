@@ -31,7 +31,22 @@ h3 { margin-bottom: 20px; font-size: 20px; font-family: sans-serif; }
 .cal-sub { height: 60px; margin-top: 20px; } /* 위 박스와의 간격 20px */
 
 .side-group { width: 40%; display: flex; flex-direction: column; }
-.order-box { height: 240px; }
+.order-box {
+    height: 240px;
+    overflow-y: auto;
+}
+
+.order-box-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    text-align: center;
+    color: #b8b8b8;
+    font-size: 15px;
+    font-weight: 600;
+}
 .notice-box { height: 140px; }
 
 /* 세로 점 3개 간격 */

@@ -34,5 +34,9 @@ public interface BidsMapper {
 
 	void updateBidOrderStatus(@Param("orderNo") String orderNo, @Param("impUid") String impUid,
 			@Param("paymentStatus") String paymentStatus);
+	
+	// 결제 시 주문내역에서 order_items 필요
+	void insertBidOrderItem(@Param("orderId") Long orderId, @Param("totalAmount") int totalAmount);
+	Long selectOrderIdByOrderNo(@Param("orderNo") String orderNo);
 
 }

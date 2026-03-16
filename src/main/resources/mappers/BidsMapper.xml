@@ -123,5 +123,14 @@
 		#{paymentStatus}
 		WHERE order_no = #{orderNo}
 	</update>
+	
+	<!-- 결제 시 주문내역에서 order_items 필요-->
+	<insert id="insertBidOrderItem">
+		INSERT INTO order_items (order_id, kit_id, quantity, price)
+		VALUES (#{orderId}, NULL, 1, #{totalAmount})
+	</insert>
+	<select id="selectOrderIdByOrderNo" resultType="Long">
+		SELECT order_id FROM orders WHERE order_no = #{orderNo}
+	</select>
 
 </mapper>

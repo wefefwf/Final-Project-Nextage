@@ -6,8 +6,11 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+
+import com.nextage.web.domain.OrderHistoryDTO;
 import com.nextage.web.domain.RequestDTO;
 import com.nextage.web.domain.ReviewDTO;
+import com.nextage.web.service.BusinessOrderHistoryService;
 import com.nextage.web.service.BusinessPortfolioService;
 import com.nextage.web.service.CustomerRequestService;
 import com.nextage.web.userDetails.BusinessUserDetails;
@@ -20,38 +23,50 @@ public class BusinessMainController {
 
     @Autowired
     private BusinessPortfolioService pfService;
-    
-    //메인 가기 
+
+    @Autowired
+    private BusinessOrderHistoryService businessOrderHistoryService;
+
     @GetMapping("/business/main")
-    public String main(@AuthenticationPrincipal BusinessUserDetails businessUserDetails,Model model) {
-    	
-    	// 1. 시큐리티에서 로그인한 사장님 정보 꺼내오기
+    public String main(@AuthenticationPrincipal BusinessUserDetails businessUserDetails, Model model) {
+
         Long businessId = null;
         String companyName = "";
-        
+        String role = "BUSER"; // 기본값
+
         if (businessUserDetails != null) {
-            businessId = businessUserDetails.getBusiness().getBusinessId();
+            businessId  = businessUserDetails.getBusiness().getBusinessId();
             companyName = businessUserDetails.getBusiness().getCompanyName();
+            role        = businessUserDetails.getRole(); // ← 추가
         }
-    	
-    	//1. 의뢰글 리스트
+
+        // 1. 의뢰글 리스트
         List<RequestDTO> newPostList = requestService.getAllRequests();
-        // 최신 5개만 잘라서 넘기기
         if (newPostList.size() > 5) {
             newPostList = newPostList.subList(0, 5);
         }
-        
-        //2. 포폴 review리스트
+
+        // 2. 포폴 리스트
         List<ReviewDTO> portfolioList = null;
         if (businessId != null) {
-            // id: 본인ID, size: 8개(슬라이더용), offset: 0, isMine: true
             portfolioList = pfService.getReview(businessId, 8, 0, true);
         }
-        
-        model.addAttribute("businessId", businessId);
-        model.addAttribute("companyName", companyName);
-        model.addAttribute("newPostList", newPostList);
+
+        // 3. 새로 들어온 주문 (최대 5건)
+        List<OrderHistoryDTO> pendingOrders = List.of();
+        if (businessId != null) {
+            pendingOrders = businessOrderHistoryService.getPendingOrders(businessId, role); // ← 소문자
+            if (pendingOrders.size() > 5) {
+                pendingOrders = pendingOrders.subList(0, 5);
+            }
+        }
+
+        model.addAttribute("businessId",    businessId);
+        model.addAttribute("companyName",   companyName);
+        model.addAttribute("newPostList",   newPostList);
         model.addAttribute("portfolioList", portfolioList);
+        model.addAttribute("pendingOrders", pendingOrders);
+
         return "views/main/business-main";
     }
 }
