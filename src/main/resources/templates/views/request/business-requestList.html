@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Nextage | 의뢰 목록</title>
-    <link rel="stylesheet" th:href="@{/css/businessRequest/businessRequestList.css}" />
+    <link rel="stylesheet" th:href="@{/css/businessRequest/business-requestList.css}" />
 </head>
 <body>
 <th:block layout:fragment="content">
@@ -49,7 +49,7 @@
                  th:data-category="${request.categoryName}"
                  th:data-price="${request.hopePrice}"
                  th:data-date="${request.createdAt}"
-                 th:onclick="|location.href='/customer/request/detail/' + ${request.requestId}|">
+                 th:onclick="|location.href='/business/request/detail/' + ${request.requestId}|">
 
                 <img th:src="${request.thumbnailPath ?: '/image/no-image.png'}" class="item-thumbnail">
 

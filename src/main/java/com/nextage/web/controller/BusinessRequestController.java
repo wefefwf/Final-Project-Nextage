@@ -28,7 +28,7 @@ public class BusinessRequestController {
         model.addAttribute("requestList", list);
         model.addAttribute("currentCategory", category);
 
-        return "views/request/businessRequestList";
+        return "views/request/business-requestList";
     }
 
     @GetMapping("/detail/{requestId}")

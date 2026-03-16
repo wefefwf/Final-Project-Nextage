@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/business-layout}">
+<head>
+  <meta charset="UTF-8">
+  <title>Nextage | 의뢰 상세</title>
+  <style>
+    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+    :root {
+      --bg:#f8f8f8; --white:#fff; --border:#ebebeb;
+      --text-1:#1a1a1a; --text-2:#444; --text-3:#888; --text-4:#bbb;
+      --pink:#ff79c6; --pink-bg:rgba(255,121,198,0.08);
+      --green:#34c759; --blue:#007aff; --red:#ff3b30;
+      --r-xl:20px; --r-lg:14px; --r-pill:999px;
+      --ease:cubic-bezier(0.4,0,0.2,1);
+      --spring:cubic-bezier(0.34,1.56,0.64,1);
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{background:var(--bg);font-family:'Pretendard',-apple-system,sans-serif;color:var(--text-1);-webkit-font-smoothing:antialiased}
+    .wrap{max-width:900px;margin:0 auto;padding:48px 20px 100px}
+    .wrap>*{animation:up .5s var(--ease) both}
+    .wrap>*:nth-child(1){animation-delay:.00s}
+    .wrap>*:nth-child(2){animation-delay:.07s}
+    .wrap>*:nth-child(3){animation-delay:.13s}
+    .wrap>*:nth-child(4){animation-delay:.19s}
+    @keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+    .back{display:inline-flex;align-items:center;gap:4px;font-size:.84rem;font-weight:600;color:var(--text-3);text-decoration:none;margin-bottom:22px;transition:color .15s}
+    .back:hover{color:var(--pink)}
+    .title-row{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:20px}
+    .title-left{flex:1;min-width:0}
+    .meta-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+    .badge{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:var(--r-pill);font-size:.68rem;font-weight:700}
+    .bdot{width:5px;height:5px;border-radius:50%}
+    .b-open{background:var(--pink-bg);color:var(--pink)}
+    .b-open .bdot{background:var(--pink);animation:blink 1.4s ease-in-out infinite}
+    .b-selected{background:rgba(52,199,89,.1);color:var(--green)}
+    .b-selected .bdot{background:var(--green)}
+    .b-paid{background:rgba(0,122,255,.1);color:var(--blue)}
+    .b-paid .bdot{background:var(--blue)}
+    .b-done{background:rgba(0,0,0,.05);color:var(--text-3)}
+    .b-done .bdot{background:var(--text-3)}
+    @keyframes blink{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.5)}}
+    .cat{font-size:.7rem;font-weight:700;color:var(--text-4);text-transform:uppercase;letter-spacing:.06em}
+    .req-title{font-size:clamp(1.5rem,3vw,2rem);font-weight:800;letter-spacing:-.05em;line-height:1.2}
+    .req-date{display:flex;align-items:center;gap:4px;font-size:.74rem;color:var(--text-4);margin-top:7px}
+    .tag-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+    .tag{padding:5px 12px;border-radius:var(--r-pill);background:var(--pink-bg);color:var(--pink);font-size:.72rem;font-weight:700;animation:tagpop .35s var(--spring) both}
+    @keyframes tagpop{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:scale(1)}}
+    .title-actions{display:flex;gap:8px;flex-shrink:0;padding-top:2px}
+    .btn{display:inline-flex;align-items:center;gap:6px;padding:10px 18px;border-radius:var(--r-lg);border:1px solid var(--border);background:var(--white);font-size:.82rem;font-weight:700;font-family:inherit;cursor:pointer;transition:all .2s var(--ease);text-decoration:none;color:var(--text-1);white-space:nowrap}
+    .btn:hover{border-color:var(--text-1);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.07)}
+    .btn:active{transform:scale(.97)}
+    .btn-del{color:var(--red);border-color:rgba(255,59,48,.2);background:rgba(255,59,48,.04)}
+    .btn-del:hover{background:var(--red);color:#fff;border-color:var(--red)}
+    .content-layout{display:grid;grid-template-columns:1fr 360px;gap:16px;align-items:start}
+    @media(max-width:680px){.content-layout{grid-template-columns:1fr}}
+    .img-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r-xl);overflow:hidden;aspect-ratio:4/3}
+    .img-card img{width:100%;height:100%;object-fit:cover;display:block}
+    .no-img{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:linear-gradient(135deg,#fce8f5,#ede4ff);color:var(--text-4)}
+    .no-img span{font-size:.8rem;font-weight:500}
+    .side-stack{display:flex;flex-direction:column;gap:12px}
+    .info-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r-xl);padding:24px}
+    .info-card-label{font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-4);margin-bottom:10px}
+    .info-card-text{font-size:.9rem;line-height:1.8;color:var(--text-2);word-break:keep-all}
+    .stat-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r-xl);overflow:hidden}
+    .stat-item{padding:18px 24px;display:flex;align-items:center;justify-content:space-between}
+    .stat-item+.stat-item{border-top:1px solid var(--border)}
+    .stat-item-label{font-size:.72rem;font-weight:700;color:var(--text-3)}
+    .stat-item-val{font-size:1rem;font-weight:800;letter-spacing:-.03em}
+    .stat-item-val.pink{color:var(--pink)}
+    .bid-section{margin-top:48px}
+    .bid-section-title{font-size:1rem;font-weight:800;letter-spacing:-.03em;margin-bottom:20px}
+    .section-divider{border:none;border-top:1px solid var(--border);margin-bottom:20px}
+  </style>
+</head>
+<body>
+<th:block layout:fragment="content">
+<div class="wrap">
+
+  <a href="/business/request/list" class="back">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg>
+    의뢰 목록
+  </a>
+
+  <div class="title-row">
+    <div class="title-left">
+
+      <div class="meta-row">
+        <div class="badge"
+             th:classappend="${request.status == 'OPEN' ? 'b-open' : (request.status == 'SELECTED' ? 'b-selected' : (request.status == 'PAID' ? 'b-paid' : 'b-done'))}">
+          <span class="bdot"></span>
+          <span th:text="${request.status == 'OPEN' ? '의뢰 받는 중' : (request.status == 'SELECTED' ? '낙찰 완료' : (request.status == 'PAID' ? '결제 완료' : '작업 완료'))}">상태</span>
+        </div>
+        <span class="cat" th:text="${request.categoryName}">카테고리</span>
+      </div>
+
+      <div class="req-title" th:text="${request.title}">의뢰 제목</div>
+
+      <div class="req-date">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        <span th:text="${request.createdAt}">작성일</span>
+      </div>
+
+      <div class="tag-row" th:if="${request.tags != null and !#strings.isEmpty(request.tags)}">
+        <span class="tag"
+              th:each="tag,s : ${#strings.arraySplit(request.tags, ',')}"
+              th:text="${#strings.trim(tag)}"
+              th:style="'animation-delay:' + ${s.index * 0.05} + 's'"></span>
+      </div>
+
+    </div>
+    <!-- 업체는 수정/삭제 버튼 없음 -->
+  </div>
+
+  <div class="content-layout">
+
+    <div class="img-card">
+      <img th:if="${request.thumbnailPath != null and !#strings.isEmpty(request.thumbnailPath)}"
+           th:src="${request.thumbnailPath}"
+           alt="의뢰 이미지">
+      <div class="no-img"
+           th:unless="${request.thumbnailPath != null and !#strings.isEmpty(request.thumbnailPath)}">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.25"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+        <span>첨부 이미지 없음</span>
+      </div>
+    </div>
+
+    <div class="side-stack">
+
+      <div class="info-card">
+        <div class="info-card-label">요청사항</div>
+        <p class="info-card-text" th:text="${request.description}">요청사항 내용</p>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-item">
+          <span class="stat-item-label">희망 가격</span>
+          <span class="stat-item-val pink"
+                th:text="${(request.hopePrice != null and request.hopePrice > 0) ? '₩' + #numbers.formatInteger(request.hopePrice, 0, 'COMMA') : '-'}">-</span>
+          <span class="stat-item-label">희망 마감일</span>
+          <span class="stat-item-val"
+                th:text="${(request.requestedDueDate != null and !#strings.isEmpty(request.requestedDueDate)) ? request.requestedDueDate : '-'}">-</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="bid-section">
+    <div class="bid-section-title"></div>
+    <hr class="section-divider">
+    <div th:replace="~{views/request/bid-comments :: bidCommentsFragment}"></div>
+  </div>
+
+</div>
+</th:block>
+</body>
+</html>
