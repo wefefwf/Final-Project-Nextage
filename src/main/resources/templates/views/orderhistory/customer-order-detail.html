@@ -165,51 +165,6 @@
             border-radius: 20px; cursor: pointer; transition: all 0.2s; white-space: nowrap;
         }
         .btn-delete-order:hover { background: #ff6b6b; color: #fff; border-color: #ff6b6b; }
-        .modal-overlay {
-            display: none; position: fixed; inset: 0;
-            background: rgba(0,0,0,0.45); backdrop-filter: blur(4px);
-            z-index: 10000; align-items: center; justify-content: center;
-        }
-        .modal-overlay.show { display: flex; }
-        .modal-box {
-            background: #fff; border-radius: 24px; padding: 36px 32px;
-            width: 440px; max-width: 95vw;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.18);
-            position: relative; animation: slideUp 0.3s ease;
-        }
-        .modal-close {
-            position: absolute; top: 16px; right: 20px;
-            border: none; background: none;
-            font-size: 22px; color: #ccc; cursor: pointer; transition: color 0.2s;
-        }
-        .modal-close:hover { color: #888; }
-        .modal-title {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 20px; font-weight: 900; color: #222; margin-bottom: 4px;
-        }
-        .modal-subtitle { font-size: 13px; color: #aaa; margin-bottom: 20px; }
-        .modal-product-name {
-            font-size: 13px; font-weight: 700; color: #666;
-            background: #f8f5ff; border-radius: 10px;
-            padding: 10px 14px; margin-bottom: 20px;
-        }
-        .review-label { font-size: 13px; color: #aaa; margin-bottom: 8px; }
-        .review-textarea {
-            width: 100%; height: 110px;
-            border: 1.5px solid #ebebeb; border-radius: 12px;
-            padding: 12px 14px; font-size: 14px; resize: none; outline: none;
-            font-family: 'Pretendard', sans-serif; transition: border-color 0.2s; color: #333;
-        }
-        .review-textarea:focus { border-color: #bd93f9; }
-        .btn-submit-review {
-            width: 100%; padding: 16px; margin-top: 16px;
-            font-size: 15px; font-weight: 800; color: #fff;
-            background: linear-gradient(135deg, #bd93f9, #a6c1ee);
-            border: none; border-radius: 14px; cursor: pointer;
-            transition: all 0.3s; box-shadow: 0 4px 16px rgba(189,147,249,0.35);
-        }
-        .btn-submit-review:hover { transform: translateY(-2px); }
-        .review-msg { text-align: center; margin-top: 12px; font-size: 13px; min-height: 20px; }
         @keyframes slideUp {
             from { opacity: 0; transform: translateY(30px); }
             to   { opacity: 1; transform: translateY(0); }
@@ -242,7 +197,6 @@
                 <span class="info-value paid">결제완료</span>
             </div>
 
-            <!-- 개인거래일 때만 업체 수락 상태 표시 -->
             <div class="info-row" th:if="${order.bidId != null}">
                 <span class="info-label">업체 수락 상태</span>
                 <span class="accept-badge accept-pending"
@@ -273,7 +227,6 @@
                       th:text="${#numbers.formatInteger(order.totalAmount, 3, 'COMMA') + '원'}"></span>
             </div>
 
-            <!-- 배송 단계 트래커 -->
             <th:block th:if="${order.deliveryStatus != 9 and order.acceptStatus != 'REJECTED'}">
                 <div class="delivery-tracker">
                     <div th:class="${order.deliveryStatus == 1} ? 'tracker-step current'
@@ -298,7 +251,6 @@
                 </div>
             </th:block>
 
-            <!-- 취소일 때 -->
             <th:block th:if="${order.deliveryStatus == 9 or order.acceptStatus == 'REJECTED'}">
                 <div style="margin-top: 16px;">
                     <span class="delivery-badge delivery-cancel">이 주문은 취소되었습니다.</span>
@@ -324,19 +276,12 @@
                      th:text="${#numbers.formatInteger(item.price * item.quantity, 3, 'COMMA') + '원'}">
                 </div>
 
-                <!-- 후기 버튼: 개인거래 + 배송완료일 때만 -->
+                <!-- 후기 버튼: 개인거래 + 배송완료일 때만 (onclick 없이 버튼만) -->
                 <th:block th:if="${order.bidId != null and order.deliveryStatus == 4}">
                     <button class="btn-reviewed"
-                            th:if="${item.reviewed}"
-                            th:data-order-item-id="${item.orderItemId}"
-                            th:data-product-name="${item.productName}"
-                            onclick="openReviewReadModal(this)">후기 보기</button>
+                            th:if="${item.reviewed}">후기 보기</button>
                     <button class="btn-review"
-                            th:if="${!item.reviewed}"
-                            th:data-order-item-id="${item.orderItemId}"
-                            th:data-business-id="${item.businessId}"
-                            th:data-product-name="${item.productName}"
-                            onclick="openReviewModalFromBtn(this)">후기 작성</button>
+                            th:if="${!item.reviewed}">후기 작성</button>
                 </th:block>
             </div>
 
@@ -346,7 +291,7 @@
                       th:text="${#numbers.formatInteger(order.totalAmount, 3, 'COMMA') + '원'}"></span>
             </div>
 
-            <!-- 채팅보기 버튼: 개인거래이고 채팅방 있을 때만 -->
+            <!-- 채팅보기 버튼 -->
             <div class="action-row" th:if="${order.bidId != null and order.roomId != null}">
                 <a class="btn-chat"
                    th:href="@{/chat(roomId=${order.roomId})}">채팅 보기</a>
@@ -365,184 +310,8 @@
 
     </div>
 
-    <!-- 후기 작성 모달 -->
-    <div class="modal-overlay" id="reviewModalOverlay">
-        <div class="modal-box">
-            <button class="modal-close" onclick="closeReviewModal()">&times;</button>
-            <div class="modal-title">후기 작성</div>
-            <div class="modal-subtitle">서비스는 어떠셨나요?</div>
-            <div class="modal-product-name" id="reviewProductName"></div>
-            <div class="review-label">후기 내용</div>
-            <textarea class="review-textarea" id="reviewContent"
-                      placeholder="서비스에 대한 솔직한 후기를 남겨주세요."></textarea>
-            <button class="btn-submit-review" onclick="submitReview()">후기 등록</button>
-            <div class="review-msg" id="reviewMsg"></div>
-        </div>
-    </div>
-
-    <!-- 후기 보기 모달 -->
-    <div class="modal-overlay" id="reviewReadModalOverlay">
-        <div class="modal-box">
-            <button class="modal-close" onclick="closeReviewReadModal()">&times;</button>
-            <div class="modal-title">내 후기</div>
-            <div class="modal-subtitle">작성한 후기 내용입니다.</div>
-            <div class="modal-product-name" id="readReviewProductName"></div>
-            <div class="review-label">후기 내용</div>
-            <div id="readReviewContent" style="
-                width:100%; min-height:110px;
-                border:1.5px solid #ebebeb; border-radius:12px;
-                padding:12px 14px; font-size:14px;
-                color:#333; background:#fafafa; line-height:1.6;
-                white-space:pre-wrap;">
-            </div>
-            <textarea id="editReviewContent" class="review-textarea"
-                      style="display:none;"
-                      placeholder="후기 내용을 수정해주세요."></textarea>
-            <div id="readReviewDate" style="
-                text-align:right; font-size:12px;
-                color:#bbb; margin-top:10px;">
-            </div>
-            <div style="display:flex; gap:10px; margin-top:16px;">
-                <button id="btnStartEdit" onclick="startEditReview()" style="
-                    flex:1; padding:14px; font-size:14px; font-weight:700; color:#bd93f9;
-                    background:#f8f5ff; border:1.5px solid #bd93f9;
-                    border-radius:14px; cursor:pointer;">수정하기</button>
-                <button id="btnSaveEdit" onclick="saveEditReview()" style="
-                    display:none; flex:1; padding:14px; font-size:14px; font-weight:800; color:#fff;
-                    background:linear-gradient(135deg, #bd93f9, #a6c1ee);
-                    border:none; border-radius:14px; cursor:pointer;">저장</button>
-                <button id="btnCancelEdit" onclick="cancelEditReview()" style="
-                    display:none; flex:1; padding:14px; font-size:14px; font-weight:700; color:#aaa;
-                    background:#f5f5f5; border:none;
-                    border-radius:14px; cursor:pointer;">취소</button>
-            </div>
-            <div id="editReviewMsg" style="
-                text-align:center; margin-top:10px;
-                font-size:13px; min-height:20px;">
-            </div>
-        </div>
-    </div>
-
     <script th:inline="javascript">
     /*<![CDATA[*/
-        var _orderItemId     = null;
-        var _businessId      = null;
-        var _editOrderItemId = null;
-
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('reviewModalOverlay')
-                .addEventListener('click', function(e) {
-                    if (e.target === this) closeReviewModal();
-                });
-            document.getElementById('reviewReadModalOverlay')
-                .addEventListener('click', function(e) {
-                    if (e.target === this) closeReviewReadModal();
-                });
-        });
-
-        function openReviewModalFromBtn(btn) {
-            _orderItemId = btn.dataset.orderItemId;
-            _businessId  = btn.dataset.businessId;
-            document.getElementById('reviewProductName').textContent = btn.dataset.productName;
-            document.getElementById('reviewContent').value           = '';
-            document.getElementById('reviewMsg').textContent         = '';
-            document.getElementById('reviewModalOverlay').classList.add('show');
-        }
-
-        function closeReviewModal() {
-            document.getElementById('reviewModalOverlay').classList.remove('show');
-        }
-
-        function openReviewReadModal(btn) {
-            _editOrderItemId = btn.dataset.orderItemId;
-            var productName  = btn.dataset.productName;
-
-            document.getElementById('readReviewProductName').textContent = productName;
-            document.getElementById('readReviewContent').textContent     = '불러오는 중...';
-            document.getElementById('readReviewDate').textContent        = '';
-            document.getElementById('editReviewMsg').textContent         = '';
-
-            document.getElementById('readReviewContent').style.display = '';
-            document.getElementById('editReviewContent').style.display = 'none';
-            document.getElementById('btnStartEdit').style.display      = '';
-            document.getElementById('btnSaveEdit').style.display       = 'none';
-            document.getElementById('btnCancelEdit').style.display     = 'none';
-
-            document.getElementById('reviewReadModalOverlay').classList.add('show');
-
-            fetch('/customer/order/review/' + _editOrderItemId)
-            .then(function(r) { return r.json(); })
-            .then(function(data) {
-                if (data.success) {
-                    document.getElementById('readReviewContent').textContent = data.content;
-                    document.getElementById('editReviewContent').value       = data.content;
-                    document.getElementById('readReviewDate').textContent
-                        = '작성일: ' + data.createdAt.substring(0, 10);
-                } else {
-                    document.getElementById('readReviewContent').textContent = '후기를 불러올 수 없습니다.';
-                }
-            })
-            .catch(function() {
-                document.getElementById('readReviewContent').textContent = '오류가 발생했습니다.';
-            });
-        }
-
-        function closeReviewReadModal() {
-            document.getElementById('reviewReadModalOverlay').classList.remove('show');
-        }
-
-        function startEditReview() {
-            document.getElementById('readReviewContent').style.display = 'none';
-            document.getElementById('editReviewContent').style.display = '';
-            document.getElementById('btnStartEdit').style.display      = 'none';
-            document.getElementById('btnSaveEdit').style.display       = '';
-            document.getElementById('btnCancelEdit').style.display     = '';
-            document.getElementById('editReviewMsg').textContent       = '';
-        }
-
-        function cancelEditReview() {
-            document.getElementById('readReviewContent').style.display = '';
-            document.getElementById('editReviewContent').style.display = 'none';
-            document.getElementById('btnStartEdit').style.display      = '';
-            document.getElementById('btnSaveEdit').style.display       = 'none';
-            document.getElementById('btnCancelEdit').style.display     = 'none';
-            document.getElementById('editReviewMsg').textContent       = '';
-        }
-
-        function saveEditReview() {
-            var content = document.getElementById('editReviewContent').value.trim();
-            if (!content) {
-                document.getElementById('editReviewMsg').innerHTML =
-                    '<span style="color:#ff6b6b;">내용을 입력해주세요.</span>';
-                return;
-            }
-
-            fetch('/customer/order/review/' + _editOrderItemId, {
-                method : 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body   : JSON.stringify({ content: content })
-            })
-            .then(function(r) { return r.json(); })
-            .then(function(data) {
-                if (data.success) {
-                    document.getElementById('readReviewContent').textContent = content;
-                    document.getElementById('editReviewMsg').innerHTML =
-                        '<span style="color:#6dca8a; font-weight:700;">수정되었습니다!</span>';
-                    setTimeout(function() {
-                        cancelEditReview();
-                        document.getElementById('editReviewMsg').textContent = '';
-                    }, 1000);
-                } else {
-                    document.getElementById('editReviewMsg').innerHTML =
-                        '<span style="color:#ff6b6b;">' + data.message + '</span>';
-                }
-            })
-            .catch(function() {
-                document.getElementById('editReviewMsg').innerHTML =
-                    '<span style="color:#ff6b6b;">오류가 발생했습니다.</span>';
-            });
-        }
-
         function confirmDelete(btn) {
             if (!confirm('이 주문 내역을 삭제하시겠습니까?\n삭제된 내역은 복구되지 않습니다.')) return;
 
@@ -558,43 +327,6 @@
                 }
             })
             .catch(function() { alert('오류가 발생했습니다.'); });
-        }
-
-        function submitReview() {
-            var content = document.getElementById('reviewContent').value.trim();
-            if (!content) {
-                document.getElementById('reviewMsg').innerHTML =
-                    '<span style="color:#ff6b6b;">후기 내용을 입력해주세요.</span>';
-                return;
-            }
-
-            fetch('/customer/order/review', {
-                method : 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body   : JSON.stringify({
-                    orderItemId: _orderItemId,
-                    businessId : _businessId,
-                    content    : content
-                })
-            })
-            .then(function(r) { return r.json(); })
-            .then(function(data) {
-                if (data.success) {
-                    document.getElementById('reviewMsg').innerHTML =
-                        '<span style="color:#6dca8a; font-weight:700;">후기가 등록되었습니다!</span>';
-                    setTimeout(function() {
-                        closeReviewModal();
-                        location.reload();
-                    }, 1200);
-                } else {
-                    document.getElementById('reviewMsg').innerHTML =
-                        '<span style="color:#ff6b6b;">' + data.message + '</span>';
-                }
-            })
-            .catch(function() {
-                document.getElementById('reviewMsg').innerHTML =
-                    '<span style="color:#ff6b6b;">오류가 발생했습니다.</span>';
-            });
         }
     /*]]>*/
     </script>
