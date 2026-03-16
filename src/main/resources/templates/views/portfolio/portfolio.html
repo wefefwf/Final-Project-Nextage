@@ -124,7 +124,8 @@
 		        </th:block>
 		    </div>
 			<!-- 페이지네이샨 -->
-			<div class="pagination-box" th:if="${totalPages > 0}">
+			<!-- 수정 후 -->
+				<div class="pagination-box" th:if="${!#lists.isEmpty(reviewList) and totalPages > 0}">
 			    
 			    <a th:if="${startPage > 0}"
 			       th:href="${isMine} ? @{/business/my-portfolio(page=${startPage - 1})} 

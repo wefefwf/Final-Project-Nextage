@@ -28,10 +28,10 @@ SELECT
     oi.created_at AS startDate,
     req.requested_due_date AS endDate
 FROM review r
-JOIN order_items oi ON r.order_item_id = oi.order_item_id
-JOIN orders o ON oi.order_id = o.order_id
-JOIN bids b ON o.bid_id = b.bid_id
-JOIN request req ON b.request_id = req.request_id
+LEFT JOIN order_items oi ON r.order_item_id = oi.order_item_id
+LEFT JOIN orders o ON oi.order_id = o.order_id
+LEFT JOIN bids b ON o.bid_id = b.bid_id
+LEFT JOIN request req ON b.request_id = req.request_id
 WHERE r.business_id = #{id}
 <if test="!isMine">
     AND r.status = 'ACTIVE'
@@ -40,7 +40,7 @@ ORDER BY r.created_at DESC
 LIMIT #{size}
 OFFSET #{offset}
 </select>
-	
+
 	<!-- career 가져오기 -->
 	<select id="getCareer" parameterType="long" resultType="CareerDTO">
 	    SELECT 
