@@ -29,7 +29,9 @@ public class CustomerRequestController {
 
     // 2. 의뢰 리스트 (카테고리 필터링 포함)
     @GetMapping("/list")
-    public String requestList(@RequestParam(value = "category", required = false) String category, Model model) {
+    public String requestList(@RequestParam(value = "category", required = false) String category,
+                              @AuthenticationPrincipal CustomerUserDetails userDetails,
+                              Model model) {
         List<RequestDTO> list;
         
         if (category != null && !category.isEmpty()) {
@@ -39,25 +41,26 @@ public class CustomerRequestController {
         }
         
         model.addAttribute("requestList", list);
-        model.addAttribute("currentCategory", category); 
+        model.addAttribute("currentCategory", category);
+        
+        // ✅ 관리자 여부 추가
+        boolean isAdmin = userDetails != null && "CADMIN".equals(userDetails.getRole());
+        model.addAttribute("isAdmin", isAdmin);
         
         return "views/request/customer-requestList"; 
     }
 
-    // 3. ✅ 의뢰 등록 (하드코딩 1L 제거 -> 로그인 ID 연동)
+    // 3. ✅ 의뢰 등록
     @PostMapping("/insert")
     public String insertRequest(RequestDTO dto, 
                                 @RequestParam(value = "files", required = false) MultipartFile[] files,
                                 @AuthenticationPrincipal CustomerUserDetails userDetails) {
-        
-        // 로그인한 세션에서 ID를 가져와 직접 세팅합니다.
         dto.setCustomerId(userDetails.getCustomerId()); 
         requestService.registerRequest(dto, files);
-        
         return "redirect:/customer/request/list";
     }
     
- // 4. 의뢰 상세 보기
+    // 4. 의뢰 상세 보기
     @GetMapping("/detail/{requestId}")
     public String requestDetail(@PathVariable("requestId") Long requestId,
                                 @AuthenticationPrincipal CustomerUserDetails userDetails,
@@ -70,54 +73,51 @@ public class CustomerRequestController {
                           && request.getCustomerId().equals(userDetails.getCustomerId());
         model.addAttribute("isOwner", isOwner);
         
+        // ✅ 관리자 여부 추가
+        boolean isAdmin = userDetails != null && "CADMIN".equals(userDetails.getRole());
+        model.addAttribute("isAdmin", isAdmin);
+        
         return "views/request/customer-requestDetail"; 
     }
     
-    // 5. ✅ 수정 폼 (보안 체크: 작성자 본인 확인 로직 추가)
+    // 5. ✅ 수정 폼
     @GetMapping("/edit/{id}")
     public String editForm(@PathVariable("id") Long requestId, 
                            @AuthenticationPrincipal CustomerUserDetails userDetails,
                            Model model) {
-        
         RequestDTO request = requestService.getRequestDetail(requestId);
-        
-        // 작성자가 아니면 리스트로 쫓아냅니다.
         if (request == null || !request.getCustomerId().equals(userDetails.getCustomerId())) {
             return "redirect:/customer/request/list";
         }
-        
         model.addAttribute("request", request);
         return "views/request/customer-requestEdit";
     }
 
-    // 6. ✅ 수정 처리 (보안 체크: 작성자 본인 확인 로직 추가)
+    // 6. ✅ 수정 처리
     @PostMapping("/edit/{id}")
     public String updateRequest(@PathVariable("id") Long requestId,
                                 RequestDTO dto,
                                 @RequestParam(value = "files", required = false) MultipartFile[] files,
                                 @AuthenticationPrincipal CustomerUserDetails userDetails) {
-        
         RequestDTO existingRequest = requestService.getRequestDetail(requestId);
-        
-        // 실제로 DB에 있는 글의 주인과 현재 로그인한 사람이 같을 때만 업데이트 실행
         if (existingRequest != null && existingRequest.getCustomerId().equals(userDetails.getCustomerId())) {
             dto.setRequestId(requestId);
             requestService.updateRequest(dto, files);
         }
-        
         return "redirect:/customer/request/detail/" + requestId;
     }
 
-    // 7. ✅ 의뢰 삭제 (보안 체크: 작성자 본인 확인 로직 추가)
+    // 7. ✅ 의뢰 삭제 (관리자도 삭제 가능하도록 수정)
     @DeleteMapping("/{requestId}")
     @ResponseBody
     public ResponseEntity<String> deleteRequest(@PathVariable("requestId") Long requestId,
                                                 @AuthenticationPrincipal CustomerUserDetails userDetails) {
         try {
             RequestDTO request = requestService.getRequestDetail(requestId);
+            boolean isAdmin = userDetails != null && "CADMIN".equals(userDetails.getRole());
             
-            // 본인 확인 후 삭제 진행
-            if (request != null && request.getCustomerId().equals(userDetails.getCustomerId())) {
+            // ✅ 본인 또는 관리자면 삭제 가능
+            if (request != null && (request.getCustomerId().equals(userDetails.getCustomerId()) || isAdmin)) {
                 requestService.removeRequest(requestId);
                 return ResponseEntity.ok("success");
             } else {
@@ -127,23 +127,18 @@ public class CustomerRequestController {
             e.printStackTrace();
             return ResponseEntity.internalServerError().body("fail");
         }
-        
     }
- // ✅ 8. 의뢰 상태 변경 (본인 확인 포함)
+
+    // 8. ✅ 의뢰 상태 변경
     @PostMapping("/status/{requestId}")
     public String updateStatus(@PathVariable("requestId") Long requestId,
                                @RequestParam("status") String status,
                                @AuthenticationPrincipal CustomerUserDetails userDetails) {
-        
-        // 로그인 정보를 서비스로 넘깁니다.
         try {
             requestService.updateRequestStatus(requestId, status, userDetails.getCustomerId());
         } catch (RuntimeException e) {
-            // 권한이 없는 경우 등에 대한 처리 (예: 리스트로 리다이렉트)
             return "redirect:/customer/request/list";
         }
-        
         return "redirect:/customer/request/detail/" + requestId;
     }
-    
 }

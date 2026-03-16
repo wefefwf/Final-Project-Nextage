@@ -31,7 +31,6 @@
             </div>
             
             <div class="header-right">
-                <!-- ✅ 수정: id, value 추가 + 금액 낮은순 추가 -->
                 <select class="form-select-sm sort-select" id="sortSelect">
                     <option value="latest">최신순</option>
                     <option value="price-high">금액 높은순</option>
@@ -46,7 +45,6 @@
                 <p>등록된 의뢰가 없습니다. 첫 번째 주인공이 되어보세요!</p>
             </div>
 
-            <!-- ✅ 수정: data-price, data-date 속성 추가 -->
             <div class="request-item" th:each="request : ${requestList}" 
                  th:data-category="${request.categoryName}"
                  th:data-price="${request.hopePrice}"
@@ -59,15 +57,15 @@
                     <div class="item-top-row">
                         <div class="item-category" th:text="${request.categoryName}">Category</div>
                         <span class="status-badge" 
-						      th:classappend="${request.status == 'OPEN' ? 'status-open' :
-						                       (request.status == 'PAID' ? 'status-paid' :
-						                       (request.status == 'SELECTED' ? 'status-selected' :
-						                       (request.status == 'COMPLETED' ? 'status-done' : '')))}"
-						      th:text="${request.status == 'OPEN' ? '의뢰중' :
-						                (request.status == 'PAID' ? '결제완료' :
-						                (request.status == 'SELECTED' ? '낙찰완료' :
-						                (request.status == 'COMPLETED' ? '작업완료' : request.status)))}">
-						</span>
+                              th:classappend="${request.status == 'OPEN' ? 'status-open' :
+                                               (request.status == 'PAID' ? 'status-paid' :
+                                               (request.status == 'SELECTED' ? 'status-selected' :
+                                               (request.status == 'COMPLETED' ? 'status-done' : '')))}"
+                              th:text="${request.status == 'OPEN' ? '의뢰중' :
+                                        (request.status == 'PAID' ? '결제완료' :
+                                        (request.status == 'SELECTED' ? '낙찰완료' :
+                                        (request.status == 'COMPLETED' ? '작업완료' : request.status)))}">
+                        </span>
                     </div>
                     
                     <div class="item-title" th:text="${request.title}">의뢰 제목</div>
@@ -80,11 +78,17 @@
                 <div class="item-price">
                     ₩ <span th:text="${#numbers.formatInteger(request.hopePrice, 0, 'COMMA')}">0</span>
                 </div>
+
+                <!-- ✅ 관리자 삭제 버튼 -->
+                <button th:if="${isAdmin}"
+				        th:onclick="|event.stopPropagation(); adminDelete(${request.requestId})|"
+				        style="margin-left:10px; padding:6px 14px; background:#ff3b30; color:#fff; border:none; border-radius:8px; font-weight:700; cursor:pointer;">
+				    삭제
+				</button>
             </div>
         </div>
     </div>
 
-    <!-- ✅ 수정: 필터 + 정렬 통합 스크립트 -->
     <script>
     let currentCategory = 'all';
 
@@ -93,33 +97,27 @@
         const list = document.querySelector('.request-list');
         const items = Array.from(document.querySelectorAll('.request-item'));
 
-        // 카테고리 필터
         items.forEach(item => {
             const itemCategory = item.getAttribute('data-category');
             item.style.display = (currentCategory === 'all' || itemCategory === currentCategory) ? 'flex' : 'none';
         });
 
-        // 보이는 항목 / 숨겨진 항목 분리
         const visibleItems = items.filter(item => item.style.display !== 'none');
         const hiddenItems  = items.filter(item => item.style.display === 'none');
 
-        // 정렬
         visibleItems.sort((a, b) => {
             if (sortValue === 'price-high') {
                 return parseInt(b.getAttribute('data-price')) - parseInt(a.getAttribute('data-price'));
             } else if (sortValue === 'price-low') {
                 return parseInt(a.getAttribute('data-price')) - parseInt(b.getAttribute('data-price'));
             } else {
-                // 최신순
                 return (b.getAttribute('data-date') || '').localeCompare(a.getAttribute('data-date') || '');
             }
         });
 
-        // DOM 재정렬
         [...visibleItems, ...hiddenItems].forEach(item => list.appendChild(item));
     }
 
-    // 카테고리 필터 버튼
     document.querySelectorAll('.filter-btn').forEach(button => {
         button.addEventListener('click', function () {
             document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
@@ -129,8 +127,17 @@
         });
     });
 
-    // 정렬 select
     document.getElementById('sortSelect').addEventListener('change', applyFilterAndSort);
+
+    // ✅ 관리자 삭제 함수
+    function adminDelete(requestId) {
+        if (!confirm('정말 삭제하시겠어요?')) return;
+        fetch('/customer/request/' + requestId, { method: 'DELETE' })
+            .then(r => {
+                if (r.ok) location.reload();
+                else alert('삭제 실패');
+            });
+    }
     </script>
 </th:block>
 </body>

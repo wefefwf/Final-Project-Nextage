@@ -131,9 +131,12 @@ public class CustomerRequestService {
 
     @Transactional
     public void removeRequest(Long requestId) {
-        requestMapper.deleteTagsByRequestId(requestId);
-        requestMapper.deleteAttachmentsByRequestId(requestId);
-        requestMapper.deleteRequest(requestId);
+		/*
+		 * requestMapper.deleteTagsByRequestId(requestId);
+		 * requestMapper.deleteAttachmentsByRequestId(requestId);
+		 * requestMapper.deleteRequest(requestId);
+		 */
+    	requestMapper.updateStatus(requestId, "HIDDEN");
     }
 
     public List<RequestDTO> getUrgentRequests() {

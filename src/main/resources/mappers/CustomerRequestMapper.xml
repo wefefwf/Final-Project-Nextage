@@ -23,7 +23,7 @@
         LEFT JOIN (SELECT * FROM attachment WHERE is_thumbnail = 1 AND ref_type = 'REQ') a
                ON r.request_id = a.ref_id
         LEFT JOIN category c ON r.category_id = c.category_id
-        ORDER BY r.created_at DESC
+        WHERE r.status != 'HIDDEN' ORDER BY r.created_at DESC
     </select>
 
     <select id="selectRequestDetail" resultType="com.nextage.web.domain.RequestDTO">
@@ -49,7 +49,7 @@
         FROM request r
         LEFT JOIN category c ON r.category_id = c.category_id
         WHERE r.customer_id = #{customerId}
-        ORDER BY r.created_at DESC
+          AND r.status != 'HIDDEN' ORDER BY r.created_at DESC
     </select>
 
     <select id="selectRequestsByCategory" parameterType="string" resultType="com.nextage.web.domain.RequestDTO">
@@ -57,7 +57,7 @@
         FROM request r
         LEFT JOIN category c ON r.category_id = c.category_id
         WHERE c.name = #{category}
-        ORDER BY r.created_at DESC
+          AND r.status != 'HIDDEN' ORDER BY r.created_at DESC
     </select>
 
     <update id="updateStatus">
@@ -65,12 +65,12 @@
         WHERE request_id = #{requestId}
     </update>
 
-    <delete id="deleteAttachmentsByRequestId">
-        DELETE FROM attachment WHERE ref_id = #{requestId} AND ref_type = 'REQ'
-    </delete>
-
     <delete id="deleteRequest">
         DELETE FROM request WHERE request_id = #{requestId}
+    </delete>
+
+    <delete id="deleteAttachmentsByRequestId">
+        DELETE FROM attachment WHERE ref_id = #{requestId} AND ref_type = 'REQ'
     </delete>
 
     <delete id="deleteTagsByRequestId">
@@ -100,8 +100,7 @@
         SELECT r.*, c.name AS categoryName
         FROM request r
         LEFT JOIN category c ON r.category_id = c.category_id
-        WHERE r.status = 'OPEN'
-        ORDER BY r.created_at DESC
+        WHERE r.status = 'OPEN' ORDER BY r.created_at DESC
         LIMIT 5
     </select>
 

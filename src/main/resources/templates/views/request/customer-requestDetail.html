@@ -98,7 +98,6 @@
     <div class="title-left">
 
       <div class="meta-row">
-        <!-- ✅ 수정: 4단계 status 반영 -->
         <div class="badge"
              th:classappend="${request.status == 'OPEN' ? 'b-open' :
                               (request.status == 'PAID' ? 'b-paid' :
@@ -129,10 +128,14 @@
 
     </div>
 
-    <div class="title-actions" th:if="${request.status == 'OPEN' and isOwner}">
-    <a class="btn" th:href="@{/customer/request/edit/{id}(id=${request.requestId})}">수정</a>
-    <button class="btn btn-del" onclick="openModal()">삭제</button>
-</div>
+    <div class="title-actions" th:if="${request.status == 'OPEN' and isOwner and !isAdmin}">
+        <a class="btn" th:href="@{/customer/request/edit/{id}(id=${request.requestId})}">수정</a>
+        <button class="btn btn-del" onclick="openModal()">삭제</button>
+    </div>
+    <div class="title-actions" th:if="${isAdmin}">
+        <button class="btn btn-del" onclick="openModal()">삭제</button>
+    </div>
+
   </div>
 
   <div class="content-layout">
@@ -158,12 +161,11 @@
       <div class="stat-card">
         <div class="stat-item">
           <span class="stat-item-label">희망 가격</span>
-<span class="stat-item-val pink"
-      th:text="${(request.hopePrice != null and request.hopePrice > 0) ? '₩' + #numbers.formatInteger(request.hopePrice, 0, 'COMMA') : '-'}">-</span>
-
-<span class="stat-item-label">희망 마감일</span>
-<span class="stat-item-val"
-      th:text="${(request.requestedDueDate != null and !#strings.isEmpty(request.requestedDueDate)) ? request.requestedDueDate : '-'}">-</span>
+          <span class="stat-item-val pink"
+                th:text="${(request.hopePrice != null and request.hopePrice > 0) ? '₩' + #numbers.formatInteger(request.hopePrice, 0, 'COMMA') : '-'}">-</span>
+          <span class="stat-item-label">희망 마감일</span>
+          <span class="stat-item-val"
+                th:text="${(request.requestedDueDate != null and !#strings.isEmpty(request.requestedDueDate)) ? request.requestedDueDate : '-'}">-</span>
         </div>
       </div>
 
@@ -178,7 +180,6 @@
 
 </div>
 
-<!-- 삭제 모달: wrap 밖, th:block 안 — 인라인 스타일로 CSS 의존 제거 -->
 <div id="overlay" onclick="bgClick(event)"
      style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.35);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);align-items:center;justify-content:center;">
   <div style="background:#fff;border-radius:20px;padding:36px 30px 28px;text-align:center;max-width:320px;width:92%;box-shadow:0 24px 60px rgba(0,0,0,.2);">
@@ -190,7 +191,7 @@
       </svg>
     </div>
     <h3 style="font-size:1rem;font-weight:800;margin-bottom:6px;letter-spacing:-.04em;">의뢰를 삭제할까요?</h3>
-    <p style="font-size:.83rem;color:#888;line-height:1.6;margin-bottom:22px;">삭제하면 복구할 수 없어요.<br>정말 삭제하시겠어요?</p>
+    <p style="font-size:.83rem;color:#888;line-height:1.6;margin-bottom:22px;">삭제된 의뢰는 목록에서 더 이상 보이지 않아요.<br>정말 삭제하시겠어요?</p>
     <div style="display:flex;gap:8px;">
       <button onclick="closeModal()"
               style="flex:1;padding:13px;border-radius:14px;border:1px solid #ebebeb;background:#f8f8f8;font-size:.88rem;font-weight:700;font-family:inherit;cursor:pointer;">취소</button>
@@ -216,19 +217,20 @@
   }
 
   function confirmDelete() {
-    fetch('/customer/request/' + REQUEST_ID, { method: 'DELETE' })
-      .then(function(r) {
-        if (r.ok) {
-          window.location.href = '/customer/request/list';
-        } else {
-          alert('\uC0AD\uC81C \uC2E4\uD328 (\uC0C1\uD0DC\uCF54\uB4DC: ' + r.status + ')');
-        }
-      })
-      .catch(function(err) {
-        console.error(err);
-        alert('\uB124\uD2B8\uC6CC\uD06C \uC624\uB958\uAC00 \uBC1C\uC0DD\uD588\uC5B4\uC694.');
-      });
-  }
+	    fetch('/customer/request/' + REQUEST_ID, { method: 'DELETE' }) // 컨트롤러의 @DeleteMapping 호출
+	      .then(function(r) {
+	        if (r.ok) {
+	          // ✅ 삭제(숨김) 성공 시 다시 목록으로 보냅니다.
+	          window.location.href = '/customer/request/list';
+	        } else {
+	          alert('삭제 처리에 실패했습니다.');
+	        }
+	      })
+	      .catch(function(err) {
+	        console.error(err);
+	        alert('네트워크 오류가 발생했습니다.');
+	      });
+	  }
 /*]]>*/
 </script>
 </th:block>
