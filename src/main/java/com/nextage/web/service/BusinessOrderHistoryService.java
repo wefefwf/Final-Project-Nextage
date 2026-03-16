@@ -4,6 +4,8 @@ import com.nextage.web.domain.OrderHistoryDTO;
 import com.nextage.web.domain.OrderSearchDTO;
 import com.nextage.web.domain.ScheduleOrderDTO;
 import com.nextage.web.mapper.BusinessOrderHistoryMapper;
+import com.nextage.web.mapper.CustomerRequestMapper;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -16,6 +18,7 @@ import java.util.List;
 public class BusinessOrderHistoryService {
     private final BusinessOrderHistoryMapper mapper;
     private static final int PAGE_SIZE = 6;
+    private final CustomerRequestMapper requestMapper;
 
     @Transactional(readOnly = true)
     public List<OrderHistoryDTO> getPendingOrders(Long businessId, String role) {
@@ -53,31 +56,33 @@ public class BusinessOrderHistoryService {
         return (int) Math.ceil((double) total / PAGE_SIZE);
     }
 
+    // 수정
     @Transactional
     public void acceptOrder(Long orderId) {
-        // 1. 수락 상태 변경
         mapper.updateAcceptStatus(orderId, "ACCEPTED");
         log.info("주문 수락 - orderId: {}", orderId);
 
-        // 2. 주문 정보 조회 (bid_id, customer_id, business_id 필요)
         OrderHistoryDTO order = mapper.selectOrderDetail(orderId);
 
-        // 3. 채팅방이 없을 때만 생성
-        if (order.getBidId() != null && order.getRoomId() == null) {
-            mapper.insertChatRoom(
-                order.getBidId(),
-                order.getCustomerId(),
-                order.getBusinessId()
-            );
-            // 4. 생성된 채팅방 ID 조회
-            Long roomId = mapper.selectRoomIdByBidId(
-                order.getBidId(),
-                order.getCustomerId(),
-                order.getBusinessId()
-            );
-            // 5. chat_function 초기화
-            mapper.insertChatFunction(roomId, order.getBusinessId(), order.getCustomerId());
-            log.info("채팅방 생성 - roomId: {}, bidId: {}", roomId, order.getBidId());
+        if (order.getBidId() != null) {
+            // request status → SELECTED
+            Long requestId = mapper.selectRequestIdByBidId(order.getBidId());
+            requestMapper.updateStatus(requestId, "SELECTED");
+
+            if (order.getRoomId() == null) {
+                mapper.insertChatRoom(
+                    order.getBidId(),
+                    order.getCustomerId(),
+                    order.getBusinessId()
+                );
+                Long roomId = mapper.selectRoomIdByBidId(
+                    order.getBidId(),
+                    order.getCustomerId(),
+                    order.getBusinessId()
+                );
+                mapper.insertChatFunction(roomId, order.getBusinessId(), order.getCustomerId());
+                log.info("채팅방 생성 - roomId: {}, bidId: {}", roomId, order.getBidId());
+            }
         }
     }
 
@@ -85,6 +90,13 @@ public class BusinessOrderHistoryService {
     public void rejectOrder(Long orderId) {
         mapper.updateAcceptStatus(orderId, "REJECTED");
         log.info("주문 거절 - orderId: {}", orderId);
+
+        OrderHistoryDTO order = mapper.selectOrderDetail(orderId);
+        if (order.getBidId() != null) {
+            // request status → OPEN으로 복구
+            Long requestId = mapper.selectRequestIdByBidId(order.getBidId());
+            requestMapper.updateStatus(requestId, "OPEN");
+        }
     }
 
     @Transactional

@@ -65,4 +65,6 @@ public interface BusinessOrderHistoryMapper {
                             @Param("customerId") Long customerId);
     
     List<ScheduleOrderDTO> selectScheduleOrders(@Param("businessId") Long businessId);
+    
+    Long selectRequestIdByBidId(@Param("bidId") Long bidId);
 }
