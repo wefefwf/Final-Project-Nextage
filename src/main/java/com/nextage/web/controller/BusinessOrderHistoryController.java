@@ -30,6 +30,8 @@ public class BusinessOrderHistoryController {
             @AuthenticationPrincipal BusinessUserDetails userDetails,
             Model model) {
 
+    	if (userDetails == null) return "redirect:/business/login";
+    	
         Long businessId = userDetails.getBusinessId();
         String role     = userDetails.getRole();
 

@@ -346,12 +346,6 @@
             </th:block>
 
             <!-- 취소일 때 -->
-            <th:block th:if="${order.deliveryStatus != 9 and order.acceptStatus != 'REJECTED'}">
-			    <div class="delivery-tracker">
-			        ...
-			    </div>
-			</th:block>
-			
 			<th:block th:if="${order.deliveryStatus == 9 or order.acceptStatus == 'REJECTED'}">
 			    <div style="margin-top: 16px;">
 			        <span class="delivery-badge delivery-cancel">이 주문은 취소되었습니다.</span>
@@ -494,8 +488,9 @@
 
     <script th:inline="javascript">
 	/*<![CDATA[*/
-	    var _orderItemId = null;
-	    var _businessId  = null;
+	    var _orderItemId     = null;
+	    var _businessId      = null;
+	    var _editOrderItemId = null;
 	
 	    document.addEventListener('DOMContentLoaded', function() {
 	        document.getElementById('reviewModalOverlay')
@@ -522,19 +517,29 @@
 	    }
 	
 	    function openReviewReadModal(btn) {
-	        var orderItemId = btn.dataset.orderItemId;
-	        var productName = btn.dataset.productName;
+	        _editOrderItemId = btn.dataset.orderItemId;
+	        var productName  = btn.dataset.productName;
 	
 	        document.getElementById('readReviewProductName').textContent = productName;
 	        document.getElementById('readReviewContent').textContent     = '불러오는 중...';
 	        document.getElementById('readReviewDate').textContent        = '';
+	        document.getElementById('editReviewMsg').textContent         = '';
+	
+	        // 보기 모드로 초기화
+	        document.getElementById('readReviewContent').style.display = '';
+	        document.getElementById('editReviewContent').style.display = 'none';
+	        document.getElementById('btnStartEdit').style.display      = '';
+	        document.getElementById('btnSaveEdit').style.display       = 'none';
+	        document.getElementById('btnCancelEdit').style.display     = 'none';
+	
 	        document.getElementById('reviewReadModalOverlay').classList.add('show');
 	
-	        fetch('/customer/order/review/' + orderItemId)
+	        fetch('/customer/order/review/' + _editOrderItemId)
 	        .then(function(r) { return r.json(); })
 	        .then(function(data) {
 	            if (data.success) {
 	                document.getElementById('readReviewContent').textContent = data.content;
+	                document.getElementById('editReviewContent').value       = data.content;
 	                document.getElementById('readReviewDate').textContent
 	                    = '작성일: ' + data.createdAt.substring(0, 10);
 	            } else {
@@ -548,6 +553,58 @@
 	
 	    function closeReviewReadModal() {
 	        document.getElementById('reviewReadModalOverlay').classList.remove('show');
+	    }
+	
+	    function startEditReview() {
+	        document.getElementById('readReviewContent').style.display = 'none';
+	        document.getElementById('editReviewContent').style.display = '';
+	        document.getElementById('btnStartEdit').style.display      = 'none';
+	        document.getElementById('btnSaveEdit').style.display       = '';
+	        document.getElementById('btnCancelEdit').style.display     = '';
+	        document.getElementById('editReviewMsg').textContent       = '';
+	    }
+	
+	    function cancelEditReview() {
+	        document.getElementById('readReviewContent').style.display = '';
+	        document.getElementById('editReviewContent').style.display = 'none';
+	        document.getElementById('btnStartEdit').style.display      = '';
+	        document.getElementById('btnSaveEdit').style.display       = 'none';
+	        document.getElementById('btnCancelEdit').style.display     = 'none';
+	        document.getElementById('editReviewMsg').textContent       = '';
+	    }
+	
+	    function saveEditReview() {
+	        var content = document.getElementById('editReviewContent').value.trim();
+	        if (!content) {
+	            document.getElementById('editReviewMsg').innerHTML =
+	                '<span style="color:#ff6b6b;">내용을 입력해주세요.</span>';
+	            return;
+	        }
+	
+	        fetch('/customer/order/review/' + _editOrderItemId, {
+	            method : 'PUT',
+	            headers: { 'Content-Type': 'application/json' },
+	            body   : JSON.stringify({ content: content })
+	        })
+	        .then(function(r) { return r.json(); })
+	        .then(function(data) {
+	            if (data.success) {
+	                document.getElementById('readReviewContent').textContent = content;
+	                document.getElementById('editReviewMsg').innerHTML =
+	                    '<span style="color:#6dca8a; font-weight:700;">수정되었습니다!</span>';
+	                setTimeout(function() {
+	                    cancelEditReview();
+	                    document.getElementById('editReviewMsg').textContent = '';
+	                }, 1000);
+	            } else {
+	                document.getElementById('editReviewMsg').innerHTML =
+	                    '<span style="color:#ff6b6b;">' + data.message + '</span>';
+	            }
+	        })
+	        .catch(function() {
+	            document.getElementById('editReviewMsg').innerHTML =
+	                '<span style="color:#ff6b6b;">오류가 발생했습니다.</span>';
+	        });
 	    }
 	
 	    function confirmDelete(btn) {
@@ -603,101 +660,8 @@
 	                '<span style="color:#ff6b6b;">오류가 발생했습니다.</span>';
 	        });
 	    }
-	    
-	    var _editOrderItemId = null;
-
-	    function openReviewReadModal(btn) {
-	        _editOrderItemId = btn.dataset.orderItemId;
-	        var productName  = btn.dataset.productName;
-
-	        document.getElementById('readReviewProductName').textContent = productName;
-	        document.getElementById('readReviewContent').textContent     = '불러오는 중...';
-	        document.getElementById('readReviewDate').textContent        = '';
-	        document.getElementById('editReviewMsg').textContent         = '';
-
-	        // 보기 모드로 초기화
-	        document.getElementById('readReviewContent').style.display  = '';
-	        document.getElementById('editReviewContent').style.display  = 'none';
-	        document.getElementById('btnStartEdit').style.display       = '';
-	        document.getElementById('btnSaveEdit').style.display        = 'none';
-	        document.getElementById('btnCancelEdit').style.display      = 'none';
-
-	        document.getElementById('reviewReadModalOverlay').classList.add('show');
-
-	        fetch('/customer/order/review/' + _editOrderItemId)
-	        .then(function(r) { return r.json(); })
-	        .then(function(data) {
-	            if (data.success) {
-	                document.getElementById('readReviewContent').textContent = data.content;
-	                document.getElementById('editReviewContent').value       = data.content;
-	                document.getElementById('readReviewDate').textContent
-	                    = '작성일: ' + data.createdAt.substring(0, 10);
-	            } else {
-	                document.getElementById('readReviewContent').textContent = '후기를 불러올 수 없습니다.';
-	            }
-	        })
-	        .catch(function() {
-	            document.getElementById('readReviewContent').textContent = '오류가 발생했습니다.';
-	        });
-	    }
-
-	    function startEditReview() {
-	        document.getElementById('readReviewContent').style.display  = 'none';
-	        document.getElementById('editReviewContent').style.display  = '';
-	        document.getElementById('btnStartEdit').style.display       = 'none';
-	        document.getElementById('btnSaveEdit').style.display        = '';
-	        document.getElementById('btnCancelEdit').style.display      = '';
-	        document.getElementById('editReviewMsg').textContent        = '';
-	    }
-
-	    function cancelEditReview() {
-	        document.getElementById('readReviewContent').style.display  = '';
-	        document.getElementById('editReviewContent').style.display  = 'none';
-	        document.getElementById('btnStartEdit').style.display       = '';
-	        document.getElementById('btnSaveEdit').style.display        = 'none';
-	        document.getElementById('btnCancelEdit').style.display      = 'none';
-	        document.getElementById('editReviewMsg').textContent        = '';
-	    }
-
-	    function saveEditReview() {
-	        var content = document.getElementById('editReviewContent').value.trim();
-	        if (!content) {
-	            document.getElementById('editReviewMsg').innerHTML =
-	                '<span style="color:#ff6b6b;">내용을 입력해주세요.</span>';
-	            return;
-	        }
-
-	        fetch('/customer/order/review/' + _editOrderItemId, {
-	            method : 'PUT',
-	            headers: { 'Content-Type': 'application/json' },
-	            body   : JSON.stringify({ content: content })
-	        })
-	        .then(function(r) { return r.json(); })
-	        .then(function(data) {
-	            if (data.success) {
-	                document.getElementById('readReviewContent').textContent = content;
-	                document.getElementById('editReviewMsg').innerHTML =
-	                    '<span style="color:#6dca8a; font-weight:700;">수정되었습니다!</span>';
-	                setTimeout(function() {
-	                    cancelEditReview();
-	                    document.getElementById('editReviewMsg').textContent = '';
-	                }, 1000);
-	            } else {
-	                document.getElementById('editReviewMsg').innerHTML =
-	                    '<span style="color:#ff6b6b;">' + data.message + '</span>';
-	            }
-	        })
-	        .catch(function() {
-	            document.getElementById('editReviewMsg').innerHTML =
-	                '<span style="color:#ff6b6b;">오류가 발생했습니다.</span>';
-	        });
-	    }
-
-	    function closeReviewReadModal() {
-	        document.getElementById('reviewReadModalOverlay').classList.remove('show');
-	    }
 	/*]]>*/
-</script>
+	</script>
 
 </th:block>
 </body>
