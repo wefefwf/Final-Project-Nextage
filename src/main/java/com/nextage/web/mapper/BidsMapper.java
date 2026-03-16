@@ -24,6 +24,15 @@ public interface BidsMapper {
 
 	Integer selectLowestBidPriceByRequestId(Long requestId);
 
-	int countActiveBidByRequestIdAndBusinessId(@Param("requestId") Long requestId, @Param("businessId") Long businessId);
+	int countActiveBidByRequestIdAndBusinessId(@Param("requestId") Long requestId,
+			@Param("businessId") Long businessId);
+
+	void insertBidOrder(@Param("orderNo") String orderNo, @Param("customerId") Long customerId,
+			@Param("businessId") Long businessId, @Param("bidId") Long bidId, @Param("totalAmount") int totalAmount);
+
+	Integer selectTotalAmountByOrderNo(@Param("orderNo") String orderNo);
+
+	void updateBidOrderStatus(@Param("orderNo") String orderNo, @Param("impUid") String impUid,
+			@Param("paymentStatus") String paymentStatus);
 
 }

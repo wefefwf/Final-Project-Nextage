@@ -117,5 +117,11 @@
         INSERT INTO request_tag (request_id, tag_name)
         VALUES (#{requestId}, #{tagName})
     </insert>
+    
+    <update id="updateDimensions">
+		UPDATE request
+		   SET dimensions = #{dimensions}
+		 WHERE request_id = #{requestId}
+	</update>
 
 </mapper>

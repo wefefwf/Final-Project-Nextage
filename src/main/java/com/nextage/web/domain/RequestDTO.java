@@ -15,7 +15,8 @@ public class RequestDTO {
     private String status;           
     private String createdAt;
     private String updatedAt;
-
+    private String dimensions;	//치수
+    
     // Join을 통해 가져올 추가 정보 (화면 표시용)
     private String categoryName;     // 카테고리 ID 대신 "2D Reform" 출력용
     private String customerNickname; // 작성자 이름 출력용

@@ -8,6 +8,7 @@ import java.util.List;
 
 @Mapper
 public interface CustomerRequestMapper {
+	
     // 1. 의뢰 등록 (ID 자동 생성을 위해 사용)
     void insertRequest(RequestDTO requestDto);
     
@@ -38,6 +39,9 @@ public interface CustomerRequestMapper {
     
     // 의뢰 등록 시 태그를 하나씩 저장하는 메서드
     void insertTag(@Param("requestId") Long requestId, @Param("tagName") String tagName);
+    
+    // 유저: 업체 선정 결제 후 치수 정보 저장
+    void updateDimensions(@Param("requestId") Long requestId, @Param("dimensions") String dimensions);
     
     // ===========================================================
     // [메인 페이지 트렌드 박스용 추가 메서드]

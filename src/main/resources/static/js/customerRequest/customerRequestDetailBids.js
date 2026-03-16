@@ -22,7 +22,7 @@ let currentRequestStatus = '';
     if (document.getElementById('bid-toast-root')) return;
     const root = document.createElement('div');
     root.id = 'bid-toast-root';
-    root.style.cssText = 'position:fixed;bottom:28px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;z-index:99999;pointer-events:none';
+    root.style.cssText = 'position:fixed;top:10%;left:50%;transform:translateX(-50%);...';
     document.body.appendChild(root);
 })();
 
@@ -30,6 +30,7 @@ function showToast(type, msg, duration) {
     duration = duration || 3400;
     const root = document.getElementById('bid-toast-root');
     if (!root) return;
+	if ([...root.querySelectorAll('.bid-toast-msg')].some(el => el.textContent === msg)) return;
     const icons = { success: '✔', error: '✕', warn: '!' };
     const classes = { success: 'bid-toast-success', error: 'bid-toast-error', warn: 'bid-toast-warn' };
     const el = document.createElement('div');
@@ -414,7 +415,7 @@ function syncCompareButton() {
 function handleBidCheckboxChange(checkbox, bidId) {
     if (checkbox.checked) {
         if (selectedBidIds.size >= 3) {
-            alert('업체 비교는 최대 3개까지 가능합니다.');
+            showToast('warn', '업체 비교는 최대 3개까지 가능합니다.');
             checkbox.checked = false;
             return;
         }
@@ -450,54 +451,57 @@ function applyStatusPriority(data) {
 
 /* ── 비교 모달 ── */
 function openCompareModal() {
-    const modal = document.getElementById('compare-modal');
-    const body = document.getElementById('compare-modal-body');
+	const modal = document.getElementById('compare-modal');
+	const body  = document.getElementById('compare-modal-body');
 
-    const selectedBids = currentBidData.filter(bid => selectedBidIds.has(bid.bidId));
+	const selectedBids = currentBidData.filter(bid => selectedBidIds.has(bid.bidId));
+	if (selectedBids.length < 2) {
+		showToast('warn', '비교하려면 최소 2개를 선택해주세요.');
+		return;
+	}
 
-    if (selectedBids.length < 2) {
-        alert('비교하려면 최소 2개를 선택해주세요.');
-        return;
-    }
+	const minPrice = Math.min(...selectedBids.map(b => b.price));
 
-    const columnsHtml = selectedBids.map(bid => `
-        <div class="compare-column">
-            <div class="compare-vendor-name">전문가 #${bid.businessId}</div>
-            <div class="compare-item">
-                <span class="compare-label">제안일</span>
-                <span class="compare-value">${formatDate(bid.createdAt)}</span>
-            </div>
-            <div class="compare-item">
-                <span class="compare-label">가격</span>
-                <span class="compare-value">₩ ${formatPrice(bid.price)}</span>
-            </div>
-            <div class="compare-item">
-                <span class="compare-label">예상 완료일</span>
-                <span class="compare-value">${bid.expectedDueDate || '-'}</span>
-            </div>
-            <div class="compare-item">
-                <span class="compare-label">A/S 여부</span>
-                <span class="compare-value">${bid.asAvailable ? '가능' : '불가'}</span>
-            </div>
-            <div class="compare-item compare-item-description">
-                <span class="compare-label">설명</span>
-                <span class="compare-value">${bid.description || '-'}</span>
-            </div>
-            <div class="compare-item">
-                <span class="compare-label">상태</span>
-                <span class="compare-value">${getStatusText(bid.status)}</span>
-            </div>
-        </div>
-    `).join('');
+	const vendorHeaders = selectedBids.map(bid => {
+		const isBest = bid.price === minPrice;
+		return `
+			<th class="cmp-th ${isBest ? 'cmp-th-best' : ''}">
+				${isBest ? '<span class="cmp-best-badge">👑 최저가</span>' : ''}
+				<span class="cmp-vendor">전문가 #${bid.businessId}</span>
+			</th>`;
+	}).join('');
 
-    body.innerHTML = `
-        <div class="compare-grid compare-grid-${selectedBids.length}">
-            ${columnsHtml}
-        </div>
-    `;
+	const rows = [
+		{ label: '제안일',	 fn: b => formatDate(b.createdAt) },
+		{ label: '가격',	   fn: b => `<span class="${b.price === minPrice ? 'cmp-price-best' : 'cmp-price'}">₩ ${formatPrice(b.price)}</span>` },
+		{ label: '예상 완료일', fn: b => b.expectedDueDate || '-' },
+		{ label: 'A/S',	   fn: b => b.asAvailable
+			? '<span class="cmp-badge-yes">✔ 가능</span>'
+			: '<span class="cmp-badge-no">✖ 불가</span>' },
+		{ label: '설명',	   fn: b => `<span class="cmp-desc">${b.description || '-'}</span>` },
+		{ label: '상태',	   fn: b => getStatusText(b.status) },
+	].map(row => `
+		<tr>
+			<td class="cmp-label-cell">${row.label}</td>
+			${selectedBids.map(bid => `<td class="cmp-td ${bid.price === minPrice ? 'cmp-td-best' : ''}">${row.fn(bid)}</td>`).join('')}
+		</tr>`
+	).join('');
 
-    modal.classList.remove('hidden');
-    document.body.classList.add('modal-open');
+	body.innerHTML = `
+		<div class="cmp-wrap">
+			<table class="cmp-table">
+				<thead>
+					<tr>
+						<th class="cmp-label-cell cmp-th-label"></th>
+						${vendorHeaders}
+					</tr>
+				</thead>
+				<tbody>${rows}</tbody>
+			</table>
+		</div>`;
+
+	modal.classList.remove('hidden');
+	document.body.classList.add('modal-open');
 }
 
 function closeCompareModal() {
@@ -587,17 +591,19 @@ function updateSelectStepUI() {
 }
 
 function goNextSelectStep() {
-    if (currentSelectStep === 1) {
-        const size = document.getElementById('select-modal-size').value.trim();
-        if (!size) {
-            alert('치수를 입력해주세요.');
-            return;
-        }
-        currentSelectStep = 2;
-        updateSelectStepUI();
-        loadSelectInfo();
-        return;
-    }
+	if (currentSelectStep === 1) {
+		const size = document.getElementById('select-modal-size');
+		if (!size.value.trim()) {
+			size.classList.add('error');
+			document.getElementById('err-select-size').classList.add('visible');
+			return;
+		}
+		size.classList.remove('error');
+		document.getElementById('err-select-size').classList.remove('visible');
+		currentSelectStep = 2;
+		updateSelectStepUI();
+		loadSelectInfo();
+	}
 }
 
 function goPrevSelectStep() {
@@ -671,7 +677,7 @@ function fillSelectConfirm(info) {
 function submitSelectBid() {
     const agreeChecked = document.getElementById('select-modal-agree').checked;
     if (!agreeChecked) {
-        alert('결제 동의가 필요합니다.');
+        document.getElementById('err-select-agree').classList.add('visible');
         return;
     }
 
@@ -689,10 +695,93 @@ function submitSelectBid() {
     }
 
     // 결제 API
-    alert('결제 API 연결 전입니다.\n결제 성공 시 치수 저장 + 선정이 처리됩니다.');
+	const submitBtn = document.getElementById('btn-submit-select-bid');
+	submitBtn.disabled = true;
+	submitBtn.textContent = '처리 중...';
 
-    // TODO: 결제 API 연동 후 성공 콜백에서 호출
-    // confirmSelectBid(size);
+	// 1단계: 주문 사전 생성
+	fetch('/api/bids/payment/create', {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({
+			bidId	  : currentSelectedBid.bidId,
+			totalAmount: currentSelectedBid.price
+		})
+	})
+	.then(res => res.json())
+	.then(data => {
+		if (!data.orderNo) throw new Error('주문 생성에 실패했습니다.');
+		return requestBidPayment(data.orderNo, size);
+	})
+	.catch(err => {
+		showToast('error', err.message);
+		submitBtn.disabled = false;
+		submitBtn.textContent = '💳 결제';
+	});
+}
+
+function requestBidPayment(orderNo, dimensions) {
+	const submitBtn = document.getElementById('btn-submit-select-bid');
+
+	// 2단계: 포트원 SDK 결제창
+	PortOne.requestPayment({
+		storeId	: 'store-86babd64-b87f-4d03-8a11-45d711b38212',
+		channelKey : 'channel-key-0b04d459-1cc2-4ee0-83a8-b8fef7d753eb',
+		paymentId  : orderNo,
+		orderName  : `전문가 #${currentSelectedBid.businessId} 수선 서비스`,
+		totalAmount: currentSelectedBid.price,
+		currency   : 'KRW',
+		payMethod  : 'EASY_PAY',
+		easyPay: { easyPayProvider: 'KAKAOPAY' },
+		customer: {
+			fullName   : '구매자',
+			email	  : 'test@nextage.com',
+			phoneNumber: '010-0000-0000',
+		}
+	})
+	.then(rsp => {
+		// 결제 취소 or 실패
+		if (rsp.code !== undefined) {
+			showToast('warn', rsp.message || '결제가 취소되었습니다.');
+			submitBtn.disabled = false;
+			submitBtn.textContent = '💳 결제';
+			return;
+		}
+
+		// 3단계: 서버 검증
+		return fetch('/api/bids/payment/verify', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				impUid	  : rsp.paymentId,
+				orderNo,
+				totalAmount : currentSelectedBid.price,
+				bidId	   : currentSelectedBid.bidId,
+				dimensions  : { raw: dimensions }
+			})
+		});
+	})
+	.then(res => {
+		if (!res) return;
+		return res.json();
+	})
+	.then(data => {
+		if (!data) return;
+		if (data.success) {
+			closeSelectBidModal();
+			showToast('success', '선정 및 결제가 완료되었습니다!');
+			refreshBidList(currentRequestId);
+		} else {
+			showToast('error', data.message || '결제 검증에 실패했습니다.');
+			submitBtn.disabled = false;
+			submitBtn.textContent = '💳 결제';
+		}
+	})
+	.catch(err => {
+		showToast('error', err.message);
+		submitBtn.disabled = false;
+		submitBtn.textContent = '💳 결제';
+	});
 }
 
 function confirmSelectBid(dimensions) {
@@ -767,6 +856,14 @@ document.addEventListener('input', (e) => {
             e.target.setSelectionRange(nextPos, nextPos);
         });
     }
+	
+	if (e.target.id === 'select-modal-size') {
+		if (e.target.value.trim()) {
+			e.target.classList.remove('error');
+			document.getElementById('err-select-size').classList.remove('visible');
+		}
+	}
+	
 });
 
 document.addEventListener('blur', (e) => {
@@ -803,6 +900,13 @@ document.addEventListener('change', (e) => {
             if (errEl) errEl.classList.remove('visible');
         }
     }
+	
+	if (e.target.id === 'select-modal-agree') {
+		if (e.target.checked) {
+			document.getElementById('err-select-agree').classList.remove('visible');
+		}
+	}
+	
 });
 
 document.addEventListener('click', (e) => {
@@ -971,15 +1075,9 @@ function renderBidList(data) {
             <div class="bid-item ${isSelected ? 'bid-selected' : ''}">
                 <div class="bid-header">
                     <div class="bid-header-left">
-                        ${isLoggedIn && !isBusinessUser ? `
+                        ${isLoggedIn && !isBusinessUser && activeData.length >= 2 ? `
                             <label class="bid-compare-check">
-                                <input
-                                    type="checkbox"
-                                    class="bid-compare-checkbox"
-                                    data-bid-id="${bid.bidId}"
-                                    ${checked}
-                                    ${disableCompareCheckbox}
-                                />
+                                <input type="checkbox" class="bid-compare-checkbox" data-bid-id="${bid.bidId}" ${checked} ${disableCompareCheckbox} />
                             </label>
                         ` : ''}
 

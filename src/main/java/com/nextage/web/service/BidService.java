@@ -1,5 +1,7 @@
 package com.nextage.web.service;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -136,15 +138,46 @@ public class BidService {
     // select: 트랜잭션으로 치수 저장 + bid 상태 SELECTED 동시 처리
     @Transactional
     public void selectBidWithDimensions(Long bidId, Object dimensions) {
-        BidDTO bid = bidsMapper.selectBidById(bidId);
-        if (bid == null) throw new IllegalArgumentException("제안 정보를 찾을 수 없습니다.");
-        
-        // 1. request.dimensions 저장 (JSON 직렬화)
-//        String dimensionsJson = new ObjectMapper().writeValueAsString(dimensions);
-//        requestMapper.updateDimensions(bid.getRequestId(), dimensionsJson);
-        
-        // 2. bid 상태 SELECTED로 변경
-//        bidsMapper.updateStatus(bidId, "SELECTED");
+    	BidDTO bid = bidsMapper.selectBidById(bidId);
+    	if (bid == null) throw new IllegalArgumentException("제안 정보를 찾을 수 없습니다.");
+    	
+    	// 1. request.dimensions 저장
+    	try {
+    		String dimensionsJson = new ObjectMapper().writeValueAsString(dimensions);
+    		requestMapper.updateDimensions(bid.getRequestId(), dimensionsJson);
+    	} catch (Exception e) {
+    		throw new RuntimeException("치수 저장 중 오류가 발생했습니다.");
+    	}
+    	
+    	// 2. bid 상태 SELECTED
+    	bidsMapper.updateBidStatus(bidId, "SELECTED");  // ← updateStatus → updateBidStatus
+    	bidsMapper.resetOtherBidsToRejected(bid.getRequestId(), bidId);
+    }
+    
+    // 주문 사전 생성
+    public String createBidOrder(Long bidId, int totalAmount) {
+    	BidDTO bid = bidsMapper.selectBidById(bidId);
+    	
+    	// bid → requestId → customerId 조회
+    	RequestDTO request = requestMapper.selectRequestDetail(bid.getRequestId());
+    	
+    	String orderNo = "BID_"
+    		+ LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"))
+    		+ "_" + (int)(Math.random() * 9000 + 1000);
+
+    	// DB에 orderNo + totalAmount 저장 (검증용)
+    	bidsMapper.insertBidOrder(orderNo, request.getCustomerId(), bid.getBusinessId(), bidId, totalAmount);
+    	return orderNo;
+    }
+
+    // 금액 검증
+    public boolean verifyBidPayment(String orderNo, String impUid, int paidAmount) {
+    	Integer savedAmount = bidsMapper.selectTotalAmountByOrderNo(orderNo);
+    	if (savedAmount == null) return false;
+    	if (savedAmount != paidAmount) return false;
+
+    	bidsMapper.updateBidOrderStatus(orderNo, impUid, "PAID");
+    	return true;
     }
     
 

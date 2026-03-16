@@ -52,12 +52,12 @@ public class ApiBidsController {
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result);
 	    }
 	}
-
+	
 	@GetMapping("/request/{requestId}")
 	public List<BidDTO> getBidsByRequest(@PathVariable("requestId") Long requestId) {
 		return bidService.getBidsByRequestId(requestId);
 	}
-
+	
 	@PatchMapping("/{bidId}/status")
 	public ResponseEntity<Map<String, Object>> updateBidStatus(@PathVariable("bidId") Long bidId, @RequestBody BidStatusUpdateDTO request) {
 
@@ -97,6 +97,62 @@ public class ApiBidsController {
 	        result.put("message", "정보 조회 중 오류가 발생했습니다.");
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result);
 	    }
+	}
+	
+	// 결제 사전 주문 생성
+	@PostMapping("/payment/create")
+	public ResponseEntity<Map<String, Object>> createBidPayment(
+			@RequestBody Map<String, Object> body) {
+		Map<String, Object> result = new HashMap<>();
+		try {
+			Long bidId	   = Long.parseLong(body.get("bidId").toString());
+			int totalAmount  = Integer.parseInt(body.get("totalAmount").toString());
+
+			String orderNo = bidService.createBidOrder(bidId, totalAmount);
+
+			result.put("success", true);
+			result.put("orderNo", orderNo);
+			return ResponseEntity.ok(result);
+
+		} catch (Exception e) {
+			result.put("success", false);
+			result.put("message", "주문 생성 중 오류가 발생했습니다.");
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result);
+		}
+	}
+
+	// 결제 검증 + 선정 처리
+	@PostMapping("/payment/verify")
+	public ResponseEntity<Map<String, Object>> verifyBidPayment(
+			@RequestBody Map<String, Object> body) {
+		Map<String, Object> result = new HashMap<>();
+		try {
+			String orderNo	= body.get("orderNo").toString();
+			String impUid	 = body.get("impUid").toString();
+			int totalAmount   = Integer.parseInt(body.get("totalAmount").toString());
+			Long bidId		= Long.parseLong(body.get("bidId").toString());
+			Object dimensions = body.get("dimensions");
+
+			boolean verified = bidService.verifyBidPayment(orderNo, impUid, totalAmount);
+			if (!verified) {
+				result.put("success", false);
+				result.put("message", "결제 검증에 실패했습니다.");
+				return ResponseEntity.badRequest().body(result);
+			}
+
+			// 검증 성공 시 선정 처리
+			bidService.selectBidWithDimensions(bidId, dimensions);
+
+			result.put("success", true);
+			result.put("message", "선정 및 결제가 완료되었습니다.");
+			return ResponseEntity.ok(result);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.put("success", false);
+			result.put("message", "결제 처리 중 오류가 발생했습니다.");
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result);
+		}
 	}
 	
 	// 결제 성공 후 치수 저장 + 선정 처리

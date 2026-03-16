@@ -1,5 +1,6 @@
-<div th:fragment="bidCommentsFragment" id="bid-comments-wrapper" class="bid-comments-container" xmlns:th="http://www.thymeleaf.org"
-     xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<div th:fragment="bidCommentsFragment" id="bid-comments-wrapper"
+	class="bid-comments-container" xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 	<link rel="stylesheet" th:href="@{/css/customerRequest/customerRequestDetailBids.css}" />
 
 	<!-- 업체 제안 등록 폼 -->
@@ -10,10 +11,11 @@
 				<p class="bid-create-subtitle">단계별로 입력하면 제안이 완성됩니다.</p>
 				<p id="bid-price-guide" class="bid-create-guide d-none"></p>
 			</div>
-			
+
 			<!-- 진행 바 (헤더 바로 아래) -->
 			<div class="progress-bar-wrap">
-				<div class="progress-bar-fill" id="bid-progress-fill" style="width:25%"></div>
+				<div class="progress-bar-fill" id="bid-progress-fill"
+					style="width: 25%"></div>
 			</div>
 
 			<!-- 스텝 인디케이터 -->
@@ -37,10 +39,10 @@
 					</div>
 				</div>
 			</div>
-			
+
 			<!-- 스텝 패널들 -->
 			<div class="bid-step-panels">
-			
+
 				<!-- STEP 1: 가격 -->
 				<div class="bid-step-panel active" data-panel="1">
 					<div class="bid-create-form-group">
@@ -49,13 +51,14 @@
 							<p class="field-error" id="err-price">제안 가격을 입력해주세요.</p>
 						</div>
 						<div class="input-wrapper">
-							<span class="input-prefix">₩</span>
-							<input type="text" id="bid-create-price" class="bid-create-input" placeholder="0" inputmode="numeric" autocomplete="off" />
+							<span class="input-prefix">₩</span> <input type="text"
+								id="bid-create-price" class="bid-create-input" placeholder="0"
+								inputmode="numeric" autocomplete="off" />
 						</div>
 						<div class="price-presets" id="bid-price-presets"></div>
 					</div>
 				</div>
-			
+
 				<!-- STEP 2: 일정 + A/S -->
 				<div class="bid-step-panel" data-panel="2">
 					<div class="bid-step2-grid">
@@ -64,7 +67,8 @@
 								<label for="bid-create-due-date">예상 완료일</label>
 								<p class="field-error" id="err-due-date">예상 완료일을 선택해주세요.</p>
 							</div>
-							<input type="date" id="bid-create-due-date" class="bid-create-input no-prefix" />
+							<input type="date" id="bid-create-due-date"
+								class="bid-create-input no-prefix" />
 						</div>
 						<div class="bid-create-form-group">
 							<div class="form-hint-row">
@@ -72,14 +76,16 @@
 								<p class="field-error" id="err-as">A/S 여부를 선택해주세요.</p>
 							</div>
 							<div class="toggle-group">
-								<button type="button" class="toggle-btn" id="as-yes" onclick="setBidAS(true)">✔ 가능</button>
-								<button type="button" class="toggle-btn" id="as-no" onclick="setBidAS(false)">✖ 불가</button>
+								<button type="button" class="toggle-btn" id="as-yes"
+									onclick="setBidAS(true)">✔ 가능</button>
+								<button type="button" class="toggle-btn" id="as-no"
+									onclick="setBidAS(false)">✖ 불가</button>
 							</div>
 							<input type="hidden" id="bid-create-as-available" value="" />
 						</div>
 					</div>
 				</div>
-		
+
 				<!-- STEP 3: 설명 -->
 				<div class="bid-step-panel" data-panel="3">
 					<div class="id-create-form-group">
@@ -88,46 +94,53 @@
 							<p class="form-hint">수선 방법, 작업 범위, 주의사항 등을 구체적으로 적어주세요.</p>
 							<p class="field-error" id="err-description">제안 설명을 입력해주세요.</p>
 						</div>
-						<textarea id="bid-create-description" class="bid-create-textarea" rows="5" maxlength="500"
-								placeholder="예: 소매 줄이기 작업 가능합니다. 작업 전 사진을 전송해드립니다."
-								oninput="document.getElementById('bid-desc-count').textContent = this.value.length"></textarea>
-						<div class="char-counter"><span id="bid-desc-count">0</span> / 500</div>
+						<textarea id="bid-create-description" class="bid-create-textarea"
+							rows="5" maxlength="500"
+							placeholder="예: 소매 줄이기 작업 가능합니다. 작업 전 사진을 전송해드립니다."
+							oninput="document.getElementById('bid-desc-count').textContent = this.value.length"></textarea>
+						<div class="char-counter">
+							<span id="bid-desc-count">0</span> / 500
+						</div>
 					</div>
 				</div>
-		
+
 				<!-- STEP 4: 최종 확인 -->
 				<div class="bid-step-panel" data-panel="4">
 					<div class="confirm-row confirm-row-inline">
-						<span class="confirm-label">제안 가격</span>
-						<span class="confirm-value price-highlight" id="bid-confirm-price">-</span>
+						<span class="confirm-label">제안 가격</span> <span
+							class="confirm-value price-highlight" id="bid-confirm-price">-</span>
 					</div>
 					<div class="confirm-card">
 						<div class="confirm-row-grid">
 							<div class="confirm-mini-card confirm-mini-card-full">
-								<span class="confirm-mini-label">제안 설명</span>
-								<span class="confirm-mini-value confirm-mini-value-desc" id="bid-confirm-description">-</span>
+								<span class="confirm-mini-label">제안 설명</span> <span
+									class="confirm-mini-value confirm-mini-value-desc"
+									id="bid-confirm-description">-</span>
 							</div>
 						</div>
 						<div class="confirm-row-grid">
 							<div class="confirm-mini-card">
-								<span class="confirm-mini-label">완료 예정</span>
-								<span class="confirm-mini-value" id="bid-confirm-due-date">-</span>
+								<span class="confirm-mini-label">완료 예정</span> <span
+									class="confirm-mini-value" id="bid-confirm-due-date">-</span>
 							</div>
 							<div class="confirm-mini-card">
-								<span class="confirm-mini-label">A/S</span>
-								<span class="confirm-mini-value" id="bid-confirm-as">-</span>
+								<span class="confirm-mini-label">A/S</span> <span
+									class="confirm-mini-value" id="bid-confirm-as">-</span>
 							</div>
 						</div>
 					</div>
 				</div>
-			
+
 			</div>
-			
+
 			<!-- 액션 버튼 -->
 			<div class="bid-create-actions">
-				<button type="button" id="btn-bid-back" class="btn-step-secondary d-none">← 이전</button>
-				<button type="button" id="btn-bid-next" class="btn-step-primary">다음 →</button>
-				<button type="button" id="btn-submit-bid-create" class="btn-submit-bid-create d-none">등록</button>
+				<button type="button" id="btn-bid-back"
+					class="btn-step-secondary d-none">← 이전</button>
+				<button type="button" id="btn-bid-next" class="btn-step-primary">다음
+					→</button>
+				<button type="button" id="btn-submit-bid-create"
+					class="btn-submit-bid-create d-none">등록</button>
 			</div>
 		</div>
 	</div>
@@ -140,8 +153,7 @@
 		<div class="bid-top-actions">
 			<div class="bid-sort-dropdown" id="bid-sort-dropdown">
 				<button class="bid-sort-button dropdown-toggle" id="bid-sort-button">
-					가격 높은순
-				</button>
+					가격 높은순</button>
 				<div class="bid-sort-menu" id="bid-sort-menu">
 					<div class="sort-option" data-sort="priceDesc">가격 높은순</div>
 					<div class="menu-divider"></div>
@@ -171,162 +183,181 @@
 	<!-- 비교 모달 : wrapper 밖으로 이동 -->
 	<div id="compare-modal" class="compare-modal hidden">
 		<div class="compare-modal-backdrop"></div>
-	
+
 		<div class="compare-modal-panel">
 			<div class="compare-modal-header">
 				<h4>업체 제안 비교</h4>
 				<button type="button" id="btn-close-compare"
 					class="compare-close-btn">✕</button>
 			</div>
-	
+
 			<div id="compare-modal-body" class="compare-modal-body"></div>
 		</div>
 	</div>
-	
+
 	<!-- 선정 / 결제 모달 -->
 	<div id="select-bid-modal" class="select-bid-modal hidden">
-	    <div class="select-bid-modal-backdrop"></div>
-	
-	    <div class="select-bid-modal-panel">
-	        <div class="select-bid-modal-header">
-	            <h4 id="select-modal-title-text">업체 선택</h4>
-	            <button type="button" id="btn-close-select-bid-modal"
-	                class="select-bid-close-btn">✕</button>
-	        </div>
-	
-	        <div class="select-bid-modal-body">
-	
-	            <!-- 스테퍼 -->
-	            <div class="select-stepper">
-	                <div class="select-step-indicator">
-	                    <div class="step-dot active" data-step="1">1</div>
-	                    <div class="step-line"></div>
-	                    <div class="step-dot" data-step="2">2</div>
-	                </div>
-	                <div class="select-step-titles">
-	                    <span class="step-title active" data-step-title="1">치수 입력</span>
-	                    <span class="step-title" data-step-title="2">최종 확인 및 결제</span>
-	                </div>
-	            </div>
-	
-	            <!-- STEP 1: 치수 입력 -->
-	            <div class="select-step-panel active" data-step-panel="1">
-	                <div class="select-form-group">
-	                    <label for="select-modal-size">치수 입력</label>
-	                    <p class="select-form-hint">총장, 어깨너비, 허리 등 필요한 치수를 입력해주세요.</p>
-	                    <textarea id="select-modal-size" class="select-textarea" rows="7"
-	                        placeholder="예: 총장 68cm / 어깨 45cm / 허리 29인치 / 가슴 96cm"></textarea>
-	                </div>
-	            </div>
-	
-	            <!-- STEP 2: 최종 확인 -->
-	            <div class="select-step-panel" data-step-panel="2">
-	
-	                <!-- 로딩 상태 -->
-	                <div id="select-confirm-loading" class="select-confirm-loading">
-	                    <div class="select-loading-spinner"></div>
-	                    <p>정보를 불러오는 중...</p>
-	                </div>
-	
-	                <!-- 확인 내용 -->
-	                <div id="select-confirm-content" class="d-none">
-	
-	                    <div class="confirm-section-title">📋 의뢰 정보</div>
-	                    <div class="confirm-info-card">
-	                        <div class="confirm-info-row">
-	                            <span class="confirm-info-label">제목</span>
-	                            <span class="confirm-info-value" id="ci-request-title">-</span>
-	                        </div>
-	                        <div class="confirm-info-row">
-	                            <span class="confirm-info-label">내용</span>
-	                            <span class="confirm-info-value" id="ci-request-desc">-</span>
-	                        </div>
-	                        <div class="confirm-info-row">
-	                            <span class="confirm-info-label">희망 가격</span>
-	                            <span class="confirm-info-value" id="ci-hope-price">-</span>
-	                        </div>
-	                        <div class="confirm-info-row">
-	                            <span class="confirm-info-label">희망 완료일</span>
-	                            <span class="confirm-info-value" id="ci-requested-due-date">-</span>
-	                        </div>
-	                        <div class="confirm-info-row">
-	                            <span class="confirm-info-label">치수</span>
-	                            <span class="confirm-info-value confirm-info-value-pre" id="ci-dimensions">-</span>
-	                        </div>
-	                    </div>
-	
-	                    <div class="confirm-section-title">🧵 업체 제안</div>
-	                    <div class="confirm-info-card">
-	                        <div class="confirm-info-row">
-	                            <span class="confirm-info-label">업체명</span>
-	                            <span class="confirm-info-value" id="ci-vendor-name">-</span>
-	                        </div>
-	                        <div class="confirm-info-row">
-	                            <span class="confirm-info-label">제안 가격</span>
-	                            <span class="confirm-info-value confirm-price-highlight" id="ci-bid-price">-</span>
-	                        </div>
-	                        <div class="confirm-info-row">
-	                            <span class="confirm-info-label">예상 완료일</span>
-	                            <span class="confirm-info-value" id="ci-bid-due-date">-</span>
-	                        </div>
-	                        <div class="confirm-info-row">
-	                            <span class="confirm-info-label">A/S</span>
-	                            <span class="confirm-info-value" id="ci-as-available">-</span>
-	                        </div>
-	                        <div class="confirm-info-row">
-	                            <span class="confirm-info-label">추가 설명</span>
-	                            <span class="confirm-info-value confirm-info-value-pre" id="ci-bid-desc">-</span>
-	                        </div>
-	                    </div>
-	
-	                    <div class="confirm-section-title">📦 배송 정보</div>
-	                    <div class="confirm-info-card">
-	                        <div class="confirm-info-row">
-	                            <span class="confirm-info-label">배송지</span>
-	                            <span class="confirm-info-value" id="ci-address">-</span>
-	                        </div>
-	                        <div class="confirm-info-row">
-	                            <span class="confirm-info-label">연락처</span>
-	                            <span class="confirm-info-value" id="ci-phone">-</span>
-	                        </div>
-	                    </div>
-	
-	                    <div class="select-agree-row">
-	                        <label class="select-agree-label">
-	                            <input type="checkbox" id="select-modal-agree" />
-	                            위 내용을 확인하였으며 결제에 동의합니다.
-	                        </label>
-	                    </div>
-	                </div>
-	            </div>
-	
-	            <!-- 액션 버튼 -->
-	            <div class="select-modal-actions step-actions">
-	                <button type="button" id="btn-prev-select-step"
-	                    class="btn-step-secondary d-none">← 이전</button>
-	                <button type="button" id="btn-next-select-step"
-	                    class="btn-step-primary">다음 →</button>
-	                <button type="button" id="btn-submit-select-bid"
-	                    class="btn-submit-select-bid d-none">💳 결제하기</button>
-	            </div>
-	
-	        </div>
-	    </div>
+		<div class="select-bid-modal-backdrop"></div>
+
+		<div class="select-bid-modal-panel">
+			<div class="select-bid-modal-header">
+				<h4 id="select-modal-title-text">업체 선택</h4>
+				<button type="button" id="btn-close-select-bid-modal"
+					class="select-bid-close-btn">✕</button>
+			</div>
+
+			<div class="select-bid-modal-body">
+
+				<!-- 스테퍼 -->
+				<div class="select-stepper">
+					<div class="select-step-indicator">
+						<div class="step-dot active" data-step="1">1</div>
+						<div class="step-line"></div>
+						<div class="step-dot" data-step="2">2</div>
+					</div>
+					<div class="select-step-titles">
+						<span class="step-title active" data-step-title="1">치수 입력</span> <span
+							class="step-title" data-step-title="2">최종 확인 및 결제</span>
+					</div>
+				</div>
+
+				<!-- STEP 1: 치수 입력 -->
+				<div class="select-step-panel active" data-step-panel="1">
+					<div class="select-form-group">
+						<label for="select-modal-size">치수 입력</label>
+						<div class="form-hint-row">
+							<p class="select-form-hint">필요한 치수를 상세히 입력해주세요.</p>
+							<p class="field-error" id="err-select-size">치수를 입력해주세요.</p>
+						</div>
+						<textarea id="select-modal-size" class="select-textarea" rows="7"
+							placeholder="예: 총장 68cm / 어깨 45cm / 허리 29인치 / 가슴 96cm"></textarea>
+					</div>
+				</div>
+
+				<!-- STEP 2: 최종 확인 -->
+				<div class="select-step-panel" data-step-panel="2">
+
+					<!-- 로딩 상태 -->
+					<div id="select-confirm-loading" class="select-confirm-loading">
+						<div class="select-loading-spinner"></div>
+						<p>정보를 불러오는 중...</p>
+					</div>
+
+					<!-- 확인 내용 -->
+					<div id="select-confirm-content" class="d-none">
+
+						<div class="confirm-section-title">📋 의뢰 정보</div>
+						<div class="confirm-info-card">
+							<div class="confirm-info-row">
+								<span class="confirm-info-label">제목</span> <span
+									class="confirm-info-value" id="ci-request-title">-</span>
+							</div>
+							<div class="confirm-info-row">
+								<span class="confirm-info-label">내용</span> <span
+									class="confirm-info-value" id="ci-request-desc">-</span>
+							</div>
+							<div class="confirm-info-row">
+								<span class="confirm-info-label">희망 가격</span> <span
+									class="confirm-info-value" id="ci-hope-price">-</span>
+							</div>
+							<div class="confirm-info-row">
+								<span class="confirm-info-label">희망 완료일</span> <span
+									class="confirm-info-value" id="ci-requested-due-date">-</span>
+							</div>
+							<div class="confirm-info-row">
+								<span class="confirm-info-label">치수</span> <span
+									class="confirm-info-value confirm-info-value-pre"
+									id="ci-dimensions">-</span>
+							</div>
+						</div>
+
+						<div class="confirm-section-title">🧵 업체 제안</div>
+						<div class="confirm-info-card">
+							<div class="confirm-info-row">
+								<span class="confirm-info-label">업체명</span> <span
+									class="confirm-info-value" id="ci-vendor-name">-</span>
+							</div>
+							<div class="confirm-info-row">
+								<span class="confirm-info-label">제안 가격</span> <span
+									class="confirm-info-value confirm-price-highlight"
+									id="ci-bid-price">-</span>
+							</div>
+							<div class="confirm-info-row">
+								<span class="confirm-info-label">예상 완료일</span> <span
+									class="confirm-info-value" id="ci-bid-due-date">-</span>
+							</div>
+							<div class="confirm-info-row">
+								<span class="confirm-info-label">A/S</span> <span
+									class="confirm-info-value" id="ci-as-available">-</span>
+							</div>
+							<div class="confirm-info-row">
+								<span class="confirm-info-label">추가 설명</span> <span
+									class="confirm-info-value confirm-info-value-pre"
+									id="ci-bid-desc">-</span>
+							</div>
+						</div>
+
+						<div class="confirm-section-title">📦 배송 정보</div>
+						<div class="confirm-info-card">
+							<div class="confirm-info-row">
+								<span class="confirm-info-label">배송지</span> <span
+									class="confirm-info-value" id="ci-address">-</span>
+							</div>
+							<div class="confirm-info-row">
+								<span class="confirm-info-label">연락처</span> <span
+									class="confirm-info-value" id="ci-phone">-</span>
+							</div>
+						</div>
+
+						<div class="select-info-box">
+							<span class="select-info-icon">⚠️</span>
+							<div class="select-info-text">
+								<strong>결제 후 업체 수락이 필요합니다.</strong>
+								<p>결제 완료 후 업체가 치수·개인정보를 확인하고 수락해야 거래가 확정됩니다. 업체 거절 시 자동 환불됩니다.</p>
+							</div>
+						</div>
+						
+						<div class="select-agree-row">
+							<label class="select-agree-label"> <input type="checkbox"
+								id="select-modal-agree" /> 위 내용을 확인하였으며, 결제 후 업체 수락 시 거래가 확정됨에 동의합니다.
+							</label>
+						</div>
+						<p class="field-error" id="err-select-agree">결제 동의가 필요합니다.</p>
+					</div>
+				</div>
+
+				<!-- 액션 버튼 -->
+				<div class="select-modal-actions step-actions">
+					<button type="button" id="btn-prev-select-step"
+						class="btn-step-secondary d-none">← 이전</button>
+					<button type="button" id="btn-next-select-step"
+						class="btn-step-primary">다음 →</button>
+					<button type="button" id="btn-submit-select-bid"
+						class="btn-submit-select-bid d-none">💳 결제</button>
+				</div>
+
+			</div>
+		</div>
 	</div>
-	
-	
-	
+
+
+
 	<!-- 인증 정보 주입용 hidden -->
-	<input type="hidden" id="auth-is-logged-in" value="false" />
-	<input type="hidden" id="auth-is-business-user" value="false" />
-	<input type="hidden" id="auth-current-business-id" value="0" />
-	<input type="hidden" id="auth-current-customer-id" value="0" />
+	<input type="hidden" id="auth-is-logged-in" value="false" /> <input
+		type="hidden" id="auth-is-business-user" value="false" /> <input
+		type="hidden" id="auth-current-business-id" value="0" /> <input
+		type="hidden" id="auth-current-customer-id" value="0" /> <input
+		type="hidden" sec:authorize="isAuthenticated()"
+		id="auth-is-logged-in-auth" value="true" /> <input type="hidden"
+		sec:authorize="hasRole('CUSER')" id="auth-current-customer-id-auth"
+		th:value="${#authentication.principal.customerId}" /> <input
+		type="hidden" sec:authorize="hasRole('BUSER')"
+		id="auth-is-business-user-auth" value="true" /> <input type="hidden"
+		sec:authorize="hasRole('BUSER')" id="auth-current-business-id-auth"
+		th:value="${#authentication.principal.businessId}" />
 	
-	<input type="hidden" sec:authorize="isAuthenticated()" id="auth-is-logged-in-auth" value="true" />
-	<input type="hidden" sec:authorize="hasRole('CUSER')" id="auth-current-customer-id-auth" th:value="${#authentication.principal.customerId}" />
-	<input type="hidden" sec:authorize="hasRole('BUSER')" id="auth-is-business-user-auth" value="true" />
-	<input type="hidden" sec:authorize="hasRole('BUSER')" id="auth-current-business-id-auth" th:value="${#authentication.principal.businessId}" />
-	
+	<!-- 포트원 v2 SDK -->
+	<script src="https://cdn.portone.io/v2/browser-sdk.js"></script>
 	<script th:src="@{/js/customerRequest/customerRequestDetailBids.js}"></script>
 	<script th:inline="javascript">
 		document.addEventListener('DOMContentLoaded', function () {
