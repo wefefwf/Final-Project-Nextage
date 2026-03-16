@@ -6,12 +6,13 @@
 
 body {
     font-family: 'Pretendard', sans-serif;
+    /*background-color:   #f8f9fa! important;*/
 }
 
 .main-content {
     width: 1200px;
     margin: 0 auto;
-    padding: 40px 0; /* 좌우 패딩 0으로 고정해서 1200px 정확히 유지 */
+    padding: 40px 0;
     box-sizing: border-box;
 }
 
@@ -21,20 +22,32 @@ body {
     width: 100%;
 }
 
-/* 글자(h3)와 아래 div(box-gray) 사이 간격을 20px로 수정 */
 h3 { margin-bottom: 20px; font-size: 20px; font-family: sans-serif; }
 
 /* 상단 레이아웃 */
 .section-top { display: flex; gap: 40px; margin-bottom: 60px; }
 .calendar-group { width: 60%; }
-.cal-main { height: 450px; }
-.cal-sub { height: 60px; margin-top: 20px; } /* 위 박스와의 간격 20px */
 
-.side-group { width: 40%; display: flex; flex-direction: column; }
+/* ────────────────────────────────────
+   side-group
+   — cal-main(450) + margin-top(20) + cal-sub(90) = 560px
+   — 거기에 calendar-group의 link-wrapper(h3 20 + 10 margin-top ≈ 30px) 반영
+   — ★ 수정: 560 → 530px 로 줄여서 notice를 더 위로 올림 ★
+──────────────────────────────────── */
+.side-group {
+    width: 40%;
+    display: flex;
+    flex-direction: column;
+    height: 530px; /* ★ 560 → 530: notice가 더 위로 올라옴 */
+}
+
 .order-box {
     height: 240px;
     overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
 }
+.order-box::-webkit-scrollbar { display: none; }
 
 .order-box-empty {
     display: flex;
@@ -47,21 +60,68 @@ h3 { margin-bottom: 20px; font-size: 20px; font-family: sans-serif; }
     font-size: 15px;
     font-weight: 600;
 }
-.notice-box { height: 140px; }
 
-/* 세로 점 3개 간격 */
-.vertical-dots { 
-    display: flex; flex-direction: column; align-items: center; 
-    justify-content: center; flex-grow: 1; gap: 10px; padding: 10px 0; 
+.order-zone { flex-shrink: 0; }
+
+.order-zone .btn-go-list,
+.order-zone .view-all-btn {
+    display: inline-block !important;
+    margin-top: 10px;
+    padding: 8px 20px;
+    background: #1d1d1f;
+    color: #ffffff !important;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.order-zone .btn-go-list:hover,
+.order-zone .view-all-btn:hover {
+    background: #3a3a3c;
+}
+.view-all {
+    color: #0071e3;    /* #333 → 파란색 */
+    font-size: 13px;   /* 12px → 13px */
+    font-weight: 500;  /* 추가 */
+    text-decoration: none;
+    transition: opacity 0.15s;
+}
+.view-all:hover {
+    opacity: 0.7;      /* color:#000 → opacity로 변경 */
+}
+/* 세로 점: 남은 공간 흡수 → notice 위로 올라옴 */
+.vertical-dots {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+    gap: 10px;
+    padding: 10px 0;
 }
 .vertical-dots span { font-size: 7px; color: #ccc; }
 
+.notice-zone { flex-shrink: 0; }
+
+/* ★ 수정: link-wrapper 높이를 고정해서 두 전체보기 버튼 정렬 맞춤 ★ */
+.link-wrapper {
+    height: 32px;          /* order-zone과 notice-zone 모두 동일한 높이 */
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-top: 10px;
+}
+
+
+.notice-box { height: 200px; }
+
+
 /* ────────────────────────────────────
-   My PortFolio Section — 중복 제거 및 간격 수정
+   My PortFolio Section
 ──────────────────────────────────── */
 .section-portfolio { margin-bottom: 40px; }
 
-/* ★ 제목과 카드 사이 간격 조절 (40px) ★ */
 .portfolio-header {
     display: flex;
     justify-content: space-between;
@@ -85,7 +145,6 @@ h3 { margin-bottom: 20px; font-size: 20px; font-family: sans-serif; }
     font-weight: 500;
 }
 
-/* 280px 바구니 고정 */
 .portfolio-full {
     height: 280px !important;
     width: 1200px;
@@ -95,7 +154,6 @@ h3 { margin-bottom: 20px; font-size: 20px; font-family: sans-serif; }
     padding: 0;
 }
 
-/* 가로 나열 고정 */
 .portfolio-slider {
     display: flex !important;
     flex-direction: row !important;
@@ -104,15 +162,10 @@ h3 { margin-bottom: 20px; font-size: 20px; font-family: sans-serif; }
     height: 100%;
 }
 
-/* 250px 정사각형 카드 디자인 */
-/* [수정] 250px 정사각형 카드 디자인 */
 .portfolio-card {
     width: 250px !important;
     height: 250px !important;
-    
-    /* ★ 핵심: 카드 윗부분에 10px 정도 빈 공간을 만듭니다 ★ */
-    margin-top: 10px; 
-    
+    margin-top: 10px;
     background: #ffffff;
     border-radius: 16px;
     border: 1px solid rgba(0,0,0,0.08);
@@ -125,15 +178,11 @@ h3 { margin-bottom: 20px; font-size: 20px; font-family: sans-serif; }
     transition: transform 0.3s ease;
 }
 
-/* [수정] 카드 hover 효과 */
-.portfolio-card:hover {
-    /* 이제 위로 5px을 올라가도 아까 만든 margin-top 10px 공간 덕분에 안 잘립니다! */
-    transform: translateY(-5px); 
-}
+.portfolio-card:hover { transform: translateY(-5px); }
 
 .card-img-wrap {
     width: 100%;
-    height: 180px; 
+    height: 180px;
     background: #f5f5f7;
     overflow: hidden;
 }
@@ -145,23 +194,25 @@ h3 { margin-bottom: 20px; font-size: 20px; font-family: sans-serif; }
 }
 
 .card-info {
-    padding: 12px;
-    flex-grow: 1;
+    padding: 15px;
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
 }
 
 .card-title {
-    font-size: 13px;
-    font-weight: 500;
+    font-size: 14px;
+    font-weight: 600;
     color: #1d1d1f;
     margin: 0;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
     overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
 }
 
-/* 메인 페이지의 포트폴리오 비어있을 때 정렬 팩스체크 */
 .portfolio-empty {
     width: 100% !important;
     height: 280px !important;
@@ -175,7 +226,6 @@ h3 { margin-bottom: 20px; font-size: 20px; font-family: sans-serif; }
     border: 1px solid rgba(0,0,0,0.08);
 }
 
-/* 타임리프 sec:authorize가 만드는 중간 div까지 강제로 중앙 정렬 */
 .portfolio-empty > div {
     display: flex !important;
     flex-direction: column !important;
@@ -207,7 +257,6 @@ h3 { margin-bottom: 20px; font-size: 20px; font-family: sans-serif; }
     text-decoration: none;
 }
 
-/* 슬라이더 없을 때 정렬 */
 .portfolio-slider.no-slider {
     display: flex !important;
     flex-direction: row !important;
@@ -215,8 +264,16 @@ h3 { margin-bottom: 20px; font-size: 20px; font-family: sans-serif; }
     justify-content: flex-start;
 }
 
+.card-no {
+    font-size: 11px;
+    font-weight: 700;
+    color: #c0c0c0;
+    text-transform: uppercase;
+}
+
+
 /* ────────────────────────────────────
-   New Post Section — 애플 스타일
+   New Post Section
 ──────────────────────────────────── */
 .section-post {
     width: 100%;
@@ -247,9 +304,7 @@ h3 { margin-bottom: 20px; font-size: 20px; font-family: sans-serif; }
     transition: opacity 0.15s;
 }
 
-.post-view-all:hover {
-    opacity: 0.7;
-}
+.post-view-all:hover { opacity: 0.7; }
 
 .section-post .post-nav {
     display: inline-flex !important;
@@ -279,9 +334,7 @@ h3 { margin-bottom: 20px; font-size: 20px; font-family: sans-serif; }
     box-shadow: 0 1px 4px rgba(0,0,0,0.12), 0 0.5px 1px rgba(0,0,0,0.08);
 }
 
-.filter-btn:hover:not(.active) {
-    color: #1d1d1f;
-}
+.filter-btn:hover:not(.active) { color: #1d1d1f; }
 
 .section-post .post-full {
     background: #ffffff !important;
@@ -309,13 +362,8 @@ h3 { margin-bottom: 20px; font-size: 20px; font-family: sans-serif; }
     background: #ffffff;
 }
 
-.main-request-item:last-child {
-    border-bottom: none;
-}
-
-.main-request-item:hover {
-    background: #f5f5f7;
-}
+.main-request-item:last-child { border-bottom: none; }
+.main-request-item:hover { background: #f5f5f7; }
 
 .item-left {
     display: flex;
@@ -377,34 +425,204 @@ h3 { margin-bottom: 20px; font-size: 20px; font-family: sans-serif; }
     font-size: 14px;
 }
 
-.link-wrapper { text-align: right; margin-top: 10px; } 
-.view-all { color: #333; text-decoration: none; font-size: 12px; }
-.card-info {
+
+/* ────────────────────────────────────
+   Calendar (cal-main / cal-sub)
+──────────────────────────────────── */
+.cal-main {
+    height: 450px !important;
+    background-color: #ffffff !important;
+    border: 1px solid #eeeeee !important;
+    border-radius: 16px;
     padding: 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+#calendar { height: 100% !important; }
+
+.fc .fc-header-toolbar { display: none !important; }
+.fc a { text-decoration: none !important; color: #000000 !important; }
+
+.fc .fc-day-today { background: transparent !important; }
+.fc .fc-day-today .fc-daygrid-day-number {
+    color: #0071e3 !important;
+    font-weight: 800;
+}
+
+/* 달력 한 칸 높이 고정 */
+.fc .fc-daygrid-day-frame {
+    height: 70px !important;
+    min-height: 70px !important;
+    max-height: 70px !important;
+    overflow: hidden !important;
+}
+
+.fc .fc-daygrid-day-events {
+    overflow: hidden !important;
+    min-height: 0 !important;
+}
+
+.fc-event {
+    background: rgba(0, 0, 0, 0.05) !important;
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    border-radius: 4px !important;
+    padding: 2px 6px !important;
+    margin-bottom: 1px !important;
+}
+
+.fc-event-title,
+.fc-event-time,
+.fc-daygrid-event .fc-event-main {
+    color: #000000 !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    text-decoration: none !important;
+}
+
+.fc-daygrid-more-link {
+    color: #000000 !important;
+    font-size: 10px !important;
+    font-weight: 700 !important;
+    text-decoration: none !important;
+}
+
+.fc-day-other { background-color: #ffffff !important; }
+
+.fc-day-other .fc-daygrid-day-top,
+.fc-day-other .fc-daygrid-day-number {
+    visibility: hidden !important;
+    background-color: #ffffff !important;
+}
+
+.fc .fc-daygrid-day { background-color: #ffffff !important; }
+
+/* cal-sub */
+.cal-sub {
+    height: 90px !important;
+    margin-top: 20px;
+    background: #ffffff !important;
+    border: 1px solid #eeeeee !important;
+    border-radius: 16px;
+    padding: 0 !important;
+    overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+}
+
+.cal-sub::-webkit-scrollbar { display: none; }
+
+.cal-sub .schedule-row {
     display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 4px; /* 요소들 사이 간격 */
+    align-items: center;
+    padding: 12px 25px;
+    height: 100%;
 }
 
-/* 주문번호: 작고 진하게 */
-.card-no {
+.cal-sub .row-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.cal-sub .badge-blue {
+    background: #000 !important;
+    color: #fff !important;
+    padding: 3px 10px;
+    border-radius: 6px;
     font-size: 11px;
-    font-weight: 700;
-    color: #c0c0c0; /* 애플 블루 포인트 */
-    text-transform: uppercase;
+    font-weight: 600;
+    white-space: nowrap;
 }
 
-/* 제목: 중간 크기, 두 줄까지 허용 */
-.card-title {
+.cal-sub .info-area h4 {
+    font-size: 15px;
+    font-weight: 700;
+    margin: 0 0 2px 0 !important;
+    color: #1d1d1f;
+}
+
+.cal-sub .period-text {
+    font-size: 12px;
+    color: #888;
+    margin: 0 !important;
+}
+
+/* order-box */
+.order-zone .order-box {
+    height: 240px !important;
+    background: #ffffff !important;
+    border: 1px solid #eeeeee !important;
+    border-radius: 16px;
+}
+
+/* notice-box */
+.notice-zone .notice-box {
+    height: 170px !important;
+    background: #ffffff !important;
+    border: 1px solid #eeeeee !important;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+    overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.notice-zone .notice-box::-webkit-scrollbar { display: none; }
+
+/* 공통: 비어있을 때 정중앙 */
+.order-box-empty, .empty-msg-small {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #b8b8b8;
     font-size: 14px;
     font-weight: 600;
-    color: #1d1d1f;
-    margin: 0;
-    line-height: 1.4;
-    /* 두 줄 넘어가면 ... 처리 */
-    display: -webkit-box;
-    -webkit-line-clamp: 1; 
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    text-decoration: none !important;
+}
+/* cal-sub: customer-info & btn-link 추가 */
+.cal-sub .schedule-row {
+    justify-content: space-between; /* 추가 */
+}
+
+.cal-sub .customer-info {
+    margin-left: auto;
+    margin-right: 40px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+}
+
+.cal-sub .btn-link {
+    border: 1px solid #000;
+    padding: 6px 14px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 700;
+    background: #000;    
+    color: #ffffff !important;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.cal-sub .btn-link:hover {
+    background: #000;
+    color: #fff !important;
+}
+.notice-zone h3 {
+    margin-bottom: 12px !important;  /* 기본 20px → 12px로 줄여서 row 맞춤 */
+}
+.cal-link-wrapper {
+    margin-top: 15px; /* 10px → 18px 로 올려보기 */
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+.notice-zone .link-wrapper {
+    margin-top: 20px;
 }
