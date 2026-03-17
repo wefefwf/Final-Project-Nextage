@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.nextage.web.domain.BizinfoDTO;
@@ -61,5 +63,26 @@ public class BusinessScheduleController {
 
 		     return "views/schedule/business-schedule"; // 실제 HTML 파일 경로 (사장님 설정에 맞게)
 		 }
+
 	 
+	 @GetMapping("/business/schedule/active")
+	 @ResponseBody
+	 public ResponseEntity<List<ScheduleOrderDTO>> getActiveSchedule(
+	         @AuthenticationPrincipal BusinessUserDetails user) {
+	     if (user == null) return ResponseEntity.status(401).build();
+
+	     Long businessId = user.getBusiness().getBusinessId();
+	     List<ScheduleOrderDTO> scheduleList = bohService.getScheduleOrders(businessId);
+
+	     LocalDate today = LocalDate.now();
+	     List<ScheduleOrderDTO> activeList = scheduleList.stream()
+	             .filter(order ->
+	                 !order.getCreatedAt().toLocalDate().isAfter(today) &&
+	                 !order.getDueDate().toLocalDate().isBefore(today)
+	             )
+	             .collect(Collectors.toList());
+
+	     return ResponseEntity.ok(activeList);
+	 }
+
 }
