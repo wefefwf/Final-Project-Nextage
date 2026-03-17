@@ -333,17 +333,31 @@
                         <span class="delivery-badge delivery-done"     th:if="${order.deliveryStatus == 4}">배송완료</span>
                         <span class="delivery-badge delivery-cancel"   th:if="${order.deliveryStatus == 9}">취소</span>
                         <th:block th:if="${order.bidId != null}">
-                            <span class="accept-badge accept-pending"  th:if="${order.acceptStatus == 'PENDING'}">검토중</span>
-                            <span class="accept-badge accept-accepted" th:if="${order.acceptStatus == 'ACCEPTED'}">수락됨</span>
-                            <span class="accept-badge accept-rejected" th:if="${order.acceptStatus == 'REJECTED'}">거절됨</span>
-                            <!-- ✅ 거절됨 아닌 경우 채팅하기 버튼 -->
-                            <a th:if="${order.acceptStatus != 'REJECTED'}"
-                               th:href="@{/customer/order/chat/enter(orderId=${order.orderId})}"
-                               onclick="event.stopPropagation()"
-                               class="btn btn-green">
-                                채팅하기
-                            </a>
-                        </th:block>
+						    <span class="accept-badge accept-pending"
+						          th:if="${order.acceptStatus == 'PENDING'}">검토중</span>
+						    <span class="accept-badge accept-accepted"
+						          th:if="${order.acceptStatus == 'ACCEPTED'}">수락됨</span>
+						    <span class="accept-badge accept-rejected"
+						          th:if="${order.acceptStatus == 'REJECTED'}">거절됨</span>
+						    <!-- ✅ 채팅하기 버튼 + unread 뱃지 -->
+						    <div th:if="${order.acceptStatus != 'REJECTED'}"
+						         style="position:relative; display:inline-flex;">
+						        <a th:href="@{/customer/order/chat/enter(orderId=${order.orderId})}"
+						           onclick="event.stopPropagation()"
+						           class="btn btn-green">
+						            채팅하기
+						        </a>
+						        <span th:if="${order.unreadCount > 0}"
+								      th:text="${order.unreadCount > 99 ? '99+' : order.unreadCount}"
+								      style="position:absolute; top:-6px; right:-6px;
+								             background:#ff4444; color:#fff; border-radius:50%;
+								             width:18px; height:18px; font-size:11px; font-weight:700;
+								             display:inline-flex; align-items:center; justify-content:center;
+								             line-height:1; padding-top:1px;
+								             box-shadow:0 2px 4px rgba(0,0,0,0.2);">
+								</span>
+						    </div>
+						</th:block>
                     </div>
                 </div>
 

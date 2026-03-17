@@ -212,5 +212,16 @@
     <delete id="deleteSettlementsByOrderId">
         DELETE FROM business_settlement WHERE order_id = #{orderId}
     </delete>
-
+	
+	<select id="selectUnreadCountByOrderId" resultType="int">
+	    SELECT COUNT(*)
+	    FROM chat_message cm
+	    JOIN chat_room cr ON cr.room_id = cm.room_id
+	    JOIN orders o ON o.bid_id = cr.bid_id
+	                  AND o.customer_id = cr.customer_id
+	                  AND o.business_id = cr.business_id
+	    WHERE o.order_id = #{orderId}
+	      AND cm.is_read = 0
+	      AND cm.sender_type = 'BUSINESS'
+	</select>
 </mapper>

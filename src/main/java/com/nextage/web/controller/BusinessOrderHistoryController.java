@@ -123,4 +123,12 @@ public class BusinessOrderHistoryController {
         Long roomId = service.getOrCreateChatRoom(orderId);
         return ResponseEntity.ok(Map.of("roomId", roomId));
     }
+    
+    @GetMapping("/chat/unread/{roomId}")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getUnreadCount(
+            @PathVariable("roomId") Long roomId) {
+        int count = service.getUnreadCount(roomId);
+        return ResponseEntity.ok(Map.of("count", count));
+    }
 }

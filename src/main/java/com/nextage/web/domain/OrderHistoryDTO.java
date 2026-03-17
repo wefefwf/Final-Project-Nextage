@@ -17,6 +17,7 @@ public class OrderHistoryDTO {
     private Long          requestId;      // ✅ 추가 - 입찰 페이지 이동용
     private int           totalAmount;
     private String        paymentStatus;
+    private int unreadCount;
 
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime createdAt;

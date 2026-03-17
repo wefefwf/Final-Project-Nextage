@@ -43,7 +43,13 @@ public class BusinessOrderHistoryService {
         } else {
             orders = mapper.selectAcceptedOrders(businessId, search, offset, PAGE_SIZE);
         }
-        orders.forEach(o -> o.setItems(mapper.selectOrderItems(o.getOrderId())));
+        orders.forEach(o -> {
+            o.setItems(mapper.selectOrderItems(o.getOrderId()));
+            // ✅ unread count 세팅
+            if (o.getRoomId() != null && !"REJECTED".equals(o.getAcceptStatus())) {
+                o.setUnreadCount(mapper.selectUnreadCount(o.getRoomId()));
+            }
+        });
         return orders;
     }
 
@@ -161,5 +167,11 @@ public class BusinessOrderHistoryService {
             mapper.insertChatFunction(roomId, order.getBusinessId(), order.getCustomerId());
         }
         return roomId;
+    }
+    
+    @Transactional(readOnly = true)
+    public int getUnreadCount(Long roomId) {
+        if (roomId == null) return 0;
+        return mapper.selectUnreadCount(roomId);
     }
 }

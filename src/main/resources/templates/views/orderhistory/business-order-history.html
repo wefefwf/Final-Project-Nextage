@@ -219,7 +219,16 @@
                 <div class="detail-btns" onclick="event.stopPropagation()">
                     <button class="btn btn-purple" onclick="acceptOrder()">수락</button>
                     <button class="btn btn-red"    onclick="rejectOrder()">거절</button>
-                    <a class="btn btn-green" id="dChatBtn" style="display:none;" href="#">채팅하기</a>
+                    <div style="position:relative; display:inline-flex;" id="dChatBtnWrap" onclick="event.stopPropagation()">
+					    <a class="btn btn-green" id="dChatBtn" style="display:none;" href="#">채팅하기</a>
+					    <span id="dUnreadBadge"
+					      style="display:none; position:absolute; top:-6px; right:-6px;
+					             background:#ff4444; color:#fff; border-radius:50%;
+					             width:18px; height:18px; font-size:11px; font-weight:700;
+					             align-items:center; justify-content:center;
+					             line-height:18px; text-align:center; padding-top:2px;
+					             box-shadow:0 2px 4px rgba(0,0,0,0.2);">0</span>
+					</div>
                 </div>
             </div>
         </div>
@@ -275,17 +284,29 @@
         <span class="accept-badge accept-rejected" th:if="${order.acceptStatus == 'REJECTED'}">거절됨</span>
 
         <div class="order-btns">
-            <button class="btn btn-blue"
-                    th:if="${!isAdmin and order.acceptStatus != 'REJECTED'}"
-                    th:data-order-id="${order.orderId}"
-                    th:data-delivery-status="${order.deliveryStatus}"
-                    onclick="openDeliveryModal(event, this)">배송관리</button>
-            <a class="btn btn-green"
-               th:if="${order.roomId != null and order.acceptStatus != 'REJECTED'}"
-               th:href="@{/chat(roomId=${order.roomId})}"
-               onclick="event.stopPropagation()">채팅하기</a>
-        </div>
-    </div>
+	    <button class="btn btn-blue"
+	            th:if="${!isAdmin and order.acceptStatus != 'REJECTED'}"
+	            th:data-order-id="${order.orderId}"
+	            th:data-delivery-status="${order.deliveryStatus}"
+	            onclick="openDeliveryModal(event, this)">배송관리</button>
+	    <!-- ✅ wrapper로 감싸서 뱃지 추가 -->
+	    <div th:if="${order.roomId != null and order.acceptStatus != 'REJECTED'}"
+	         style="position:relative; display:inline-flex;">
+	        <a class="btn btn-green"
+	           th:href="@{/chat(roomId=${order.roomId})}"
+	           onclick="event.stopPropagation()">채팅하기</a>
+	        <span th:if="${order.unreadCount > 0}"
+	              th:text="${order.unreadCount > 99 ? '99+' : order.unreadCount}"
+	              style="position:absolute; top:-6px; right:-6px;
+	                     background:#ff4444; color:#fff; border-radius:50%;
+	                     width:18px; height:18px; font-size:10px; font-weight:700;
+	                     display:inline-flex; align-items:center; justify-content:center;
+	                     padding-top:1px;
+	                     box-shadow:0 2px 4px rgba(0,0,0,0.2);">
+	        </span>
+	    </div>
+	</div>
+	</div>
 
     <!-- 페이징 -->
     <div class="pagination" th:if="${totalPages > 1}">
@@ -416,7 +437,10 @@
         document.getElementById('dDueDate').textContent = parseDate(o.dueDate) || '미정';
 
         var chatBtn = document.getElementById('dChatBtn');
-        chatBtn.style.display = ''; // ✅ 항상 표시
+        var unreadBadge = document.getElementById('dUnreadBadge');
+
+        chatBtn.style.display = '';
+
         chatBtn.onclick = function(e) {
             e.preventDefault();
             e.stopPropagation();
@@ -430,6 +454,22 @@
                 });
             }
         };
+
+        // ✅ unread count 조회
+        if (o.roomId) {
+            fetch('/business/order/chat/unread/' + o.roomId)
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.count > 0) {
+                    unreadBadge.textContent = data.count > 99 ? '99+' : data.count;
+                    unreadBadge.style.display = 'inline-flex';
+                } else {
+                    unreadBadge.style.display = 'none';
+                }
+            });
+        } else {
+            unreadBadge.style.display = 'none';
+        }
 
         document.getElementById('detailEmpty').style.display  = 'none';
         document.getElementById('detailBody').style.display   = '';

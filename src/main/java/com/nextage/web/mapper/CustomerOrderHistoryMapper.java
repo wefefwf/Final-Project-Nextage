@@ -52,4 +52,5 @@ public interface CustomerOrderHistoryMapper {
     void deleteOrderItemsByOrderId(@Param("orderId") Long orderId);
     void deleteOrderByOrderId(@Param("orderId") Long orderId);
     void deleteSettlementsByOrderId(@Param("orderId") Long orderId);
+    int selectUnreadCountByOrderId(@Param("orderId") Long orderId);
 }

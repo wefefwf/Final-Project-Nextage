@@ -33,9 +33,16 @@ public class CustomerOrderHistoryService {
         } else {
             orders = customerOrderHistoryMapper.selectOrdersByCustomerId(customerId, search, offset, PAGE_SIZE);
         }
-        orders.forEach(order ->
-            order.setItems(customerOrderHistoryMapper.selectOrderItems(order.getOrderId()))
-        );
+        orders.forEach(order -> {
+            order.setItems(customerOrderHistoryMapper.selectOrderItems(order.getOrderId()));
+            // ✅ 개인거래이고 거절 아닌 경우 unread count 세팅
+            if (order.getBidId() != null && order.getAcceptStatus() != null
+                    && !"REJECTED".equals(order.getAcceptStatus())) {
+                order.setUnreadCount(
+                    customerOrderHistoryMapper.selectUnreadCountByOrderId(order.getOrderId())
+                );
+            }
+        });
         return orders;
     }
 
