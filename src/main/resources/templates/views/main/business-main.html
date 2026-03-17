@@ -41,10 +41,11 @@
         <!-- 캘린더 -->
             <div class="calendar-group">
                 <h3>Calendar</h3>
-                <div class="box-gray cal-main">
-                    <div id="calendar" style="min-height: 400px;"></div>
-                </div>
-
+                <div class="cal-wrapper">
+	                <div class="cal-main">
+	                    <div id="calendar" style="min-height: 400px;"></div>
+	                </div>
+				</div>
                 <!-- 작업중인 내역 -->
                 <div class="cal-sub">
                     <!-- 진행중인 작업이 있을 때 -->
@@ -266,30 +267,37 @@
 document.addEventListener('DOMContentLoaded', function() {
     const calendarEl = document.getElementById('calendar');
     const eventsData = /*[[${scheduleList}]]*/ [];
-
+    
+    const events = eventsData.map(item => {
+        const getStr = (v) => {
+            if (!v) return null;
+            if (Array.isArray(v)) return v[0] + '-' + String(v[1]).padStart(2,'0') + '-' + String(v[2]).padStart(2,'0');
+            return String(v).substring(0, 10);
+        };
+        const start = getStr(item.createdAt);
+        const endBase = getStr(item.dueDate);
+        const [y, m, d] = endBase.split('-').map(Number);
+        const endDate = new Date(y, m - 1, d + 1);
+        const endPlusOne = endDate.getFullYear() + '-' + String(endDate.getMonth()+1).padStart(2,'0') + '-' + String(endDate.getDate()).padStart(2,'0');
+        return {
+            title: item.requestTitle,
+            start: start,
+            end: endPlusOne,
+            url: '/business/order/detail/' + item.orderId,
+            allDay: true
+        };
+    });
     const calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
         locale: 'ko',
         fixedWeekCount: false,
         showNonCurrentDates: false,
-        dayMaxEvents: 2,
-
+        dayMaxEvents: false,        // ← 변경
+        eventDisplay: 'block',     // ← 추가
         headerToolbar: { left: '', center: '', right: '' },
-
-        dayCellContent: function(info) {
-            return info.date.getDate();
-        },
-
-        events: (eventsData || []).map(item => ({
-            title: item.requestTitle,
-            start: item.createdAt,
-            end: item.dueDate,
-            url: '/business/order/detail/' + item.orderId,
-            display: 'block',
-            allDay: true
-        }))
+        dayCellContent: function(info) { return info.date.getDate(); },
+        events: events
     });
-
     calendar.render();
 });
 </script>

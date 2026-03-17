@@ -28,17 +28,11 @@ h3 { margin-bottom: 20px; font-size: 20px; font-family: sans-serif; }
 .section-top { display: flex; gap: 40px; margin-bottom: 60px; }
 .calendar-group { width: 60%; }
 
-/* ────────────────────────────────────
-   side-group
-   — cal-main(450) + margin-top(20) + cal-sub(90) = 560px
-   — 거기에 calendar-group의 link-wrapper(h3 20 + 10 margin-top ≈ 30px) 반영
-   — ★ 수정: 560 → 530px 로 줄여서 notice를 더 위로 올림 ★
-──────────────────────────────────── */
 .side-group {
     width: 40%;
     display: flex;
     flex-direction: column;
-    height: 530px; /* ★ 560 → 530: notice가 더 위로 올라옴 */
+    height: 530px;
 }
 
 .order-box {
@@ -81,16 +75,15 @@ h3 { margin-bottom: 20px; font-size: 20px; font-family: sans-serif; }
     background: #3a3a3c;
 }
 .view-all {
-    color: #0071e3;    /* #333 → 파란색 */
-    font-size: 13px;   /* 12px → 13px */
-    font-weight: 500;  /* 추가 */
+    color: #0071e3;
+    font-size: 13px;
+    font-weight: 500;
     text-decoration: none;
     transition: opacity 0.15s;
 }
 .view-all:hover {
-    opacity: 0.7;      /* color:#000 → opacity로 변경 */
+    opacity: 0.7;
 }
-/* 세로 점: 남은 공간 흡수 → notice 위로 올라옴 */
 .vertical-dots {
     display: flex;
     flex-direction: column;
@@ -104,15 +97,13 @@ h3 { margin-bottom: 20px; font-size: 20px; font-family: sans-serif; }
 
 .notice-zone { flex-shrink: 0; }
 
-/* ★ 수정: link-wrapper 높이를 고정해서 두 전체보기 버튼 정렬 맞춤 ★ */
 .link-wrapper {
-    height: 32px;          /* order-zone과 notice-zone 모두 동일한 높이 */
+    height: 32px;
     display: flex;
     align-items: center;
     justify-content: flex-end;
     margin-top: 10px;
 }
-
 
 .notice-box { height: 200px; }
 
@@ -429,16 +420,6 @@ h3 { margin-bottom: 20px; font-size: 20px; font-family: sans-serif; }
 /* ────────────────────────────────────
    Calendar (cal-main / cal-sub)
 ──────────────────────────────────── */
-.cal-main {
-    height: 450px !important;
-    background-color: #ffffff !important;
-    border: 1px solid #eeeeee !important;
-    border-radius: 16px;
-    padding: 15px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-    overflow: hidden;
-    box-sizing: border-box;
-}
 
 #calendar { height: 100% !important; }
 
@@ -451,36 +432,43 @@ h3 { margin-bottom: 20px; font-size: 20px; font-family: sans-serif; }
     font-weight: 800;
 }
 
-/* 달력 한 칸 높이 고정 */
+/* 달력 한 칸 높이 고정 — overflow: visible 로 변경해야 multi-day 바가 보임 */
 .fc .fc-daygrid-day-frame {
-    height: 70px !important;
-    min-height: 70px !important;
-    max-height: 70px !important;
-    overflow: hidden !important;
+    min-height: 60px !important;
+    overflow: visible !important;
 }
 
 .fc .fc-daygrid-day-events {
-    overflow: hidden !important;
-    min-height: 0 !important;
+    margin-top: 8px !important;
 }
 
-.fc-event {
-    background: rgba(0, 0, 0, 0.05) !important;
-    backdrop-filter: blur(4px);
-    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+/* 이벤트 바 스타일 */
+.fc-event,
+.fc-v-event,
+.fc-h-event {
+    background-color: #f5f5f7 !important;
+    border: 1px solid rgba(0,0,0,0.08) !important;
     border-radius: 4px !important;
     padding: 2px 6px !important;
     margin-bottom: 1px !important;
+    opacity: 1 !important;
 }
 
 .fc-event-title,
 .fc-event-time,
-.fc-daygrid-event .fc-event-main {
-    color: #000000 !important;
+.fc-event-main {
+    color: #1d1d1f !important;
     font-size: 11px !important;
     font-weight: 600 !important;
     text-decoration: none !important;
 }
+
+.fc-event:hover {
+    background-color: #e8e8ed !important;
+    border-color: rgba(0,0,0,0.15) !important;
+}
+
+.fc-daygrid-event-dot { display: none !important; }
 
 .fc-daygrid-more-link {
     color: #000000 !important;
@@ -489,15 +477,33 @@ h3 { margin-bottom: 20px; font-size: 20px; font-family: sans-serif; }
     text-decoration: none !important;
 }
 
-.fc-day-other { background-color: #ffffff !important; }
-
+.fc-day-other { background-color: transparent !important; }
 .fc-day-other .fc-daygrid-day-top,
 .fc-day-other .fc-daygrid-day-number {
     visibility: hidden !important;
-    background-color: #ffffff !important;
+    background-color: transparent !important;
 }
 
-.fc .fc-daygrid-day { background-color: #ffffff !important; }
+.fc .fc-daygrid-day {
+    background-color: transparent !important;
+    position: relative !important;
+}
+
+/* 셀 테두리 */
+.fc table,
+.fc td,
+.fc th,
+.fc .fc-scrollgrid,
+.fc .fc-scrollgrid-sync-table,
+.fc .fc-scrollgrid-section > td {
+    border-color: #eeeeee !important;
+}
+
+.fc .fc-scrollgrid { border: none !important; }
+.fc .fc-scrollgrid-section-liquid > td { border-bottom: none !important; }
+.fc .fc-daygrid-body { border-right: none !important; }
+.fc .fc-scrollgrid-section > td:last-child { border-right: none !important; }
+.fc td:last-child, .fc th:last-child { border-right: none !important; }
 
 /* cal-sub */
 .cal-sub {
@@ -518,6 +524,7 @@ h3 { margin-bottom: 20px; font-size: 20px; font-family: sans-serif; }
 .cal-sub .schedule-row {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     padding: 12px 25px;
     height: 100%;
 }
@@ -551,6 +558,31 @@ h3 { margin-bottom: 20px; font-size: 20px; font-family: sans-serif; }
     margin: 0 !important;
 }
 
+.cal-sub .customer-info {
+    margin-left: auto;
+    margin-right: 40px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+}
+
+.cal-sub .btn-link {
+    border: 1px solid #000;
+    padding: 6px 14px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 700;
+    background: #000;
+    color: #ffffff !important;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.cal-sub .btn-link:hover {
+    background: #000;
+    color: #fff !important;
+}
+
 /* order-box */
 .order-zone .order-box {
     height: 240px !important;
@@ -573,7 +605,6 @@ h3 { margin-bottom: 20px; font-size: 20px; font-family: sans-serif; }
 
 .notice-zone .notice-box::-webkit-scrollbar { display: none; }
 
-/* 공통: 비어있을 때 정중앙 */
 .order-box-empty, .empty-msg-small {
     display: flex;
     align-items: center;
@@ -584,45 +615,36 @@ h3 { margin-bottom: 20px; font-size: 20px; font-family: sans-serif; }
     font-weight: 600;
     text-decoration: none !important;
 }
-/* cal-sub: customer-info & btn-link 추가 */
-.cal-sub .schedule-row {
-    justify-content: space-between; /* 추가 */
-}
 
-.cal-sub .customer-info {
-    margin-left: auto;
-    margin-right: 40px;
-    font-size: 13px;
-    font-weight: 600;
-    color: #333;
-}
-
-.cal-sub .btn-link {
-    border: 1px solid #000;
-    padding: 6px 14px;
-    border-radius: 10px;
-    font-size: 12px;
-    font-weight: 700;
-    background: #000;    
-    color: #ffffff !important;
-    text-decoration: none;
-    white-space: nowrap;
-}
-
-.cal-sub .btn-link:hover {
-    background: #000;
-    color: #fff !important;
-}
 .notice-zone h3 {
-    margin-bottom: 12px !important;  /* 기본 20px → 12px로 줄여서 row 맞춤 */
+    margin-bottom: 12px !important;
 }
+
 .cal-link-wrapper {
-    margin-top: 15px; /* 10px → 18px 로 올려보기 */
+    margin-top: 15px;
     height: 32px;
     display: flex;
     align-items: center;
     justify-content: flex-end;
 }
+
 .notice-zone .link-wrapper {
     margin-top: 20px;
+}
+
+/*여기부터 메인 수정본*/
+.cal-wrapper {
+    border: 1px solid #eeeeee;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.cal-main {
+    height: 450px !important;
+    background: #ffffff !important;
+    border: none !important;
+    border-radius: 20px !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    box-sizing: border-box;
 }
