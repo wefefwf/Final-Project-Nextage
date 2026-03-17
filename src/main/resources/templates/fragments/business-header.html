@@ -41,9 +41,9 @@
 							</ul>
 						</div>
 					</li>
-					<li class="login-item" style="position:relative;">
+					<li class="login-item" style="position:relative; display:flex; align-items:center;">
 					    <div sec:authorize="isAuthenticated()"
-						     style="position:absolute; bottom:100%; right:0; margin-bottom:8px;
+						     style="position:absolute; top:100%; right:0; margin-top:10px;
 						            font-size:14px; font-weight:500; color:#aaa;
 						            white-space:nowrap;">
 						    반갑습니다, <span th:text="${#authentication.getPrincipal().getBusiness().getCompanyName()}"></span>님
