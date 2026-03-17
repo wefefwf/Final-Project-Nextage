@@ -108,4 +108,19 @@ public class BusinessOrderHistoryController {
         return "views/orderhistory/business-order-detail"; // 상세 페이지 뷰
     }
     
+    @GetMapping("/chat/enter")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> enterChat(
+            @RequestParam("orderId") Long orderId,
+            @AuthenticationPrincipal BusinessUserDetails userDetails) {
+
+        OrderHistoryDTO order = service.getOrderDetail(orderId);
+        if (order.getRoomId() != null) {
+            return ResponseEntity.ok(Map.of("roomId", order.getRoomId()));
+        }
+
+        // 채팅방 생성
+        Long roomId = service.getOrCreateChatRoom(orderId);
+        return ResponseEntity.ok(Map.of("roomId", roomId));
+    }
 }

@@ -67,4 +67,6 @@ public interface BusinessOrderHistoryMapper {
     List<ScheduleOrderDTO> selectScheduleOrders(@Param("businessId") Long businessId);
     
     Long selectRequestIdByBidId(@Param("bidId") Long bidId);
+    
+    int selectChatFunctionExists(@Param("roomId") Long roomId);
 }

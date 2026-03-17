@@ -319,5 +319,11 @@
     <select id="selectRequestIdByBidId" resultType="Long">
         SELECT request_id FROM bids WHERE bid_id = #{bidId}
     </select>
+    
+    <select id="selectChatFunctionExists" resultType="int">
+	    SELECT COUNT(*)
+	    FROM chat_function
+	    WHERE room_id = #{roomId}
+	</select>
 
 </mapper>

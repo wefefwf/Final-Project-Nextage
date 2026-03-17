@@ -219,7 +219,7 @@
                 <div class="detail-btns" onclick="event.stopPropagation()">
                     <button class="btn btn-purple" onclick="acceptOrder()">수락</button>
                     <button class="btn btn-red"    onclick="rejectOrder()">거절</button>
-                    <a class="btn btn-green" id="dChatBtn" style="display:none;" href="#">채팅 보기</a>
+                    <a class="btn btn-green" id="dChatBtn" style="display:none;" href="#">채팅하기</a>
                 </div>
             </div>
         </div>
@@ -283,7 +283,7 @@
             <a class="btn btn-green"
                th:if="${order.roomId != null and order.acceptStatus != 'REJECTED'}"
                th:href="@{/chat(roomId=${order.roomId})}"
-               onclick="event.stopPropagation()">채팅보기</a>
+               onclick="event.stopPropagation()">채팅하기</a>
         </div>
     </div>
 
@@ -416,12 +416,20 @@
         document.getElementById('dDueDate').textContent = parseDate(o.dueDate) || '미정';
 
         var chatBtn = document.getElementById('dChatBtn');
-        if (o.roomId) {
-            chatBtn.href = '/chat?roomId=' + o.roomId;
-            chatBtn.style.display = '';
-        } else {
-            chatBtn.style.display = 'none';
-        }
+        chatBtn.style.display = ''; // ✅ 항상 표시
+        chatBtn.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (o.roomId) {
+                location.href = '/chat?roomId=' + o.roomId;
+            } else {
+                fetch('/business/order/chat/enter?orderId=' + o.orderId)
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    location.href = '/chat?roomId=' + data.roomId;
+                });
+            }
+        };
 
         document.getElementById('detailEmpty').style.display  = 'none';
         document.getElementById('detailBody').style.display   = '';

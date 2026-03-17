@@ -4,6 +4,7 @@ import com.nextage.web.domain.OrderHistoryDTO;
 import com.nextage.web.domain.OrderSearchDTO;
 import com.nextage.web.domain.ReviewDTO;
 import com.nextage.web.domain.ScheduleOrderDTO;
+import com.nextage.web.mapper.BusinessOrderHistoryMapper;
 import com.nextage.web.mapper.CustomerOrderHistoryMapper;
 import com.nextage.web.mapper.CustomerReviewMapper;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ public class CustomerOrderHistoryService {
 
     private final CustomerOrderHistoryMapper customerOrderHistoryMapper;
     private final CustomerReviewMapper       customerReviewMapper;
+    private final BusinessOrderHistoryMapper businessOrderHistoryMapper;
     private static final int PAGE_SIZE = 5;
 
     @Transactional(readOnly = true)
@@ -113,4 +115,32 @@ public class CustomerOrderHistoryService {
         log.info("주문 삭제 - orderId: {}, customerId: {}", orderId, customerId);
     }
 
+    @Transactional
+    public Long getOrCreateChatRoom(Long orderId, Long customerId) {
+        OrderHistoryDTO order = customerOrderHistoryMapper.selectOrderDetail(orderId);
+
+        if (order.getRoomId() != null) return order.getRoomId();
+
+        if (order.getBidId() == null) throw new IllegalArgumentException("개인거래 주문이 아닙니다.");
+
+        // chat_room 생성
+        businessOrderHistoryMapper.insertChatRoom(
+            order.getBidId(),
+            customerId,
+            order.getBusinessId()
+        );
+        Long roomId = businessOrderHistoryMapper.selectRoomIdByBidId(
+            order.getBidId(),
+            customerId,
+            order.getBusinessId()
+        );
+
+        // ✅ chat_function 중복 체크 후 INSERT
+        int exists = businessOrderHistoryMapper.selectChatFunctionExists(roomId);
+        if (exists == 0) {
+            businessOrderHistoryMapper.insertChatFunction(roomId, order.getBusinessId(), customerId);
+        }
+
+        return roomId;
+    }
 }

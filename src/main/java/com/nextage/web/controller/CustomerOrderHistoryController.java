@@ -161,4 +161,15 @@ public class CustomerOrderHistoryController {
 	 * ResponseEntity.badRequest().body(Map.of("success", false, "message",
 	 * e.getMessage())); } }
 	 */
+    
+    @GetMapping("/chat/enter")
+    public String enterChat(
+            @RequestParam("orderId") Long orderId,
+            @AuthenticationPrincipal CustomerUserDetails userDetails) {
+
+        if (userDetails == null) return "redirect:/login";
+
+        Long roomId = service.getOrCreateChatRoom(orderId, userDetails.getCustomerId());
+        return "redirect:/chat?roomId=" + roomId;
+    }
 }

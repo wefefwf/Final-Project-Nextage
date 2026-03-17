@@ -82,7 +82,10 @@ public class BusinessOrderHistoryService {
                     order.getCustomerId(),
                     order.getBusinessId()
                 );
-                mapper.insertChatFunction(roomId, order.getBusinessId(), order.getCustomerId());
+                int exists = mapper.selectChatFunctionExists(roomId);
+                if (exists == 0) {
+                    mapper.insertChatFunction(roomId, order.getBusinessId(), order.getCustomerId());
+                }
                 log.info("채팅방 생성 - roomId: {}, bidId: {}", roomId, order.getBidId());
             }
         }
@@ -142,5 +145,21 @@ public class BusinessOrderHistoryService {
     List<ScheduleOrderDTO> orders = mapper.selectScheduleOrders(businessId);
      return orders; 
      
+    }
+    
+    @Transactional
+    public Long getOrCreateChatRoom(Long orderId) {
+        OrderHistoryDTO order = mapper.selectOrderDetail(orderId);
+        if (order.getRoomId() != null) return order.getRoomId();
+
+        mapper.insertChatRoom(order.getBidId(), order.getCustomerId(), order.getBusinessId());
+        Long roomId = mapper.selectRoomIdByBidId(
+            order.getBidId(), order.getCustomerId(), order.getBusinessId()
+        );
+        int exists = mapper.selectChatFunctionExists(roomId);
+        if (exists == 0) {
+            mapper.insertChatFunction(roomId, order.getBusinessId(), order.getCustomerId());
+        }
+        return roomId;
     }
 }
