@@ -279,7 +279,10 @@
                 <!-- 후기 버튼: 개인거래 + 배송완료일 때만 (onclick 없이 버튼만) -->
                 <th:block th:if="${order.bidId != null and order.deliveryStatus == 4}">
                     <button class="btn-reviewed"
-                            th:if="${item.reviewed}">후기 보기</button>
+					        th:if="${item.reviewed}"
+					        th:onclick="|location.href='/business/portfolio/' + ${order.businessId} + '?reviewId=' + ${item.reviewId}|">
+					    후기 보기
+					</button>
                     <button class="btn-review"
 				        th:if="${!item.reviewed}"
 				        th:onclick="|location.href='/customer/review/write?orderItemId=' + ${item.orderItemId}|">

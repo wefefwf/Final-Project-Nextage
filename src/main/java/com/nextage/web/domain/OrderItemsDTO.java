@@ -16,4 +16,6 @@ public class OrderItemsDTO {
     private int    price;
     private boolean reviewed;
     private LocalDateTime createdAt;
+    
+    private Long reviewId;
 }
