@@ -4,6 +4,7 @@ import com.nextage.web.domain.OrderHistoryDTO;
 import com.nextage.web.domain.OrderSearchDTO;
 import com.nextage.web.domain.ScheduleOrderDTO;
 import com.nextage.web.mapper.BusinessOrderHistoryMapper;
+import com.nextage.web.mapper.BusinessSettlementMapper;
 import com.nextage.web.mapper.CustomerRequestMapper;
 
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ public class BusinessOrderHistoryService {
     private final BusinessOrderHistoryMapper mapper;
     private static final int PAGE_SIZE = 6;
     private final CustomerRequestMapper requestMapper;
+    private final BusinessSettlementMapper settlementMapper;
 
     @Transactional(readOnly = true)
     public List<OrderHistoryDTO> getPendingOrders(Long businessId, String role) {
@@ -104,6 +106,26 @@ public class BusinessOrderHistoryService {
     public void updateDeliveryStatus(Long orderId, int deliveryStatus) {
         mapper.updateDeliveryStatus(orderId, deliveryStatus);
         log.info("배송 상태 변경 - orderId: {}, status: {}", orderId, deliveryStatus);
+
+        // ✅ 배송완료(4)이고 아직 정산 데이터 없으면 자동 생성
+        if (deliveryStatus == 4) {
+            int exists = settlementMapper.existsSettlement(orderId);
+            if (exists == 0) {
+                OrderHistoryDTO order = mapper.selectOrderDetail(orderId);
+                int sales      = order.getTotalAmount();
+                int commission = (int) Math.round(sales * 0.1); // 10% 수수료
+                int settlement = sales - commission;
+
+                settlementMapper.insertSettlement(
+                    order.getBusinessId(),
+                    orderId,
+                    sales,
+                    commission,
+                    settlement
+                );
+                log.info("정산 생성 - orderId: {}, settlement: {}", orderId, settlement);
+            }
+        }
     }
 
     @Transactional(readOnly = true)
