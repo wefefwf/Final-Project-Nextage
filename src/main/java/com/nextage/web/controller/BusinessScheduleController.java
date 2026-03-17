@@ -68,21 +68,29 @@ public class BusinessScheduleController {
 	 @GetMapping("/business/schedule/active")
 	 @ResponseBody
 	 public ResponseEntity<List<ScheduleOrderDTO>> getActiveSchedule(
-	         @AuthenticationPrincipal BusinessUserDetails user) {
+	         @AuthenticationPrincipal BusinessUserDetails user,
+	         @RequestParam(name = "dueDate", required = false) String dueDateStr) {
+
 	     if (user == null) return ResponseEntity.status(401).build();
 
 	     Long businessId = user.getBusiness().getBusinessId();
 	     List<ScheduleOrderDTO> scheduleList = bohService.getScheduleOrders(businessId);
 
-	     LocalDate today = LocalDate.now();
+	     if (dueDateStr == null) return ResponseEntity.ok(List.of());
+
+	     LocalDate targetDueDate = LocalDate.parse(dueDateStr);
+
 	     List<ScheduleOrderDTO> activeList = scheduleList.stream()
 	             .filter(order -> {
-	                 LocalDate dueDate = order.getDueDate().toLocalDate();
-	                 long diff = java.time.temporal.ChronoUnit.DAYS.between(today, dueDate);
-	                 return diff >= -2 && diff <= 2; // ← 완료일 앞뒤 2일
+	                 LocalDate existingDueDate = order.getDueDate().toLocalDate();
+	                 long diff = java.time.temporal.ChronoUnit.DAYS
+	                         .between(existingDueDate, targetDueDate);
+	                 return Math.abs(diff) <= 2; // ← 새 주문 마감일 기준 앞뒤 2일
 	             })
 	             .collect(Collectors.toList());
 
 	     return ResponseEntity.ok(activeList);
 	 }
+
+
 }
