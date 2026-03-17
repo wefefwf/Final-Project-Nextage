@@ -61,6 +61,7 @@ public class CustomerOrderHistoryController {
         model.addAttribute("totalPages",  totalPages);
         model.addAttribute("search",      search);
         model.addAttribute("isAdmin",     "CADMIN".equals(role));
+        model.addAttribute("nickname", userDetails.getCustomer().getNickname());
 
         return "views/orderhistory/customer-order-history";
     }
