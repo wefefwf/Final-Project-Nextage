@@ -42,10 +42,16 @@
                             </ul>
                         </div>
                     </li>
-                    <li class="login-item">
-                        <a sec:authorize="isAnonymous()"     th:href="@{/customer/login}"           class="login-btn">Login</a>
-                        <a sec:authorize="isAuthenticated()" th:href="@{/auth/customer/logoutAction}" class="login-btn">Logout</a>
-                    </li>
+                    <li class="login-item" style="position:relative;">
+                    	<div sec:authorize="isAuthenticated()"
+						     style="position:absolute; bottom:100%; right:0; margin-bottom:8px;
+						            font-size:14px; font-weight:500; color:#aaa;
+						            white-space:nowrap;">
+						    반갑습니다, <span th:text="${#authentication.getPrincipal().getCustomer().getNickname()}"></span>님
+						</div>
+					    <a sec:authorize="isAnonymous()" th:href="@{/customer/login}" class="login-btn">Login</a>
+					    <a sec:authorize="isAuthenticated()" th:href="@{/auth/customer/logoutAction}" class="login-btn">Logout</a>
+					</li>
                 </ul>
             </nav>
         </div>
