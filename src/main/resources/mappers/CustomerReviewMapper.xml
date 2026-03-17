@@ -8,6 +8,7 @@
         SELECT 
             oi.order_item_id AS orderItemId,
             o.order_no AS orderNo,
+            o.order_id AS orderId,  
             req.title AS requestTitle,
             oi.created_at AS startDate,
             req.requested_due_date AS endDate,
@@ -20,6 +21,11 @@
         WHERE oi.order_item_id = #{orderItemId}
           AND o.customer_id = (SELECT customer_id FROM customer WHERE login_id = #{loginId})
     </select>
-	
-	
+    
+	<!-- 집어넣기 -->
+	<insert id="insertReview" parameterType="ReviewDTO">
+    INSERT INTO review (order_item_id, customer_id, business_id, content, image1, image2, image3, status)
+    VALUES (#{orderItemId}, #{customerId}, #{businessId}, #{content}, #{image1}, #{image2}, #{image3}, 'ACTIVE')
+</insert>
+
 </mapper>

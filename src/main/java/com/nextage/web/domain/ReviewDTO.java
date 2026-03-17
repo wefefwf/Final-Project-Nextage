@@ -31,5 +31,5 @@ public class ReviewDTO {
     private LocalDateTime startDate; // 작업시작일 (order_items 생성일)
     private LocalDateTime endDate;   // 작업마감일 (request 마감일)
     
-    
+    private Long orderId;  // ← 테이블 x 그냥 주문 보려고 
 }

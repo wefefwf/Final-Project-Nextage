@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -29,6 +30,7 @@ import com.nextage.web.service.BusinessPortfolioService;
 import com.nextage.web.service.CustomerReviewService;
 import com.nextage.web.service.CustomerShopService;
 import com.nextage.web.userDetails.BusinessUserDetails;
+import com.nextage.web.userDetails.CustomerUserDetails;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -38,9 +40,7 @@ public class CustomerReviewController {
 	@Autowired
 	public CustomerReviewService cService;
 
-	
-	  //portfolio페이지 가기 -business
-	  
+	 //review가기 
 	 @PreAuthorize("hasAnyRole('CUSER','CADMIN')") 
 	 @GetMapping("/customer/review/write")
 	 public String goReview(@AuthenticationPrincipal UserDetails userDetails,Model model,@RequestParam("orderItemId") long orderItemId ){
@@ -59,4 +59,25 @@ public class CustomerReviewController {
 		 return "views/review/customer-review";
 	 } 
 
+	 //review 추가하기
+	 @PostMapping("/customer/review/save")
+	 	public String insertReview(
+	 			@RequestParam("orderItemId") Long orderItemId,
+	 		    @RequestParam("businessId") Long businessId,
+	 		    @RequestParam("orderId") Long orderId,
+	 		    @RequestParam("content") String content,
+	 		    @RequestParam("image1") MultipartFile image1,
+	 		    @RequestParam(value = "image2", required = false) MultipartFile image2,
+	 		    @RequestParam(value = "image3", required = false) MultipartFile image3,
+	 		    @AuthenticationPrincipal CustomerUserDetails customerUserDetails) {
+		 
+	     ReviewDTO reviewDTO = new ReviewDTO();
+	     reviewDTO.setOrderItemId(orderItemId);
+	     reviewDTO.setBusinessId(businessId);
+	     reviewDTO.setContent(content);
+	     reviewDTO.setCustomerId(customerUserDetails.getCustomerId());
+	     
+	     cService.insertReview(reviewDTO, image1, image2, image3);
+	     return "redirect:/customer/order/detail/" + orderId;
+	 }
 }

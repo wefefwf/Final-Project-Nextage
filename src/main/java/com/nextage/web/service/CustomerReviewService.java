@@ -42,13 +42,13 @@ public class CustomerReviewService {
 		    String uuidName = UUID.randomUUID().toString() + extension;
 		    
 		 // 1. DB에 저장될 경로 (통합된 /images/kit/ 경로 사용)
-		    String dbPath = "/images/" + uuidName;
+		    String dbPath = "/images/review/" + uuidName;
 		    
 
 		 // 2. 물리적 저장 경로 (D:/nextageImage/kit/uuid.jpg)
 		    try {
 		        // uploadDir(D:/nextageImage) 바로 아래의 kit 폴더에 저장
-		    	String savePath = uploadDir.endsWith("/") ? uploadDir : uploadDir + "/";
+		        String savePath = uploadDir.endsWith("/") ? uploadDir + "review/" : uploadDir + "/review/";
 		        
 		        File folder = new File(savePath);
 		        if (!folder.exists()) folder.mkdirs(); 
@@ -60,6 +60,17 @@ public class CustomerReviewService {
 		    }
 
 		    return dbPath;
+		}
+		
+		
+		//review 저장하기
+		public void insertReview(ReviewDTO reviewDTO, MultipartFile image1, MultipartFile image2, MultipartFile image3) {
+		    
+			reviewDTO.setImage1(uploadFile(image1));
+		    reviewDTO.setImage2(uploadFile(image2));
+		    reviewDTO.setImage3(uploadFile(image3));
+		    
+		    cMapper.insertReview(reviewDTO);
 		}
 		
 		//review들고오기

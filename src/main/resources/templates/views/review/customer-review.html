@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/customer-layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>Nextage | 후기 작성</title>
+    <style>
+        :root {
+            --bg: #f5f5f7;
+            --border: rgba(0,0,0,0.08);
+            --text-primary: #1d1d1f;
+            --text-secondary: #6e6e73;
+            --accent: #bd93f9;
+            --radius-xl: 22px;
+            --radius-lg: 16px;
+            --radius-pill: 999px;
+            --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+            --ease-apple: cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body { background: var(--bg); font-family: 'Pretendard', sans-serif; color: var(--text-primary); }
+
+        .progress-wrap { position: sticky; top: 0; z-index: 200; padding: 16px 24px; background: rgba(245,245,247,0.82); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); }
+        .progress-inner { max-width: 600px; margin: 0 auto; display: flex; align-items: center; gap: 14px; }
+        .step-dots { display: flex; gap: 6px; }
+        .step-dot { width: 6px; height: 6px; border-radius: 50%; background: #aeaeb2; transition: all 0.4s var(--ease-apple); }
+        .step-dot.active { width: 20px; border-radius: 3px; background: var(--accent); }
+        .step-dot.done { background: var(--accent); }
+
+        /* 1. 전체 페이지 컨테이너 정렬 */
+		.page { 
+		    max-width: 600px; 
+		    margin: 0 auto; 
+		    padding: 60px 0 180px 0; /* 좌우 패딩을 0으로 만들어 기준선을 잡습니다 */
+		}
+        .step-section { display: none; }
+        .step-section.active { display: block; animation: stepIn 0.5s var(--ease-apple) both; }
+        @keyframes stepIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+		/* 2. 섹션 헤더 - 완전 밀착 정렬 */
+		.section-header { 
+		    margin-bottom: 40px; 
+		    display: flex; 
+		    flex-direction: column; 
+		    align-items: flex-start; 
+		    text-align: left;
+		}
+		
+		.section-eyebrow { 
+		    font-size: 0.75rem; 
+		    font-weight: 700; 
+		    color: var(--accent); 
+		    letter-spacing: 0; 
+		    margin-bottom: 8px;
+		    padding: 0;
+		}
+		
+		.section-header h2 { 
+		    font-size: 2.2rem; /* 크기를 살짝 키워 시원하게 */
+		    font-weight: 800; 
+		    letter-spacing: -0.06em; /* 굵은 글씨 특유의 자간 보정 */
+		    line-height: 1.1; 
+		    margin: 10px 0 15px -3px; /* ★ 굵은 폰트 특유의 왼쪽 공백을 마이너스 마진으로 상쇄 ★ */
+		    padding: 0;
+		    color: var(--text-primary);
+		}
+		
+		.section-header p { 
+		    margin: 0; 
+		    padding: 0;
+		    font-size: 0.95rem; 
+		    color: var(--text-secondary); 
+		    line-height: 1.6;
+		}
+        /* 공지 박스 아이콘 정렬 */
+        .notice-box p { 
+            font-size: 0.82rem; 
+            color: #7d669e; 
+            line-height: 1.6; 
+            display: flex; 
+            align-items: flex-start; 
+            gap: 6px; 
+            margin: 0; 
+        }
+
+        .notice-box i { 
+            color: var(--accent); 
+            font-size: 1rem; 
+            margin-top: 1px; /* 텍스트 첫 줄과 높이 맞춤 */
+            flex-shrink: 0;
+        }
+        .order-info-card { background: #fff; border-radius: var(--radius-xl); padding: 30px; border: 1px solid var(--border); box-shadow: 0 4px 20px rgba(0,0,0,0.03); }
+        .info-row { display: flex; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid var(--border); }
+        .info-row:last-child { border-bottom: none; }
+        .info-label { color: var(--text-secondary); font-size: 0.9rem; }
+        .info-value { font-weight: 600; }
+
+        /* ✅ 안내 문구 스타일 수정: Height를 문구에 맞게 자동 조정 */
+        .notice-box { 
+            margin-top: 24px; 
+            padding: 12px 16px; /* 패딩 축소 */
+            border-radius: var(--radius-lg); 
+            background: #fefaff; 
+            border: 1px solid rgba(189, 147, 249, 0.1); 
+            display: inline-block; /* 내용물만큼만 차지하도록 */
+            width: 100%;
+        }
+
+        /* ✅ 이미지 업로드 섹션 스타일 수정 */
+        .image-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 20px; }
+        .image-box { 
+            aspect-ratio: 1/1; border: 2px dashed var(--border); border-radius: var(--radius-lg);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            cursor: pointer; position: relative; overflow: hidden; background: #fff; transition: all 0.3s;
+        }
+        /* 첫 번째 박스(필수) 강조 */
+        .image-box.required-box { border-color: rgba(189, 147, 249, 0.4); background: #fdfbff; }
+        .image-box.required-box::before {
+            content: "REQUIRED";
+            position: absolute; top: 8px; left: 8px;
+            font-size: 0.6rem; font-weight: 800; color: var(--accent);
+            letter-spacing: 0.05em;
+        }
+        .image-box:hover { border-color: var(--accent); background: var(--accent-soft); }
+        .image-box i { font-size: 1.5rem; color: #aeaeb2; margin-bottom: 5px; }
+        .image-box span { font-size: 0.7rem; color: #aeaeb2; font-weight: 600; }
+        .image-box.required-box i, .image-box.required-box span { color: var(--accent); }
+        
+        .image-box input[type="file"] { display: none; }
+        
+        .preview-img { 
+            position: absolute; inset: 0; width: 100%; height: 100%; 
+            object-fit: cover; display: none; 
+            background-color: #ffffff;
+            z-index: 10;
+        }
+
+        .apple-textarea { 
+            width: 100%; height: 250px; padding: 20px; border-radius: var(--radius-lg);
+            border: 1.5px solid var(--border); background: #fff; font-size: 1rem;
+            font-family: inherit; outline: none; resize: none; transition: all 0.25s;
+        }
+        .apple-textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
+
+        .action-bar { position: fixed; bottom: 0; left: 0; width: 100%; padding: 20px 24px 40px; background: rgba(245,245,247,0.82); backdrop-filter: saturate(180%) blur(20px); border-top: 1px solid var(--border); z-index: 100; }
+        .action-bar-inner { max-width: 600px; margin: 0 auto; display: grid; grid-template-columns: 8fr 4fr; gap: 12px; align-items: center; }
+        
+        .back-btn-new { padding: 18px; border-radius: var(--radius-lg); border: 1.5px solid var(--border); background: #fff; color: var(--text-secondary); font-weight: 700; cursor: pointer; transition: all 0.25s; text-align: center; font-family: inherit; }
+        .back-btn-new:hover { background: #f5f5f7; border-color: var(--text-tertiary); }
+
+        .cta-btn { width: 100%; padding: 18px; border-radius: var(--radius-lg); border: none; background: var(--text-primary); color: #fff; font-weight: 700; cursor: pointer; transition: all 0.3s var(--spring); font-family: inherit; }
+        .cta-btn:hover { background: var(--accent); transform: scale(1.02); }
+        /* 3. 카드 및 입력창들도 왼쪽 라인에 맞춤 */
+.order-info-card, .notice-box, .image-grid, .apple-textarea {
+    width: 100%;
+    margin-left: 0;
+}
+    </style>
+</head>
+<body>
+<th:block layout:fragment="content">
+    <div class="progress-wrap">
+        <div class="progress-inner">
+            <div class="step-dots">
+                <div class="step-dot active" id="dot1"></div>
+                <div class="step-dot" id="dot2"></div>
+                <div class="step-dot" id="dot3"></div>
+            </div>
+            <div class="progress-label" id="stepLabel">Step 1 of 3</div>
+        </div>
+    </div>
+
+    <div class="page">
+        <form id="reviewForm" th:action="@{/customer/review/save}" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="orderItemId" th:value="${orderInfo.orderItemId}">
+            <input type="hidden" name="businessId" th:value="${orderInfo.businessId}">
+            <input type="hidden" name="orderId" th:value="${orderInfo.orderId}">
+
+            <div class="step-section active" id="step1">
+                <div class="section-header">
+                    <div class="section-eyebrow">Review Step 1</div>
+                    <h2>주문 정보를 확인해 주세요!</h2>
+                </div>
+                <div class="order-info-card">
+                    <div class="info-row">
+                        <span class="info-label">의뢰 제목</span>
+                        <span class="info-value" th:text="${orderInfo.requestTitle}">의뢰 제목</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">주문 번호</span>
+                        <span class="info-value" th:text="${orderInfo.orderNo}">ORD-12345</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">작업 기간</span>
+                        <span class="info-value">
+                            <span th:text="${#temporals.format(orderInfo.startDate, 'yy.MM.dd')}"></span> ~ 
+                            <span th:text="${#temporals.format(orderInfo.endDate, 'yy.MM.dd')}"></span>
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="notice-box">
+                    <p>
+                        <i class="bi bi-info-circle-fill"></i>
+                        <span>&nbsp;작성하신 후기는 등록 후 수정 및 삭제가 어렵습니다.<br>&nbsp;후기는 제작자의 포트폴리오로 활용되니 신중하게 작성해 주세요.</span>
+                    </p>
+                </div>
+            </div>
+
+            <div class="step-section" id="step2">
+                <div class="section-header">
+                    <div class="section-eyebrow">Review Step 2</div>
+                    <h2 class ="mt-2 mb-2">멋진 결과물을<br>사진으로 공유해 주세요</h2>
+                    <p>최대 3장까지 등록 가능합니다. <strong style="color:var(--accent); font-weight:500;">(첫 번째 사진은 필수입니다.)</strong></p>
+                </div>
+                <div class="image-grid">
+                    <label class="image-box required-box" for="file1">
+                        <i class="bi bi-camera-fill"></i><span>대표 사진</span>
+                        <input type="file" id="file1" name="image1" accept="image/*" onchange="preview(this)">
+                        <img class="preview-img">
+                    </label>
+                    <label class="image-box" for="file2">
+                        <i class="bi bi-plus-lg"></i><span>추가 사진</span>
+                        <input type="file" id="file2" name="image2" accept="image/*" onchange="preview(this)">
+                        <img class="preview-img">
+                    </label>
+                    <label class="image-box" for="file3">
+                        <i class="bi bi-plus-lg"></i><span>추가 사진</span>
+                        <input type="file" id="file3" name="image3" accept="image/*" onchange="preview(this)">
+                        <img class="preview-img">
+                    </label>
+                </div>
+                <div class="notice-box">
+                    <p>
+                        <i class="bi bi-info-circle-fill"></i>
+                        <span>&nbsp;작성하신 후기는 등록 후 수정 및 삭제가 어렵습니다.<br>&nbsp;후기는 제작자의 포트폴리오로 활용되니 신중하게 작성해 주세요.</span>
+                    </p>
+                </div>
+            </div>
+
+            <div class="step-section" id="step3">
+                <div class="section-header">
+                    <div class="section-eyebrow">Review Step 3</div>
+                    <h2>상세한 후기를<br>남겨주세요</h2>
+                    <p>작업 과정이나 결과물에 대해 자유롭게 적어주세요.</p>
+                </div>
+                <textarea name="content" id="reviewContent" class="apple-textarea" placeholder="여기에 내용을 입력하세요..."></textarea>
+                <div class="notice-box">
+                    <p>
+                        <i class="bi bi-info-circle-fill"></i>
+                        <span>&nbsp;작성하신 후기는 등록 후 수정 및 삭제가 어렵습니다.<br>&nbsp;후기는 제작자의 포트폴리오로 활용되니 신중하게 작성해 주세요.</span>
+                    </p>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="action-bar">
+        <div class="action-bar-inner">
+            <button type="button" class="cta-btn" id="mainBtn" onclick="nextStep()">계속하기</button>
+            <button type="button" class="back-btn-new" id="backBtn" onclick="handleBack()">목록으로</button>
+        </div>
+    </div>
+
+<script th:inline="javascript">
+    let currentStep = 1;
+
+    function updateUI() {
+        const sections = document.querySelectorAll('.step-section');
+        sections.forEach((s, idx) => {
+            s.classList.toggle('active', (idx + 1) === currentStep);
+        });
+
+        for (let i = 1; i <= 3; i++) {
+            const dot = document.getElementById('dot' + i);
+            dot.classList.remove('active', 'done');
+            if (i < currentStep) dot.classList.add('done');
+            if (i === currentStep) dot.classList.add('active');
+        }
+
+        document.getElementById('stepLabel').innerText = `Step ${currentStep} of 3`;
+        const backBtn = document.getElementById('backBtn');
+        const mainBtn = document.getElementById('mainBtn');
+        
+        if (currentStep === 1) {
+            backBtn.innerText = "목록으로";
+        } else {
+            backBtn.innerText = "이전";
+        }
+        mainBtn.innerText = currentStep === 3 ? '후기 등록하기' : '계속하기';
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+
+    function handleBack() {
+        if (currentStep === 1) {
+            if (confirm('후기 작성을 취소하고 목록으로 돌아갈까요?')) {
+                location.href = '/customer/order/history';
+            }
+        } else {
+            currentStep--;
+            updateUI();
+        }
+    }
+
+    function nextStep() {
+        if (currentStep === 1) {
+            currentStep = 2;
+            updateUI();
+        } else if (currentStep === 2) {
+            const file1 = document.getElementById('file1');
+            if (!file1.files || file1.files.length === 0) {
+                alert('대표 사진을 등록해 주세요.');
+                return;
+            }
+            currentStep = 3;
+            updateUI();
+        } else if (currentStep === 3) {
+            const content = document.getElementById('reviewContent').value.trim();
+            if (!content) {
+                alert('상세한 후기 내용을 입력해 주세요.');
+                return;
+            }
+            if (confirm('작성하신 후기를 등록하시겠습니까?')) {
+                document.getElementById('reviewForm').submit();
+            }
+        }
+    }
+
+    function preview(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            const previewImg = input.parentElement.querySelector('.preview-img');
+            reader.onload = function(e) {
+                previewImg.src = e.target.result;
+                previewImg.style.display = 'block';
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>
+</th:block>
+</body>
+</html>

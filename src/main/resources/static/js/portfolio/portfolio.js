@@ -66,6 +66,9 @@ $(document).ready(function() {
         // 이미지 2개 이상이면 slick 실행
         if(sliderImages.length >= 2){
 
+            // 숨겨진 슬라이드 완전히 제거
+            $slider.find('.slide-item:hidden').remove();
+
             $slider.slick({
                 dots: true,
                 arrows: false,
@@ -80,13 +83,20 @@ $(document).ready(function() {
         }
     });
 
-    // 모달 닫힐 때 slick 제거
-    $('#workModal').on('hide.bs.modal', function () {
-        if ($slider.hasClass('slick-initialized')) {
-            $slider.slick('unslick');
-        }
-    });
-});
+    // 모달 닫힐 때 slick 제거 + 슬라이드 복원
+	// 모달 닫힐 때 slick 제거 + 슬라이드 복원
+	$('#workModal').on('hidden.bs.modal', function () {
+	    if ($slider.hasClass('slick-initialized')) {
+	        $slider.slick('unslick');
+	    }
+	    $slider.html(`
+	        <div class="slide-item"><img id="mImg1" src="" class="square-img"></div>
+	        <div class="slide-item"><img id="mImg2" src="" class="square-img"></div>
+	        <div class="slide-item"><img id="mImg3" src="" class="square-img"></div>
+	    `);
+	});
+
+	}); // ← 이 닫는 괄호가 빠져있어요! 첫 번째 $(document).ready 닫기
 
 // 3. 상태 변경
 function toggleStatus() {
@@ -177,8 +187,6 @@ function toggleStatus() {
 	}
 	
 	//커리어 수정
-	// 버튼(btn) 인자 빼고 careerId만 받아서 처리
-	// 1. btn 인자를 확실히 활용하도록 수정
 	function editCareer(btn, careerId) {
 	    const box = btn.closest('.career-item');
 	    if (!box) return;
@@ -186,7 +194,6 @@ function toggleStatus() {
 	    const span = box.querySelector('span');
 	    const originalText = span.innerText;
 
-	    // 1. 수정 중인지 확인하는 플래그 (중복 실행 방지)
 	    let isSubmitting = false;
 
 	    span.style.flex = "1";
@@ -195,7 +202,6 @@ function toggleStatus() {
 	    const input = span.querySelector('input');
 	    input.focus();
 
-	    // 엔터 누르면 수정 Ajax
 	    input.addEventListener('keypress', function(e) {
 	        if (e.key === 'Enter') {
 	            const updatedText = this.value.trim();
@@ -204,7 +210,7 @@ function toggleStatus() {
 	                return;
 	            }
 
-	            isSubmitting = true; // 수정 시작됨을 표시
+	            isSubmitting = true;
 
 	            $.ajax({
 	                url: '/business/portfolio/updateCareer',
@@ -220,16 +226,13 @@ function toggleStatus() {
 	                error: function(response){ 
 	                    alert("경력 수정 실패"); 
 						console.log("서버 응답:", response);
-	                    span.innerText = originalText; // 에러 시 복구
+	                    span.innerText = originalText;
 	                }
 	            });
 	        }
 	    });
 
-	    // 포커스 잃으면 원상복구
 	    input.addEventListener('blur', function(){
-	        // 2. 만약 엔터를 눌러서 이미 서버로 보내는 중(isSubmitting)이라면, 
-	        // blur 로직(원상복구)이 실행되지 않게 막아야 합니다.
 	        if(!isSubmitting) {
 	            span.innerText = originalText;
 	        }
@@ -239,10 +242,8 @@ function toggleStatus() {
 	$('.btn-add-career').click(function() {
 	    const container = $('.career-container');
 	    
-	    // 1. 이미 비어있는 입력창이 있으면 패스
 	    if ($('.career-new-input').length > 0) return;
 
-	    // 2. 새로운 입력창 추가
 	    const newBox = $(`
 	        <div class="info-box career-item">
 	            <span style="flex:1;">
@@ -251,14 +252,12 @@ function toggleStatus() {
 	        </div>
 	    `);
 	    
-	    // 만약 "등록된 경력이 없습니다" 박스가 있으면 지우고 추가
 	    if ($('.empty-box').length > 0) $('.empty-box').hide();
 	    
 	    container.append(newBox);
 	    const input = newBox.find('input');
 	    input.focus();
 
-	    // 3. 엔터 치면 저장
 	    input.on('keypress', function(e) {
 	        if (e.key === 'Enter') {
 	            const text = $(this).val().trim();
@@ -277,31 +276,27 @@ function toggleStatus() {
 	});
 	//이미지 추가,수정
 	function uploadProfileImage(input) {
-	    // 1. 선택된 파일이 있는지 확인
 	    if (!input.files || !input.files[0]) return;
 
 	    const file = input.files[0];
 	    
-	    // 2. 파일이 진짜 이미지인지 간단히 체크 (보안)
 	    if (!file.type.match('image.*')) {
 	        alert("이미지 파일만 업로드 가능합니다.");
 	        return;
 	    }
 
-	    // 3. FormData 객체 생성 (파일 전송용 바구니)
 	    const formData = new FormData();
 	    formData.append("profileImage", file); 
 
-	    // 4. 서버로 전송
 	    $.ajax({
 	        url: '/business/portfolio/updateProfileImage',
 	        type: 'POST',
 	        data: formData,
-	        processData: false, // 파일 전송 시 필수!
-	        contentType: false, // 파일 전송 시 필수!
+	        processData: false,
+	        contentType: false,
 	        success: function(response) {
 	            alert("프로필 이미지가 변경되었습니다.");
-	            location.reload(); // 화면 새로고침해서 바뀐 사진 보여주기
+	            location.reload();
 	        },
 	        error: function() {
 	            alert("이미지 업로드 실패");
@@ -309,21 +304,15 @@ function toggleStatus() {
 	    });
 	}
 	//메인에서 포폴 눌렀을떄
-	
 	$(document).ready(function() {
-	    // 1. URL에서 ?reviewId=123 파라미터가 있는지 확인
 	    const urlParams = new URLSearchParams(window.location.search);
 	    const reviewId = urlParams.get('reviewId');
 
 	    if (reviewId) {
-	        // 2. 상세 페이지의 카드들 중 th:data-id="${review.reviewId}"가 일치하는 녀석 찾기
-	        // 사장님 상세페이지 HTML을 보니 .work-card 클래스에 data-id 속성이 있네요.
 	        const $targetCard = $(`.work-card[data-id="${reviewId}"]`);
 	        
 	        if ($targetCard.length > 0) {
-	            // 3. 페이지 로딩 후 0.5초 뒤에 강제로 클릭 발생
 	            setTimeout(function() {
-	                // 부트스트랩 모달을 띄우는 이벤트를 트리거합니다.
 	                $targetCard.get(0).click(); 
 	                console.log(reviewId + "번 포트폴리오 모달을 자동으로 엽니다.");
 	            }, 500);
