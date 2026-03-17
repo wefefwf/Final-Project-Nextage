@@ -5,14 +5,14 @@
 
 <div layout:fragment="content">
     <style>
-        .chat-page-container { max-width: 1200px; margin: 40px auto; display: flex; height: 750px; border: 1px solid #333; border-radius: 12px; overflow: hidden; background: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-        .chat-sidebar { width: 320px; border-right: 1px solid #eee; display: flex; flex-direction: column; background: #f8f9fa; }
+        .chat-page-container { max-width: 1200px; margin: 0 auto 40px; display: flex; height: 750px; border: 1px solid #333; border-radius: 12px; overflow: hidden; background: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .chat-sidebar { width: 320px; border-right: 1px solid #eee; display: flex; flex-direction: column; background: #f8f9fa; flex-shrink: 0; }
         .sidebar-header { padding: 25px; font-weight: 800; font-size: 1.2rem; border-bottom: 2px solid #333; color: #222; background: #fff; }
         .chat-list { flex: 1; overflow-y: auto; }
         .chat-item { padding: 20px; border-bottom: 1px solid #eee; cursor: pointer; transition: 0.2s; }
         .chat-item.active { background: #333 !important; color: #fff !important; border-left: 6px solid #ffc107; }
         .chat-item.active .text-muted { color: #ccc !important; }
-        .chat-main { flex: 1; display: flex; flex-direction: column; background: #fff; }
+        .chat-main { flex: 1; display: flex; flex-direction: column; background: #fff; min-width: 0; }
         .chat-body { flex: 1; overflow-y: auto; padding: 25px; display: flex; flex-direction: column; gap: 12px; background: #f4f4f4; }
         .msg-row { display: flex; align-items: flex-end; width: 100%; margin-bottom: 5px; }
         .msg-row.right { flex-direction: row-reverse; }
@@ -49,11 +49,7 @@
                                   class="badge bg-danger rounded-pill me-1" 
                                   th:id="'unread-count-' + ${room.roomId}" 
                                   th:text="${room.unreadCount}"></span>
-                            <span th:unless="${room.unreadCount != null and room.unreadCount > 0}" 
-                                  class="badge bg-danger rounded-pill me-1" 
-                                  th:id="'unread-count-' + ${room.roomId}" 
-                                  style="display: none;">0</span>
-                            <small th:id="'room-time-' + ${room.roomId}" th:text="${room.lastMessageTime}"></small>
+                            <small class="room-time-text" th:id="'room-time-' + ${room.roomId}" th:data-time="${room.lastMessageTime}"></small>
                         </div>
                     </div>
                     <div style="font-size: 12px; margin-top: 4px;" class="text-truncate">
@@ -70,9 +66,7 @@
                 <div th:each="room : ${myRooms}" th:if="${room.roomId == currentRoomId}"
                      class="p-3 d-flex justify-content-between align-items-center"
                      th:onclick="|location.href='/business/request/detail/' + ${room.requestId}|"
-                     style="cursor: pointer; transition: background 0.2s;" 
-                     onmouseover="this.style.background='#f8f9fa'" 
-                     onmouseout="this.style.background='#fff'">
+                     style="cursor: pointer;">
                     <div class="d-flex flex-column">
                         <div class="fw-bold text-dark" style="font-size: 16px;" th:text="${room.partnerName}"></div>
                         <div style="font-size: 13px; color: #b8860b; margin-top: 4px;">
@@ -118,14 +112,21 @@
         let selectedFile = null;
         let lastDisplayedDate = null;
 
-        function formatTime(dateStr) {
-            const date = new Date(dateStr);
-            let hours = date.getHours();
-            const minutes = String(date.getMinutes()).padStart(2, '0');
-            const ampm = hours >= 12 ? '오후' : '오전';
-            hours = hours % 12;
-            hours = hours ? hours : 12;
-            return ampm + ' ' + hours + ':' + minutes;
+        function formatDisplayDate(dateStr) {
+            if (!dateStr) return '';
+            const d = new Date(dateStr);
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const targetDate = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+            const diffDays = Math.floor((today - targetDate) / (24 * 60 * 60 * 1000));
+            if (diffDays === 0) return d.getHours().toString().padStart(2, '0') + ':' + d.getMinutes().toString().padStart(2, '0');
+            if (diffDays === 1) return '어제';
+            return d.getFullYear() + '-' + (d.getMonth() + 1).toString().padStart(2, '0') + '-' + d.getDate().toString().padStart(2, '0');
+        }
+
+        function formatBubbleTime(dateStr) {
+            const d = new Date(dateStr);
+            return d.getHours().toString().padStart(2, '0') + ':' + d.getMinutes().toString().padStart(2, '0');
         }
 
         function formatDate(dateStr) {
@@ -143,10 +144,11 @@
         function connect() {
             const socket = new SockJS('/ws-chat');
             stompClient = Stomp.over(socket);
+            stompClient.debug = null;
             stompClient.connect({}, function (frame) {
                 stompClient.subscribe('/sub/chat/user/' + userType + '/' + myId, function (message) {
                     const msg = JSON.parse(message.body);
-                    updateSidebar(msg.roomId, msg.content, msg.messageType);
+                    updateSidebar(msg.roomId, msg.content, msg.messageType, msg.sendAt);
                 });
                 if (currentRoomId) {
                     stompClient.subscribe('/sub/chat/room/' + currentRoomId, function (message) {
@@ -164,52 +166,52 @@
                 lastDisplayedDate = msgDate;
             }
             const row = document.createElement('div');
-            row.className = `msg-row ${message.senderId === myId && message.senderType === 'BUSINESS' ? 'right' : 'left'}`;
+            const isMy = message.senderId === myId && message.senderType === userType;
+            row.className = `msg-row ${isMy ? 'right' : 'left'}`;
             let content = '';
             if (message.messageType === 'IMAGE') {
-                content = `<div class="msg-bubble msg-image-only ${message.senderId === myId && message.senderType === 'BUSINESS' ? 'msg-right' : 'msg-left'}"><img src="${message.content}" style="max-width:200px; border-radius:8px;"></div>`;
+                content = `<div class="msg-bubble msg-image-only ${isMy ? 'msg-right' : 'msg-left'}"><img src="${message.content}" style="max-width:200px; border-radius:8px;"></div>`;
             } else {
-                content = `<div class="msg-bubble ${message.senderId === myId && message.senderType === 'BUSINESS' ? 'msg-right' : 'msg-left'}"><span>${message.content}</span></div>`;
+                content = `<div class="msg-bubble ${isMy ? 'msg-right' : 'msg-left'}"><span>${message.content}</span></div>`;
             }
-            row.innerHTML = content + `<span class="msg-time">${formatTime(message.sendAt)}</span>`;
+            row.innerHTML = content + `<span class="msg-time">${formatBubbleTime(message.sendAt)}</span>`;
             chatBody.appendChild(row);
             if(!isInitial) {
                 chatBody.scrollTop = chatBody.scrollHeight;
-                updateSidebar(message.roomId, message.content, message.messageType);
+                updateSidebar(message.roomId, message.content, message.messageType, message.sendAt);
             }
         }
 
-        function updateSidebar(roomId, content, messageType) {
+        function updateSidebar(roomId, content, messageType, sendAt) {
             const roomItem = document.getElementById('room-item-' + roomId);
             if(roomItem) {
                 const msgSpan = document.getElementById('room-msg-' + roomId);
                 const timeSpan = document.getElementById('room-time-' + roomId);
-                const now = new Date();
                 if(msgSpan) msgSpan.innerText = (messageType === 'IMAGE') ? '(사진)' : content;
-                if(timeSpan) timeSpan.innerText = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+                if(timeSpan) timeSpan.innerText = formatDisplayDate(sendAt || new Date());
                 document.getElementById('chatListContainer')?.prepend(roomItem);
             }
         }
 
         function sendMessage() {
             const input = document.getElementById('messageInput');
-            if(!input || (!input.value && !selectedFile)) return;
+            if(!input || (!input.value.trim() && !selectedFile)) return;
             if (selectedFile) {
                 const formData = new FormData();
                 formData.append("file", selectedFile);
                 fetch('/chat/upload', { method: 'POST', body: formData }).then(res => res.text()).then(url => {
-                    stompClient.send("/pub/chat/send", {}, JSON.stringify({ roomId: currentRoomId, senderId: myId, senderType: 'BUSINESS', messageType: 'IMAGE', content: url }));
+                    stompClient.send("/pub/chat/send", {}, JSON.stringify({ roomId: currentRoomId, senderId: myId, senderType: userType, messageType: 'IMAGE', content: url }));
                     clearImagePreview();
-                    if(input.value) { sendTextMessage(input.value); input.value = ''; }
+                    if(input.value.trim()) { sendTextMessage(input.value.trim()); input.value = ''; }
                 });
             } else {
-                sendTextMessage(input.value);
+                sendTextMessage(input.value.trim());
                 input.value = ''; 
             }
         }
 
         function sendTextMessage(content) {
-            stompClient.send("/pub/chat/send", {}, JSON.stringify({ roomId: currentRoomId, senderId: myId, senderType: 'BUSINESS', messageType: 'TEXT', content: content }));
+            stompClient.send("/pub/chat/send", {}, JSON.stringify({ roomId: currentRoomId, senderId: myId, senderType: userType, messageType: 'TEXT', content: content }));
         }
 
         function previewFile() {
@@ -218,7 +220,7 @@
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     document.getElementById('imagePreview').src = e.target.result;
-                    document.getElementById('imagePreviewContainer').style.display = 'block';
+                    document.getElementById('imagePreviewContainer').setAttribute('style', 'display: block !important');
                 };
                 reader.readAsDataURL(selectedFile);
             }
@@ -235,6 +237,9 @@
         }
 
         window.onload = function() {
+            document.querySelectorAll('.room-time-text').forEach(el => {
+                el.innerText = formatDisplayDate(el.getAttribute('data-time'));
+            });
             connect();
             if(initialMessages) { initialMessages.forEach(m => appendMessageToScreen(m, true)); chatBody.scrollTop = chatBody.scrollHeight; }
             document.getElementById('messageInput')?.addEventListener('keypress', e => { if(e.key === 'Enter') sendMessage(); });

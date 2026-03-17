@@ -2,11 +2,13 @@ package com.nextage.web.service;
 
 import java.util.List;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import com.nextage.web.domain.ChatMessageDTO;
 import com.nextage.web.domain.ChatRoomDTO;
 import com.nextage.web.mapper.ChatMapper;
 
 @Service
+@Transactional
 public class ChatService {
     private final ChatMapper chatMapper;
 
@@ -14,41 +16,35 @@ public class ChatService {
         this.chatMapper = chatMapper;
     }
 
-    public List<ChatRoomDTO> getMyRooms(Long myId, String userType) {
-        return chatMapper.selectMyChatRooms(myId, userType);
+    public List<ChatRoomDTO> getMyRooms(Long userId, String userType) {
+        return chatMapper.findRoomsByUserId(userId, userType);
+    }
+
+    public List<ChatRoomDTO> getAllRooms() {
+        return chatMapper.findAllRooms();
     }
 
     public List<ChatMessageDTO> getRoomMessages(Long roomId) {
-        return chatMapper.selectMessages(roomId);
+        return chatMapper.findMessagesByRoomId(roomId);
     }
 
     public void saveMessage(ChatMessageDTO message) {
         chatMapper.insertMessage(message);
     }
 
-    public void updateReadStatus(Long roomId, String userType) {
-        chatMapper.updateMessageReadStatus(roomId, userType);
-    }
-
-    public int getTotalUnreadCount(Long myId, String userType) {
-        return chatMapper.selectTotalUnreadCount(myId, userType);
-    }
-
-    public List<ChatMessageDTO> getPastMessages(Long roomId, Long lastMessageId) {
-        return chatMapper.selectPastMessages(roomId, lastMessageId);
-    }
-
     public ChatRoomDTO getRoomById(Long roomId) {
-        return chatMapper.selectRoomById(roomId);
+        return chatMapper.findRoomById(roomId);
     }
 
     public ChatRoomDTO getRoomByBidId(Long bidId) {
-        Long roomId = chatMapper.selectRoomByBidId(bidId);
-        if (roomId == null) return null;
-        return chatMapper.selectRoomById(roomId);
+        return chatMapper.findRoomByBidId(bidId);
     }
 
     public void createChatRoom(ChatRoomDTO chatRoomDTO) {
         chatMapper.insertChatRoom(chatRoomDTO);
+    }
+
+    public void updateReadStatus(Long roomId, String userType) {
+        chatMapper.updateReadStatus(roomId, userType);
     }
 }

@@ -35,6 +35,6 @@ public class BusinessRequestController {
     public String requestDetail(@PathVariable("requestId") Long requestId, Model model) {
         RequestDTO request = requestService.getRequestDetail(requestId);
         model.addAttribute("request", request);
-        return "views/request/business-requestDetail";
+        return "views/request/customer-requestDetail";
     }
 }

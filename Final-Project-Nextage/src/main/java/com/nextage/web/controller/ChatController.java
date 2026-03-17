@@ -47,7 +47,8 @@ public class ChatController {
         String userType = null;
         String viewName = null;
 
-        boolean isAdmin = authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_BADMIN"));
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_BADMIN") || a.getAuthority().equals("BADMIN"));
 
         if (isAdmin) {
             userType = "BADMIN";
@@ -65,16 +66,18 @@ public class ChatController {
             return "redirect:/login";
         }
 
-        List<ChatRoomDTO> myRooms = chatService.getMyRooms(myId, userType);
+        List<ChatRoomDTO> myRooms = isAdmin ? chatService.getAllRooms() : chatService.getMyRooms(myId, userType);
+        
         if (roomId != null) {
             if (!isAdmin) {
                 boolean isAuthorized = myRooms.stream().anyMatch(room -> room.getRoomId().equals(roomId));
-                if (!isAuthorized) throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+                if (!isAuthorized) throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access Denied");
                 chatService.updateReadStatus(roomId, userType);
             }
             model.addAttribute("messages", chatService.getRoomMessages(roomId));
             model.addAttribute("currentRoomId", roomId);
         }
+        
         model.addAttribute("myRooms", myRooms);
         model.addAttribute("myId", myId);
         model.addAttribute("userType", userType);
@@ -88,15 +91,20 @@ public class ChatController {
         Object principal = authentication.getPrincipal();
         Long myId = null;
         String userType = null;
-        if (authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_BADMIN"))) {
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_BADMIN") || a.getAuthority().equals("BADMIN"));
+        
+        if (isAdmin) {
             userType = "BADMIN"; myId = 0L;
         } else if (principal instanceof CustomerUserDetails) {
             myId = ((CustomerUserDetails) principal).getCustomer().getCustomerId(); userType = "CUSTOMER";
         } else if (principal instanceof BusinessUserDetails) {
             myId = ((BusinessUserDetails) principal).getBusiness().getBusinessId(); userType = "BUSINESS";
         }
-        List<ChatRoomDTO> rooms = chatService.getMyRooms(myId, userType);
+        
+        List<ChatRoomDTO> rooms = isAdmin ? chatService.getAllRooms() : chatService.getMyRooms(myId, userType);
         int totalUnread = rooms.stream().mapToInt(ChatRoomDTO::getUnreadCount).sum();
+        
         Map<String, Object> result = new HashMap<>();
         result.put("myId", myId);
         result.put("userType", userType);
@@ -109,11 +117,14 @@ public class ChatController {
     public ResponseEntity<List<ChatRoomDTO>> getMiniRooms(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         Object principal = authentication.getPrincipal();
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_BADMIN") || a.getAuthority().equals("BADMIN"));
+        
+        if (isAdmin) return ResponseEntity.ok(chatService.getAllRooms());
+        
         Long myId = null;
         String userType = null;
-        if (authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_BADMIN"))) {
-            userType = "BADMIN"; myId = 0L;
-        } else if (principal instanceof CustomerUserDetails) {
+        if (principal instanceof CustomerUserDetails) {
             myId = ((CustomerUserDetails) principal).getCustomer().getCustomerId(); userType = "CUSTOMER";
         } else if (principal instanceof BusinessUserDetails) {
             myId = ((BusinessUserDetails) principal).getBusiness().getBusinessId(); userType = "BUSINESS";
