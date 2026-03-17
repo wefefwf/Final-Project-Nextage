@@ -36,4 +36,12 @@ public interface BusinessSettlementMapper {
 
     // BADMIN: 특정 업체 이번 달 요약
     SettlementDTO selectMonthSummaryByBusinessIdForAdmin(@Param("businessId") Long businessId);
+    
+    void insertSettlement(@Param("businessId")       Long businessId,
+		            @Param("orderId")           Long orderId,
+		            @Param("salesAmount")       int salesAmount,
+		            @Param("commissionAmount")  int commissionAmount,
+		            @Param("settlementAmount")  int settlementAmount);
+			
+	int existsSettlement(@Param("orderId") Long orderId);
 }

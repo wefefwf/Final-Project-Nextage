@@ -91,5 +91,24 @@
           AND YEAR(created_at)  = YEAR(NOW())
           AND MONTH(created_at) = MONTH(NOW())
     </select>
+    
+    <insert id="insertSettlement">
+	    INSERT INTO business_settlement 
+	        (business_id, order_id, sales_amount, commission_amount, settlement_amount, settlement_status, created_at)
+	    VALUES (
+	        #{businessId},
+	        #{orderId},
+	        #{salesAmount},
+	        #{commissionAmount},
+	        #{settlementAmount},
+	        'PENDING',
+	        NOW()
+	    )
+	</insert>
+	
+	<!-- 중복 체크 -->
+	<select id="existsSettlement" resultType="int">
+	    SELECT COUNT(*) FROM business_settlement WHERE order_id = #{orderId}
+	</select>
 
 </mapper>

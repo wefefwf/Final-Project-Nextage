@@ -6,6 +6,9 @@
         SELECT 
             cr.room_id as roomId,
             <choose>
+                <when test="userType == 'BADMIN'">
+                    CONCAT(c.nickname, ' &amp; ', b.company_name) as partnerName,
+                </when>
                 <when test="userType == 'CUSTOMER'">
                     b.company_name as partnerName,
                 </when>
@@ -13,7 +16,6 @@
                     c.nickname as partnerName,
                 </otherwise>
             </choose>
-            <![CDATA[
             IFNULL(
                 CASE 
                     WHEN m.message_type = 'IMAGE' THEN '(사진)'
@@ -23,27 +25,13 @@
             ) as lastMessage,
             CASE 
                 WHEN m.send_at IS NULL THEN '' 
-                WHEN YEAR(m.send_at) < YEAR(CURDATE()) THEN DATE_FORMAT(m.send_at, '%Y-%m-%d')
                 WHEN DATE(m.send_at) = CURDATE() THEN DATE_FORMAT(m.send_at, '%H:%i')
-                WHEN DATE(m.send_at) = DATE_SUB(CURDATE(), INTERVAL 1 DAY) THEN '어제'
                 ELSE DATE_FORMAT(m.send_at, '%m-%d')
             END as lastMessageTime,
-            (SELECT COUNT(*) 
-             FROM chat_message cm 
-             WHERE cm.room_id = cr.room_id 
-               AND cm.sender_type != #{userType} 
-               AND cm.is_read = 0) as unreadCount
-            ]]>
+            (SELECT COUNT(*) FROM chat_message cm WHERE cm.room_id = cr.room_id AND cm.is_read = 0) as unreadCount
         FROM chat_room cr
-        <choose>
-            <when test="userType == 'CUSTOMER'">
-                JOIN business b ON cr.business_id = b.business_id
-            </when>
-            <otherwise>
-                JOIN customer c ON cr.customer_id = c.customer_id
-            </otherwise>
-        </choose>
-        <![CDATA[
+        JOIN business b ON cr.business_id = b.business_id
+        JOIN customer c ON cr.customer_id = c.customer_id
         LEFT JOIN (
             SELECT t1.room_id, t1.message_type, t1.content, t1.send_at
             FROM chat_message t1
@@ -53,56 +41,20 @@
                 GROUP BY room_id
             ) t2 ON t1.message_id = t2.max_id
         ) m ON cr.room_id = m.room_id
-        ]]>
-        WHERE 
-        <choose>
-            <when test="userType == 'CUSTOMER'">
-                cr.customer_id = #{myId}
-            </when>
-            <otherwise>
-                cr.business_id = #{myId}
-            </otherwise>
-        </choose>
+        <where>
+            <choose>
+                <when test="userType == 'BADMIN'">
+                    1=1
+                </when>
+                <when test="userType == 'CUSTOMER'">
+                    AND cr.customer_id = #{myId}
+                </when>
+                <otherwise>
+                    AND cr.business_id = #{myId}
+                </otherwise>
+            </choose>
+        </where>
         ORDER BY IFNULL(m.send_at, cr.created_at) DESC
-    </select>
-
-    <select id="selectMessages" resultType="com.nextage.web.domain.ChatMessageDTO">
-        SELECT * FROM (
-            SELECT 
-                message_id as messageId,
-                room_id as roomId,
-                sender_id as senderId, 
-                sender_type as senderType, 
-                message_type as messageType,
-                content, 
-                DATE_FORMAT(send_at, '%H:%i') as sendAt
-            FROM chat_message
-            WHERE room_id = #{roomId}
-            ORDER BY message_id DESC
-            LIMIT 20
-        ) sub
-        ORDER BY messageId ASC
-    </select>
-
-    <select id="selectPastMessages" resultType="com.nextage.web.domain.ChatMessageDTO">
-        SELECT * FROM (
-            SELECT 
-                message_id as messageId,
-                room_id as roomId,
-                sender_id as senderId, 
-                sender_type as senderType, 
-                message_type as messageType,
-                content, 
-                DATE_FORMAT(send_at, '%H:%i') as sendAt
-            FROM chat_message
-            WHERE room_id = #{roomId}
-            <![CDATA[
-              AND message_id < #{lastMessageId}
-            ]]>
-            ORDER BY message_id DESC
-            LIMIT 20
-        ) sub
-        ORDER BY messageId ASC
     </select>
 
     <select id="selectTotalUnreadCount" resultType="int">
@@ -111,6 +63,9 @@
         JOIN chat_room cr ON cm.room_id = cr.room_id
         WHERE cm.is_read = 0
         <choose>
+            <when test="userType == 'BADMIN'">
+                AND 1=0
+            </when>
             <when test="userType == 'CUSTOMER'">
                 AND cr.customer_id = #{myId}
                 AND cm.sender_type != 'CUSTOMER'
@@ -121,24 +76,5 @@
             </otherwise>
         </choose>
     </select>
-
-    <insert id="insertMessage">
-        INSERT INTO chat_message (room_id, sender_id, sender_type, message_type, content, send_at)
-        VALUES (#{roomId}, #{senderId}, #{senderType}, #{messageType}, #{content}, NOW())
-    </insert>
-
-    <update id="updateMessageReadStatus">
-        UPDATE chat_message
-        SET is_read = 1
-        WHERE room_id = #{roomId}
-          AND sender_type != #{userType}
-          AND is_read = 0
-    </update>
-
-    <select id="selectRoomById" resultType="com.nextage.web.domain.ChatRoomDTO">
-        SELECT room_id as roomId, customer_id as customerId, business_id as businessId
-        FROM chat_room
-        WHERE room_id = #{roomId}
-    </select>
-
+    
 </mapper>
