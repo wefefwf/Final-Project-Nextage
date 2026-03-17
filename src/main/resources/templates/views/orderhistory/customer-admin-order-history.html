@@ -276,7 +276,6 @@
         <div class="order-amount"
              th:text="${#numbers.formatInteger(order.totalAmount, 3, 'COMMA') + '원'}"></div>
 
-        <th:block th:if="${order.acceptStatus != 'REJECTED'}">
 		    <span class="delivery-badge delivery-checking"
 		          th:if="${order.deliveryStatus == 1}">결제확인중</span>
 		    <span class="delivery-badge delivery-ready"
@@ -287,11 +286,11 @@
 		          th:if="${order.deliveryStatus == 4}">배송완료</span>
 		    <span class="delivery-badge delivery-cancel"
 		          th:if="${order.deliveryStatus == 9}">취소</span>
-		</th:block>
 
         <!-- 수정: business처럼 event 전달 방식으로 변경 -->
 		<div class="order-btns">
 		    <button class="btn btn-blue"
+		    		th:if="${order.acceptStatus != 'REJECTED'}"
 		            th:attr="data-order-id=${order.orderId},data-delivery-status=${order.deliveryStatus}"
 		            onclick="openDeliveryModal(event, this)">배송 관리</button>
 		    <a class="btn btn-green"
