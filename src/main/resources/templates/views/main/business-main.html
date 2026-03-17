@@ -48,29 +48,33 @@
 				</div>
                 <!-- 작업중인 내역 -->
                 <div class="cal-sub">
-                    <!-- 진행중인 작업이 있을 때 -->
-                    <div th:unless="${#lists.isEmpty(todayWork)}" th:with="tw=${todayWork[0]}" class="schedule-row">
-		            <div class="row-left">
-		                <div class="d-day-area">
-		                    <span class="badge-blue">진행중</span>
-		                </div>
-		                <div class="info-area">
-		                    <h4 th:text="${tw.requestTitle}">의뢰 제목</h4>
-		                    <p class="period-text" th:text="${#temporals.format(tw.createdAt, 'yy.MM.dd')} + ' ~ ' + ${#temporals.format(tw.dueDate, 'yy.MM.dd')}"></p>
-		                </div>
-		            </div>
-		
-		            <div class="customer-info" th:text="${tw.customerNickname} + '님'"></div>
-		
-		            <div class="row-right">
-		                <a th:href="@{/business/order/detail/{id}(id=${tw.orderId})}" class="btn-link">상세보기</a>
-		            </div>
-		        </div>
-                    <!-- 진행중인 작업이 없을 때 -->
-                    <div th:if="${#lists.isEmpty(todayWork)}" class="order-box-empty">
-                        작업중인 내역이 없습니다.
-                    </div>
-                </div>
+				    <div th:if="${businessId == null}" class="order-box-empty">
+				        <i class="bi bi-patch-question" style="font-size: 1.5rem; display: block; margin-right: 10px; color: #c8c8c8;"></i>
+				        로그인 후 확인해주세요.
+				    </div>
+				
+				    <th:block th:if="${businessId != null}">
+				        <div th:unless="${#lists.isEmpty(todayWork)}" th:with="tw=${todayWork[0]}" class="schedule-row">
+				            <div class="row-left">
+				                <div class="d-day-area">
+				                    <span class="badge-blue">진행중</span>
+				                </div>
+				                <div class="info-area">
+				                    <h4 th:text="${tw.requestTitle}">의뢰 제목</h4>
+				                    <p class="period-text" th:text="${#temporals.format(tw.createdAt, 'yy.MM.dd')} + ' ~ ' + ${#temporals.format(tw.dueDate, 'yy.MM.dd')}"></p>
+				                </div>
+				            </div>
+				            <div class="customer-info" th:text="${tw.customerNickname} + '님'"></div>
+				            <div class="row-right">
+				                <a th:href="@{/business/order/detail/{id}(id=${tw.orderId})}" class="btn-link">상세보기</a>
+				            </div>
+				        </div>
+				
+				        <div th:if="${#lists.isEmpty(todayWork)}" class="order-box-empty">
+				            작업중인 내역이 없습니다.
+				        </div>
+				    </th:block>
+				</div>
                 <!-- 전체보기: cal-sub 밖, calendar-group 안 -->
                 <div class="link-wrapper cal-link-wrapper">
 				    <a th:href="@{/business/schedule}" class="view-all">전체 보러가기 →</a>

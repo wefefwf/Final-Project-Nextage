@@ -76,13 +76,13 @@ public class BusinessScheduleController {
 
 	     LocalDate today = LocalDate.now();
 	     List<ScheduleOrderDTO> activeList = scheduleList.stream()
-	             .filter(order ->
-	                 !order.getCreatedAt().toLocalDate().isAfter(today) &&
-	                 !order.getDueDate().toLocalDate().isBefore(today)
-	             )
+	             .filter(order -> {
+	                 LocalDate dueDate = order.getDueDate().toLocalDate();
+	                 long diff = java.time.temporal.ChronoUnit.DAYS.between(today, dueDate);
+	                 return diff >= -2 && diff <= 2; // ← 완료일 앞뒤 2일
+	             })
 	             .collect(Collectors.toList());
 
 	     return ResponseEntity.ok(activeList);
 	 }
-
 }
