@@ -2,6 +2,7 @@ package com.nextage.web.domain;
 
 public class ChatRoomDTO {
     private Long roomId;
+    private Long bidId; // 새로 추가된 필드
     private Long customerId;
     private Long businessId;
     private String partnerName;
@@ -11,6 +12,10 @@ public class ChatRoomDTO {
 
     public Long getRoomId() { return roomId; }
     public void setRoomId(Long roomId) { this.roomId = roomId; }
+
+    // 새로 추가된 Getter / Setter
+    public Long getBidId() { return bidId; }
+    public void setBidId(Long bidId) { this.bidId = bidId; }
 
     public Long getCustomerId() { return customerId; }
     public void setCustomerId(Long customerId) { this.customerId = customerId; }

@@ -8,7 +8,6 @@ import com.nextage.web.mapper.ChatMapper;
 
 @Service
 public class ChatService {
-    
     private final ChatMapper chatMapper;
 
     public ChatService(ChatMapper chatMapper) {
@@ -41,5 +40,15 @@ public class ChatService {
 
     public ChatRoomDTO getRoomById(Long roomId) {
         return chatMapper.selectRoomById(roomId);
+    }
+
+    public ChatRoomDTO getRoomByBidId(Long bidId) {
+        Long roomId = chatMapper.selectRoomByBidId(bidId);
+        if (roomId == null) return null;
+        return chatMapper.selectRoomById(roomId);
+    }
+
+    public void createChatRoom(ChatRoomDTO chatRoomDTO) {
+        chatMapper.insertChatRoom(chatRoomDTO);
     }
 }
