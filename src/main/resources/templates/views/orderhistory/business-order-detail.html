@@ -309,19 +309,33 @@
         <div class="info-card">
             <div class="info-card-title">주문 상품</div>
 
-            <div th:each="item : ${order.items}" class="order-item-row">
-                <div class="item-placeholder" th:if="${item.imageUrl == null}"></div>
-                <img class="item-img"
-                     th:if="${item.imageUrl != null}"
-                     th:src="${item.imageUrl}"
-                     th:alt="${item.productName}">
-                <div class="item-info">
-                    <div class="item-name" th:text="${item.productName}">상품명</div>
-                    <div class="item-qty" th:text="${item.quantity} + '개'">1개</div>
-                </div>
-                <div class="item-price"
-                     th:text="${#numbers.formatInteger(item.price * item.quantity, 3, 'COMMA') + '원'}"></div>
-            </div>
+            <!-- ✅ 이미지에 링크 -->
+		    <a th:href="${order.bidId != null}
+		               ? '/business/request/detail/' + ${order.requestId}
+		               : '/customer/shop/kit/' + ${item.kitId}"
+		       style="text-decoration:none; flex-shrink:0; display:block;">
+		        <div class="item-placeholder" th:if="${item.imageUrl == null}"></div>
+		        <img class="item-img"
+		             th:if="${item.imageUrl != null}"
+		             th:src="${item.imageUrl}"
+		             th:alt="${item.productName}">
+		    </a>
+		
+		    <div class="item-info">
+		        <!-- ✅ 상품명에 링크 -->
+		        <a th:href="${order.bidId != null}
+		                   ? '/business/request/detail/' + ${order.requestId}
+		                   : '/customer/shop/kit/' + ${item.kitId}"
+		           style="text-decoration:none; color:inherit;">
+		            <div class="item-name" th:text="${item.productName}"
+		                 style="cursor:pointer;">상품명</div>
+		        </a>
+		        <div class="item-qty" th:text="${item.quantity} + '개'">1개</div>
+		    </div>
+		
+		    <div class="item-price"
+		         th:text="${#numbers.formatInteger(item.price * item.quantity, 3, 'COMMA') + '원'}"></div>
+		</div>
 
             <div class="total-row">
                 <span class="total-label">총 결제 금액</span>

@@ -132,11 +132,14 @@
 	        o.order_id, o.order_no, o.customer_id, o.business_id,
 	        o.bid_id, o.total_amount, o.payment_status,
 	        o.accept_status, o.delivery_status, o.created_at,
-	        cr.room_id
+	        cr.room_id,
+	        r.request_id  -- ✅ 추가
 	    FROM orders o
 	    LEFT JOIN chat_room cr ON cr.bid_id      = o.bid_id
 	                           AND cr.customer_id = o.customer_id
 	                           AND cr.business_id = o.business_id
+	    LEFT JOIN bids b       ON b.bid_id = o.bid_id           -- ✅ 추가
+	    LEFT JOIN request r    ON r.request_id = b.request_id   -- ✅ 추가
 	    WHERE o.order_id       = #{orderId}
 	      AND o.customer_deleted = 0
 	</select>
@@ -162,27 +165,32 @@
     </select>
      -->
     <select id="selectOrderItems" resultType="com.nextage.web.domain.OrderItemsDTO">
-    SELECT
-        oi.order_item_id,
-        oi.order_id,
-        oi.kit_id,
-        o.business_id,
-        oi.quantity,
-        oi.price,
-        COALESCE(k.name, '개인거래 상품') AS product_name,
-        k.main_image1                    AS image_url,
-        (SELECT COUNT(*) > 0
-           FROM review r
-          WHERE r.order_item_id = oi.order_item_id) AS reviewed,
-        (SELECT r.review_id
-           FROM review r
-          WHERE r.order_item_id = oi.order_item_id
-          LIMIT 1) AS review_id
-    FROM order_items oi
-    JOIN orders o ON o.order_id = oi.order_id
-    LEFT JOIN kit k ON k.kit_id = oi.kit_id
-    WHERE oi.order_id = #{orderId}
-</select>
+	    SELECT
+	        oi.order_item_id,
+	        oi.order_id,
+	        oi.kit_id,
+	        o.business_id,
+	        oi.quantity,
+	        oi.price,
+	        COALESCE(k.name, r.title, '개인거래 상품') AS product_name,
+	        COALESCE(k.main_image1, a.image_url)       AS image_url,
+	        (SELECT COUNT(*) > 0
+	           FROM review rv
+	          WHERE rv.order_item_id = oi.order_item_id) AS reviewed,
+	        (SELECT rv.review_id
+	           FROM review rv
+	          WHERE rv.order_item_id = oi.order_item_id
+	          LIMIT 1) AS review_id
+	    FROM order_items oi
+	    JOIN orders o       ON o.order_id    = oi.order_id
+	    LEFT JOIN kit k     ON k.kit_id      = oi.kit_id
+	    LEFT JOIN bids b    ON b.bid_id      = o.bid_id
+	    LEFT JOIN request r ON r.request_id  = b.request_id
+	    LEFT JOIN attachment a ON a.ref_type = 'REQ'
+	                           AND a.ref_id  = r.request_id
+	                           AND a.is_thumbnail = 1
+	    WHERE oi.order_id = #{orderId}
+	</select>
 
     <!-- CADMIN: PENDING Kit 주문 (새로 들어온 주문) -->
     <select id="selectPendingOrders" resultType="com.nextage.web.domain.OrderHistoryDTO">
