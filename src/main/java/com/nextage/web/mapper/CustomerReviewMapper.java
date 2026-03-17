@@ -6,9 +6,6 @@ import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface CustomerReviewMapper {
-    void insertReview(ReviewDTO dto);
-    boolean existsReview(@Param("orderItemId") Long orderItemId);
-    ReviewDTO selectReviewByOrderItemId(@Param("orderItemId") Long orderItemId);
-    void updateReview(@Param("orderItemId") Long orderItemId,
-            @Param("content") String content);
+
+	public ReviewDTO getOrderItemForReview(@Param("orderItemId") long orderItemId,@Param("loginId")String loginId);
 }

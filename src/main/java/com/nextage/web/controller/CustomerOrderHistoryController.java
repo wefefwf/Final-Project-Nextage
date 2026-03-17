@@ -89,20 +89,24 @@ public class CustomerOrderHistoryController {
     /* ─────────────────────────────────────────
        후기 작성
        ───────────────────────────────────────── */
-    @PostMapping("/review")
-    @ResponseBody
-    public ResponseEntity<Map<String, Object>> writeReview(
-            @RequestBody com.nextage.web.domain.ReviewDTO dto,
-            @AuthenticationPrincipal CustomerUserDetails userDetails) {
-
-        if (userDetails == null)
-            return ResponseEntity.status(401).body(Map.of("success", false, "message", "로그인 필요"));
-
-        dto.setCustomerId(userDetails.getCustomerId());
-        boolean ok = service.writeReview(dto);
-        if (ok) return ResponseEntity.ok(Map.of("success", true));
-        return ResponseEntity.badRequest().body(Map.of("success", false, "message", "이미 작성한 후기입니다."));
-    }
+	/*
+	 * @PostMapping("/review")
+	 * 
+	 * @ResponseBody public ResponseEntity<Map<String, Object>> writeReview(
+	 * 
+	 * @RequestBody com.nextage.web.domain.ReviewDTO dto,
+	 * 
+	 * @AuthenticationPrincipal CustomerUserDetails userDetails) {
+	 * 
+	 * if (userDetails == null) return
+	 * ResponseEntity.status(401).body(Map.of("success", false, "message",
+	 * "로그인 필요"));
+	 * 
+	 * dto.setCustomerId(userDetails.getCustomerId()); boolean ok =
+	 * service.writeReview(dto); if (ok) return ResponseEntity.ok(Map.of("success",
+	 * true)); return ResponseEntity.badRequest().body(Map.of("success", false,
+	 * "message", "이미 작성한 후기입니다.")); }
+	 */
 
     /* ─────────────────────────────────────────
        구매내역 삭제
@@ -123,37 +127,38 @@ public class CustomerOrderHistoryController {
             return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
         }
     }
-    
-    @GetMapping("/review/{orderItemId}")
-    @ResponseBody
-    public ResponseEntity<Map<String, Object>> getReview(
-            @PathVariable("orderItemId") Long orderItemId,
-            @AuthenticationPrincipal CustomerUserDetails userDetails) {
-        if (userDetails == null)
-            return ResponseEntity.status(401).body(Map.of("success", false));
-
-        com.nextage.web.domain.ReviewDTO review = service.getReview(orderItemId);
-        if (review == null)
-            return ResponseEntity.ok(Map.of("success", false));
-        return ResponseEntity.ok(Map.of("success", true, "content", review.getContent(),
-                                        "createdAt", review.getCreatedAt().toString()));
-    }
-    
-    @PutMapping("/review/{orderItemId}")
-    @ResponseBody
-    public ResponseEntity<Map<String, Object>> updateReview(
-            @PathVariable("orderItemId") Long orderItemId,
-            @RequestBody Map<String, String> body,
-            @AuthenticationPrincipal CustomerUserDetails userDetails) {
-
-        if (userDetails == null)
-            return ResponseEntity.status(401).body(Map.of("success", false, "message", "로그인 필요"));
-
-        try {
-            service.updateReview(orderItemId, body.get("content"));
-            return ResponseEntity.ok(Map.of("success", true));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
-        }
-    }
+	/*
+	 * @GetMapping("/review/{orderItemId}")
+	 * 
+	 * @ResponseBody public ResponseEntity<Map<String, Object>> getReview(
+	 * 
+	 * @PathVariable("orderItemId") Long orderItemId,
+	 * 
+	 * @AuthenticationPrincipal CustomerUserDetails userDetails) { if (userDetails
+	 * == null) return ResponseEntity.status(401).body(Map.of("success", false));
+	 * 
+	 * com.nextage.web.domain.ReviewDTO review = service.getReview(orderItemId); if
+	 * (review == null) return ResponseEntity.ok(Map.of("success", false)); return
+	 * ResponseEntity.ok(Map.of("success", true, "content", review.getContent(),
+	 * "createdAt", review.getCreatedAt().toString())); }
+	 * 
+	 * @PutMapping("/review/{orderItemId}")
+	 * 
+	 * @ResponseBody public ResponseEntity<Map<String, Object>> updateReview(
+	 * 
+	 * @PathVariable("orderItemId") Long orderItemId,
+	 * 
+	 * @RequestBody Map<String, String> body,
+	 * 
+	 * @AuthenticationPrincipal CustomerUserDetails userDetails) {
+	 * 
+	 * if (userDetails == null) return
+	 * ResponseEntity.status(401).body(Map.of("success", false, "message",
+	 * "로그인 필요"));
+	 * 
+	 * try { service.updateReview(orderItemId, body.get("content")); return
+	 * ResponseEntity.ok(Map.of("success", true)); } catch (Exception e) { return
+	 * ResponseEntity.badRequest().body(Map.of("success", false, "message",
+	 * e.getMessage())); } }
+	 */
 }

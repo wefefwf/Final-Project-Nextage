@@ -3,29 +3,23 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.nextage.web.mapper.CustomerReviewMapper">
 
-   <insert id="insertReview">
-	    INSERT INTO review (order_item_id, customer_id, business_id, content, image1)
-	    VALUES (#{orderItemId}, #{customerId}, #{businessId}, #{content}, 
-	            #{image1, jdbcType=VARCHAR})
-	</insert>
+	<!-- review속 내용물 들고오기 -->
+	<select id="getOrderItemForReview" resultType="ReviewDTO">
+        SELECT 
+            oi.order_item_id AS orderItemId,
+            o.order_no AS orderNo,
+            req.title AS requestTitle,
+            oi.created_at AS startDate,
+            req.requested_due_date AS endDate,
+            o.business_id AS businessId,
+            o.customer_id AS customerId
+        FROM order_items oi
+        JOIN orders o ON oi.order_id = o.order_id
+        JOIN bids b ON o.bid_id = b.bid_id
+        JOIN request req ON b.request_id = req.request_id
+        WHERE oi.order_item_id = #{orderItemId}
+          AND o.customer_id = (SELECT customer_id FROM customer WHERE login_id = #{loginId})
+    </select>
 	
-	<select id="existsReview" resultType="boolean">
-	    SELECT COUNT(*) > 0
-	    FROM review
-	    WHERE order_item_id = #{orderItemId}
-	</select>
 	
-	<!-- 추가 -->
-	<select id="selectReviewByOrderItemId" resultType="com.nextage.web.domain.ReviewDTO">
-	    SELECT review_id, order_item_id, customer_id, business_id, content, created_at
-	    FROM review
-	    WHERE order_item_id = #{orderItemId}
-	    LIMIT 1
-	</select>
-	
-	<update id="updateReview">
-	    UPDATE review
-	    SET content = #{content}
-	    WHERE order_item_id = #{orderItemId}
-	</update>
 </mapper>

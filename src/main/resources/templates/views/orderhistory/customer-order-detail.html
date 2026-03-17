@@ -281,7 +281,10 @@
                     <button class="btn-reviewed"
                             th:if="${item.reviewed}">후기 보기</button>
                     <button class="btn-review"
-                            th:if="${!item.reviewed}">후기 작성</button>
+				        th:if="${!item.reviewed}"
+				        th:onclick="|location.href='/customer/review/write?orderItemId=' + ${item.orderItemId}|">
+				    	후기 작성
+					</button>
                 </th:block>
             </div>
 

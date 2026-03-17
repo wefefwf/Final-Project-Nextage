@@ -100,32 +100,6 @@ public class CustomerOrderHistoryService {
         log.info("주문 취소 - orderId: {}", orderId);
     }
 
-    /* ─────────────────────────────────────────
-       후기 작성
-       ───────────────────────────────────────── */
-    @Transactional
-    public boolean writeReview(ReviewDTO dto) {
-        if (customerReviewMapper.existsReview(dto.getOrderItemId())) {
-            log.warn("이미 작성된 리뷰 - orderItemId: {}", dto.getOrderItemId());
-            return false;
-        }
-        // image1 null이면 빈 문자열로 설정
-        if (dto.getImage1() == null) {
-            dto.setImage1("");
-        }
-        customerReviewMapper.insertReview(dto);
-        log.info("리뷰 등록 - orderItemId: {}, customerId: {}, businessId: {}",
-                dto.getOrderItemId(), dto.getCustomerId(), dto.getBusinessId());
-        return true;
-    }
-
-    /* ─────────────────────────────────────────
-       후기 조회
-       ───────────────────────────────────────── */
-    @Transactional(readOnly = true)
-    public ReviewDTO getReview(Long orderItemId) {
-        return customerReviewMapper.selectReviewByOrderItemId(orderItemId);
-    }
 
     /* ─────────────────────────────────────────
        주문 삭제
@@ -139,9 +113,4 @@ public class CustomerOrderHistoryService {
         log.info("주문 삭제 - orderId: {}, customerId: {}", orderId, customerId);
     }
 
-    @Transactional
-    public void updateReview(Long orderItemId, String content) {
-        customerReviewMapper.updateReview(orderItemId, content);
-        log.info("리뷰 수정 - orderItemId: {}", orderItemId);
-    }
 }
