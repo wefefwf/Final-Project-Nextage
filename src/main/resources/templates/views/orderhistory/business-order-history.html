@@ -54,10 +54,7 @@
 
         .order-row { background: #fff; border: 1px solid #e8e8e8; border-radius: 12px; padding: 22px 20px; display: flex; align-items: center; gap: 14px; margin-bottom: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); transition: box-shadow 0.2s; cursor: pointer; }
         .order-row:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.09); }
-        .order-row.rejected {
-		    background: #f5f5f5;
-		    opacity: 0.7;
-		}
+        .order-row.rejected { background: #f5f5f5; opacity: 0.7; }
         .order-thumb { width: 50px; height: 50px; border-radius: 10px; flex-shrink: 0; background: linear-gradient(135deg, #f2f6fa, #e8edf3); overflow: hidden; }
         .order-thumb img { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; }
         .order-info { flex: 1; min-width: 0; }
@@ -71,6 +68,10 @@
         .status-ing      { background: #e8f0fe; color: #4285f4; border: 1px solid #c5d8fd; }
         .status-done     { background: #f0f0f0; color: #888;    border: 1px solid #e0e0e0; }
         .status-cancel   { background: #fff5f5; color: #ff6b6b; border: 1px solid #ffc2c2; }
+
+        .accept-badge { font-size: 13px; font-weight: 700; padding: 7px 18px; border-radius: 20px; flex-shrink: 0; white-space: nowrap; display: inline-flex; align-items: center; }
+        .accept-accepted { background: #eefbf3; color: #2ecc71; border: 1px solid #a7f3d0; }
+        .accept-rejected { background: #fff5f5; color: #ff6b6b; border: 1px solid #ffc2c2; }
 
         .order-btns { display: flex; gap: 8px; flex-shrink: 0; align-items: center; }
         .btn { padding: 8px 16px; font-size: 12px; font-weight: 700; border-radius: 20px; cursor: pointer; border: none; transition: all 0.2s; white-space: nowrap; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; }
@@ -108,7 +109,6 @@
         .opt-ready    .delivery-option-badge { background: #eaf4fb; color: #2e86c1; border: 1px solid #aed6f1; }
         .opt-ing      .delivery-option-badge { background: #e8f0fe; color: #4285f4; border: 1px solid #c5d8fd; }
         .opt-done     .delivery-option-badge { background: #f0f0f0; color: #888;    border: 1px solid #e0e0e0; }
-        .opt-cancel   .delivery-option-badge { background: #fff5f5; color: #ff6b6b; border: 1px solid #ffc2c2; }
         .btn-confirm { width: 100%; padding: 16px; font-size: 15px; font-weight: 800; color: #fff; background: linear-gradient(135deg, #2c2c2c, #555); border: none; border-radius: 14px; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 16px rgba(0,0,0,0.18); }
         .btn-confirm:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.25); }
 
@@ -183,16 +183,16 @@
                     <div class="pending-info">
                         <div class="pending-name" th:text="${order.customerNickname} + ' 님의 주문'"></div>
                         <div class="pending-sub"
-						     th:if="${order.items != null and !#lists.isEmpty(order.items)}"
-						     th:text="${order.items[0].productName} + 
-						              (${#lists.size(order.items)} > 1 
-						               ? ' 외 ' + (${#lists.size(order.items)} - 1) + '건' 
-						               : '')">
-						</div>
-						<div class="pending-sub"
-						     th:if="${order.items == null or #lists.isEmpty(order.items)}">
-						    상품 정보 없음
-						</div>
+                             th:if="${order.items != null and !#lists.isEmpty(order.items)}"
+                             th:text="${order.items[0].productName} +
+                                      (${#lists.size(order.items)} > 1
+                                       ? ' 외 ' + (${#lists.size(order.items)} - 1) + '건'
+                                       : '')">
+                        </div>
+                        <div class="pending-sub"
+                             th:if="${order.items == null or #lists.isEmpty(order.items)}">
+                            상품 정보 없음
+                        </div>
                     </div>
                     <div class="pending-price"
                          th:text="${#numbers.formatInteger(order.totalAmount, 3, 'COMMA') + '원'}"></div>
@@ -201,27 +201,32 @@
         </div>
 
         <!-- 오른쪽: 상세 -->
-        <div class="detail-panel">
-            <div class="panel-header"><span>Order 상세</span></div>
-            <div id="detailEmpty" class="detail-empty-msg">왼쪽 목록에서 주문을 선택하세요.</div>
-            <div id="detailBody" class="detail-body" style="display:none;">
-                <div class="detail-img" id="detailImg"></div>
-                <div class="detail-row"><span class="detail-label">주문번호</span><span class="detail-value" id="dOrderNo">-</span></div>
-                <div class="detail-row"><span class="detail-label">고객명</span><span class="detail-value" id="dCustomer">-</span></div>
-                <div class="detail-row"><span class="detail-label">상품명</span><span class="detail-value" id="dProduct">-</span></div>
-                <div class="detail-row"><span class="detail-label">수량</span><span class="detail-value" id="dQty">-</span></div>
-                <div class="detail-row"><span class="detail-label">결제일시</span><span class="detail-value" id="dDate">-</span></div>
-                <div class="detail-row"><span class="detail-label">거래유형</span><span class="detail-value" id="dType">-</span></div>
-            </div>
-            <div id="detailFooter" class="detail-footer" style="display:none;">
-                <div class="detail-amount" id="dAmount">0원</div>
-                <div class="detail-btns">
-                    <button class="btn btn-purple" onclick="acceptOrder()">수락</button>
-                    <button class="btn btn-red"    onclick="rejectOrder()">거절</button>
-                </div>
-            </div>
-        </div>
-    </div>
+        <!-- 오른쪽: 상세 -->
+		<div class="detail-panel" onclick="goToRequestDetail()" style="cursor:pointer;">
+		    <div class="panel-header"><span>Order 상세</span></div>
+		    <div id="detailEmpty" class="detail-empty-msg">왼쪽 목록에서 주문을 선택하세요.</div>
+		    <div id="detailBody" class="detail-body" style="display:none;">
+		        <div class="detail-img" id="detailImg"></div>
+		        <div class="detail-row"><span class="detail-label">주문번호</span><span class="detail-value" id="dOrderNo">-</span></div>
+		        <div class="detail-row"><span class="detail-label">고객명</span><span class="detail-value" id="dCustomer">-</span></div>
+		        <div class="detail-row"><span class="detail-label">상품명</span><span class="detail-value" id="dProduct">-</span></div>
+		        <div class="detail-row"><span class="detail-label">수량</span><span class="detail-value" id="dQty">-</span></div>
+		        <div class="detail-row"><span class="detail-label">결제일시</span><span class="detail-value" id="dDate">-</span></div>
+		        <div class="detail-row"><span class="detail-label">거래유형</span><span class="detail-value" id="dType">-</span></div>
+		        <div class="detail-row"><span class="detail-label">구매자 희망 완료일</span><span class="detail-value" id="dExpectedDueDate">-</span></div>
+		        <div class="detail-row"><span class="detail-label">판매자 예상 완료일</span><span class="detail-value" id="dDueDate">-</span></div>
+		    </div>
+		    <div id="detailFooter" class="detail-footer" style="display:none;">
+		        <div class="detail-amount" id="dAmount">0원</div>
+		        <!-- ✅ 수정 2: 버튼 클릭 시 상위 onclick 막기 -->
+		        <div class="detail-btns" onclick="event.stopPropagation()">
+		            <button class="btn btn-purple" onclick="acceptOrder()">수락</button>
+		            <button class="btn btn-red"    onclick="rejectOrder()">거절</button>
+		            <a class="btn btn-green" id="dChatBtn" style="display:none;" href="#">채팅 보기</a>
+		        </div>
+		    </div>
+		</div>
+		</div>
 
     <!-- 하단: 수락한 주문 목록 -->
     <div class="section-header">
@@ -235,9 +240,9 @@
     </div>
 
     <div th:each="order : ${acceptedOrders}"
-	     th:class="${order.acceptStatus == 'REJECTED'} ? 'order-row rejected' : 'order-row'"
-	     th:data-order-id="${order.orderId}"
-	     onclick="goOrderDetail(this)">
+         th:class="${order.acceptStatus == 'REJECTED'} ? 'order-row rejected' : 'order-row'"
+         th:data-order-id="${order.orderId}"
+         onclick="goOrderDetail(this)">
 
         <div class="order-thumb">
             <img th:if="${order.items != null and !#lists.isEmpty(order.items) and order.items[0].imageUrl != null}"
@@ -246,14 +251,14 @@
 
         <div class="order-info">
             <div class="order-name"
-			     th:if="${order.items != null and !#lists.isEmpty(order.items)}"
-			     th:text="${order.items[0].productName} + 
-			              (${#lists.size(order.items)} > 1 
-			               ? ' 외 ' + (${#lists.size(order.items)} - 1) + '건' 
-			               : '')">
-			</div>
-			<div class="order-name"
-			     th:if="${order.items == null or #lists.isEmpty(order.items)}">주문</div>
+                 th:if="${order.items != null and !#lists.isEmpty(order.items)}"
+                 th:text="${order.items[0].productName} +
+                          (${#lists.size(order.items)} > 1
+                           ? ' 외 ' + (${#lists.size(order.items)} - 1) + '건'
+                           : '')">
+            </div>
+            <div class="order-name"
+                 th:if="${order.items == null or #lists.isEmpty(order.items)}">주문</div>
             <div class="order-sub"
                  style="font-family:'Montserrat',sans-serif; color:#bd93f9; font-size:11px; font-weight:700; margin-top:2px;"
                  th:text="${order.orderNo}"></div>
@@ -264,24 +269,25 @@
         <div class="order-amount"
              th:text="${#numbers.formatInteger(order.totalAmount, 3, 'COMMA') + '원'}"></div>
 
-	        <span class="status-badge status-checking" th:if="${order.deliveryStatus == 1}">결제확인중</span>
-	        <span class="status-badge status-ready"    th:if="${order.deliveryStatus == 2}">배송준비</span>
-	        <span class="status-badge status-ing"      th:if="${order.deliveryStatus == 3}">배송중</span>
-	        <span class="status-badge status-done"     th:if="${order.deliveryStatus == 4}">배송완료</span>
-	        <span class="status-badge status-cancel"   th:if="${order.deliveryStatus == 9}">취소</span>
+        <span class="status-badge status-checking" th:if="${order.deliveryStatus == 1}">결제확인중</span>
+        <span class="status-badge status-ready"    th:if="${order.deliveryStatus == 2}">배송준비</span>
+        <span class="status-badge status-ing"      th:if="${order.deliveryStatus == 3}">배송중</span>
+        <span class="status-badge status-done"     th:if="${order.deliveryStatus == 4}">배송완료</span>
+        <span class="status-badge status-cancel"   th:if="${order.deliveryStatus == 9}">취소</span>
 
-        <!-- 수정: BADMIN은 배송관리 버튼 숨김 -->
-		<div class="order-btns">
-		    <button class="btn btn-blue"
-		            th:if="${!isAdmin and order.acceptStatus != 'REJECTED'}"
-		            th:data-order-id="${order.orderId}"
-		            th:data-delivery-status="${order.deliveryStatus}"
-		            onclick="openDeliveryModal(event, this)">배송관리</button>
-		    <a class="btn btn-green"
-		       th:if="${order.roomId != null}"
-		       th:href="@{/chat(roomId=${order.roomId})}"
-		       onclick="event.stopPropagation()">채팅보기</a>
-		</div>
+        <span class="accept-badge accept-rejected" th:if="${order.acceptStatus == 'REJECTED'}">거절됨</span>
+
+        <div class="order-btns">
+            <button class="btn btn-blue"
+                    th:if="${!isAdmin and order.acceptStatus != 'REJECTED'}"
+                    th:data-order-id="${order.orderId}"
+                    th:data-delivery-status="${order.deliveryStatus}"
+                    onclick="openDeliveryModal(event, this)">배송관리</button>
+            <a class="btn btn-green"
+               th:if="${order.roomId != null and order.acceptStatus != 'REJECTED'}"
+               th:href="@{/chat(roomId=${order.roomId})}"
+               onclick="event.stopPropagation()">채팅보기</a>
+        </div>
     </div>
 
     <!-- 페이징 -->
@@ -338,15 +344,15 @@
 /*<![CDATA[*/
     var pendingOrders    = /*[[${pendingOrders}]]*/ [];
     var _selected        = null;
+    var _selectedDueDate = null;
     var _deliveryOrderId = null;
     var _selectedStatus  = null;
 
-    /* 페이징: 현재 검색 조건 유지 */
     function goPage(page) {
-        var keyword   = /*[[${search.keyword    != null ? search.keyword    : ''}]]*/ '';
-        var startDate = /*[[${search.startDate  != null ? search.startDate  : ''}]]*/ '';
-        var endDate   = /*[[${search.endDate    != null ? search.endDate    : ''}]]*/ '';
-        var period    = /*[[${search.period     != null ? search.period     : ''}]]*/ '';
+        var keyword   = /*[[${search.keyword   != null ? search.keyword   : ''}]]*/ '';
+        var startDate = /*[[${search.startDate != null ? search.startDate : ''}]]*/ '';
+        var endDate   = /*[[${search.endDate   != null ? search.endDate   : ''}]]*/ '';
+        var period    = /*[[${search.period    != null ? search.period    : ''}]]*/ '';
         var url = '/business/order/history?page=' + page;
         if (keyword)   url += '&keyword='   + encodeURIComponent(keyword);
         if (startDate) url += '&startDate=' + startDate;
@@ -367,24 +373,62 @@
     function selectOrder(orderId) {
         _selected = pendingOrders.find(function(o) { return o.orderId == orderId; });
         if (!_selected) return;
+        
+     // 임시 확인용
+        console.log('bidExpectedDueDate:', _selected.bidExpectedDueDate);
+        console.log('dueDate:', _selected.dueDate);
+        console.log('전체 객체:', _selected);
+        
+        _selectedDueDate = _selected.dueDate || null;
         document.querySelectorAll('.pending-item').forEach(function(el) {
             el.classList.toggle('active', el.dataset.orderId == orderId);
         });
         var o = _selected;
         var items = o.items || [];
         var first = items[0] || {};
+
         var imgEl = document.getElementById('detailImg');
         imgEl.innerHTML = first.imageUrl
             ? '<img src="' + first.imageUrl + '" style="width:100%;height:100%;object-fit:cover;" alt="">'
             : '';
+
         document.getElementById('dOrderNo').textContent  = o.orderNo          || '-';
         document.getElementById('dCustomer').textContent = o.customerNickname || '-';
-        document.getElementById('dProduct').textContent  = first.productName  || '-';
-        document.getElementById('dQty').textContent      = first.quantity ? first.quantity + '개' : '-';
-        document.getElementById('dDate').textContent     = o.createdAt
+
+        var productHtml = items.map(function(it) {
+            return '<div style="display:flex; justify-content:space-between; '
+                 + 'padding:4px 0; font-size:13px; border-bottom:1px solid #f5f5f5;">'
+                 + '<span style="color:#444;">' + it.productName + '</span>'
+                 + '<span style="color:#222; font-weight:600; margin-left:12px;">'
+                 + it.quantity + '개</span>'
+                 + '</div>';
+        }).join('');
+        document.getElementById('dProduct').innerHTML = productHtml || '-';
+
+        var totalQty = items.reduce(function(sum, it) { return sum + (it.quantity || 0); }, 0);
+        document.getElementById('dQty').textContent  = totalQty ? totalQty + '개' : '-';
+        document.getElementById('dDate').textContent = o.createdAt
             ? o.createdAt.substring(0, 16).replace('T', ' ') : '-';
-        document.getElementById('dType').textContent     = o.bidId ? '개인거래' : 'Kit 구매';
-        document.getElementById('dAmount').textContent   = Number(o.totalAmount).toLocaleString('ko-KR') + '원';
+        document.getElementById('dType').textContent   = o.bidId ? '개인거래' : 'Kit 구매';
+        document.getElementById('dAmount').textContent = Number(o.totalAmount).toLocaleString('ko-KR') + '원';
+
+        // 구매자 희망 완료일
+        document.getElementById('dExpectedDueDate').textContent =
+            o.bidExpectedDueDate ? o.bidExpectedDueDate.substring(0, 10) : '미정';
+
+        // 판매자 예상 완료일
+        document.getElementById('dDueDate').textContent =
+            o.dueDate ? o.dueDate.substring(0, 10).replace('T', ' ') : '미정';
+
+        // 채팅 버튼
+        var chatBtn = document.getElementById('dChatBtn');
+        if (o.roomId) {
+            chatBtn.href = '/chat?roomId=' + o.roomId;
+            chatBtn.style.display = '';
+        } else {
+            chatBtn.style.display = 'none';
+        }
+
         document.getElementById('detailEmpty').style.display  = 'none';
         document.getElementById('detailBody').style.display   = '';
         document.getElementById('detailFooter').style.display = '';
@@ -429,14 +473,40 @@
 
     function acceptOrder() {
         if (!_selected) return;
-        if (!confirm(_selected.customerNickname + ' 님의 주문을 수락하시겠습니까?')) return;
-        fetch('/business/order/accept/' + _selected.orderId, { method: 'POST' })
+
+        var url = '/business/schedule/active';
+        if (_selectedDueDate) {
+            url += '?dueDate=' + _selectedDueDate.substring(0, 10);
+        }
+
+        fetch(url)
         .then(function(r) { return r.json(); })
         .then(function(data) {
-            if (data.success) { alert('주문을 수락했습니다.'); location.reload(); }
-            else alert(data.message || '처리에 실패했습니다.');
+            var confirmMsg = _selected.customerNickname + ' 님의 주문을 수락하시겠습니까?';
+            if (data && data.length > 0) {
+                var activeOrder = data[0];
+                confirmMsg = activeOrder.dueDate.substring(0, 10)
+                           + ' 까지 완료해야 하는 주문이 있습니다.\n\n'
+                           + _selected.customerNickname + ' 님의 주문을 수락하시겠습니까?';
+            }
+            if (!confirm(confirmMsg)) return;
+            fetch('/business/order/accept/' + _selected.orderId, { method: 'POST' })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.success) { alert('주문을 수락했습니다.'); location.reload(); }
+                else alert(data.message || '처리에 실패했습니다.');
+            })
+            .catch(function() { alert('오류가 발생했습니다.'); });
         })
-        .catch(function() { alert('오류가 발생했습니다.'); });
+        .catch(function() {
+            if (!confirm(_selected.customerNickname + ' 님의 주문을 수락하시겠습니까?')) return;
+            fetch('/business/order/accept/' + _selected.orderId, { method: 'POST' })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.success) { alert('주문을 수락했습니다.'); location.reload(); }
+                else alert(data.message || '처리에 실패했습니다.');
+            });
+        });
     }
 
     function rejectOrder() {
@@ -454,6 +524,12 @@
     function goOrderDetail(el) {
         var id = el.dataset.orderId;
         location.href = '/business/order/detail/' + id;
+    }
+    
+ // ✅ 추가: detail-panel 클릭 시 입찰 상세 이동
+    function goToRequestDetail() {
+        if (!_selected || !_selected.requestId) return;
+        location.href = '/business/request/detail/' + _selected.requestId;
     }
 /*]]>*/
 </script>

@@ -8,39 +8,26 @@
     <style>
         * { box-sizing: border-box; }
         body { font-family: 'Pretendard', sans-serif; background: #fafafa; color: #333; }
-
-        .detail-wrapper {
-            max-width: 900px;
-            margin: 40px auto;
-            padding: 0 20px 80px;
-        }
-
+        .detail-wrapper { max-width: 900px; margin: 40px auto; padding: 0 20px 80px; }
         .back-btn {
             display: inline-flex; align-items: center; gap: 6px;
             font-size: 13px; color: #7c8cfb; font-weight: 600;
-            text-decoration: none; margin-bottom: 24px;
-            transition: gap 0.2s;
+            text-decoration: none; margin-bottom: 24px; transition: gap 0.2s;
         }
         .back-btn:hover { gap: 10px; }
-
         .page-title {
             font-family: 'Montserrat', sans-serif;
             font-size: 32px; font-weight: 900; color: #222; margin-bottom: 6px;
         }
         .page-subtitle { font-size: 14px; color: #aaa; margin-bottom: 32px; }
-
         .info-card {
-            background: #fff;
-            border: 1px solid #ebebeb;
-            border-radius: 16px;
-            padding: 24px 28px;
-            margin-bottom: 16px;
+            background: #fff; border: 1px solid #ebebeb; border-radius: 16px;
+            padding: 24px 28px; margin-bottom: 16px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         }
         .info-card-title {
             font-size: 11px; font-weight: 700; color: #bbb;
-            text-transform: uppercase; letter-spacing: 1.5px;
-            margin-bottom: 18px;
+            text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 18px;
         }
         .info-row {
             display: flex; justify-content: space-between;
@@ -50,8 +37,6 @@
         .info-label { color: #aaa; }
         .info-value { font-weight: 600; color: #333; }
         .info-value.paid { color: #7c8cfb; font-weight: 700; }
-
-        /* 배송 상태 뱃지 */
         .delivery-badge {
             font-size: 12px; font-weight: 700;
             padding: 4px 14px; border-radius: 20px;
@@ -62,8 +47,6 @@
         .delivery-ing      { background: #e8f0fe; color: #4285f4; border: 1px solid #c5d8fd; }
         .delivery-done     { background: #f0f0f0; color: #888;    border: 1px solid #e0e0e0; }
         .delivery-cancel   { background: #fff5f5; color: #ff6b6b; border: 1px solid #ffc2c2; }
-
-        /* 수락 상태 뱃지 */
         .accept-badge {
             font-size: 12px; font-weight: 700;
             padding: 4px 14px; border-radius: 20px;
@@ -72,64 +55,48 @@
         .accept-pending  { background: #fff8e1; color: #f59e0b; border: 1px solid #fde68a; }
         .accept-accepted { background: #eefbf3; color: #2ecc71; border: 1px solid #a7f3d0; }
         .accept-rejected { background: #fff5f5; color: #ff6b6b; border: 1px solid #ffc2c2; }
-
-        /* 배송 단계 트래커 */
-        .delivery-tracker {
-            display: flex; align-items: center;
-            margin: 20px 0 8px; gap: 0;
-        }
+        .delivery-tracker { display: flex; align-items: center; margin: 20px 0 8px; gap: 0; }
         .tracker-step {
             display: flex; flex-direction: column; align-items: center;
             flex: 1; position: relative;
         }
         .tracker-step:not(:last-child)::after {
-            content: '';
-            position: absolute; top: 14px; left: 50%;
-            width: 100%; height: 2px;
-            background: #ebebeb; z-index: 0;
+            content: ''; position: absolute; top: 14px; left: 50%;
+            width: 100%; height: 2px; background: #ebebeb; z-index: 0;
         }
         .tracker-step.active::after { background: linear-gradient(135deg, #7c8cfb, #5aa9ff); }
         .tracker-dot {
             width: 28px; height: 28px; border-radius: 50%;
             background: #ebebeb; border: 2px solid #e0e0e0;
             display: flex; align-items: center; justify-content: center;
-            z-index: 1; position: relative;
-            transition: all 0.3s;
+            z-index: 1; position: relative; transition: all 0.3s;
         }
         .tracker-step.active .tracker-dot {
-            background: linear-gradient(135deg, #7c8cfb, #5aa9ff);
-            border-color: #7c8cfb;
+            background: linear-gradient(135deg, #7c8cfb, #5aa9ff); border-color: #7c8cfb;
         }
         .tracker-step.current .tracker-dot {
-            background: linear-gradient(135deg, #7c8cfb, #5aa9ff);
-            border-color: #7c8cfb;
+            background: linear-gradient(135deg, #7c8cfb, #5aa9ff); border-color: #7c8cfb;
             box-shadow: 0 0 0 4px rgba(124,140,251,0.2);
         }
-        .tracker-dot-inner {
-            width: 8px; height: 8px; border-radius: 50%; background: #fff;
-        }
+        .tracker-dot-inner { width: 8px; height: 8px; border-radius: 50%; background: #fff; }
         .tracker-label {
             font-size: 11px; font-weight: 600; color: #bbb;
             margin-top: 8px; text-align: center; white-space: nowrap;
         }
         .tracker-step.active .tracker-label,
         .tracker-step.current .tracker-label { color: #7c8cfb; }
-
         .order-item-row {
             display: flex; align-items: center;
-            gap: 16px; padding: 18px 0;
-            border-bottom: 1px solid #f5f5f5;
+            gap: 16px; padding: 18px 0; border-bottom: 1px solid #f5f5f5;
         }
         .order-item-row:last-of-type { border-bottom: none; }
-
         .item-img {
             width: 72px; height: 72px; object-fit: cover;
             border-radius: 12px; border: 1px solid #eee; flex-shrink: 0;
         }
         .item-placeholder {
             width: 72px; height: 72px; border-radius: 12px;
-            background: linear-gradient(135deg, #f0f2ff, #e8eeff);
-            flex-shrink: 0;
+            background: linear-gradient(135deg, #f0f2ff, #e8eeff); flex-shrink: 0;
         }
         .item-info { flex: 1; min-width: 0; }
         .item-name {
@@ -142,7 +109,6 @@
             font-size: 17px; font-weight: 900; color: #333;
             flex-shrink: 0; min-width: 90px; text-align: right;
         }
-
         .total-row {
             display: flex; justify-content: space-between;
             align-items: center; padding-top: 20px;
@@ -155,22 +121,14 @@
             background: linear-gradient(to right, #7c8cfb, #5aa9ff);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
-
-        /* 버튼 영역 */
         .action-area {
-            background: #fff;
-            border: 1px solid #ebebeb;
-            border-radius: 16px;
-            padding: 20px 28px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
+            background: #fff; border: 1px solid #ebebeb; border-radius: 16px;
+            padding: 20px 28px; display: flex;
+            justify-content: space-between; align-items: center;
+            gap: 12px; flex-wrap: wrap;
             box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         }
         .action-area-left { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-
         .btn {
             padding: 10px 22px; font-size: 13px; font-weight: 700;
             border-radius: 20px; cursor: pointer; border: none;
@@ -178,19 +136,15 @@
             text-decoration: none; display: inline-flex; align-items: center; gap: 5px;
         }
         .btn-blue {
-            color: #fff;
-            background: linear-gradient(135deg, #7c8cfb, #5aa9ff);
+            color: #fff; background: linear-gradient(135deg, #7c8cfb, #5aa9ff);
             box-shadow: 0 2px 10px rgba(124,140,251,0.35);
         }
-        .btn-blue:hover { transform: translateY(-2px); color: #fff; box-shadow: 0 4px 16px rgba(124,140,251,0.45); }
+        .btn-blue:hover { transform: translateY(-2px); color: #fff; }
         .btn-green {
-            color: #fff;
-            background: linear-gradient(135deg, #6dca8a, #a8e6cf);
+            color: #fff; background: linear-gradient(135deg, #6dca8a, #a8e6cf);
             box-shadow: 0 2px 10px rgba(109,202,138,0.3);
         }
         .btn-green:hover { transform: translateY(-2px); color: #fff; }
-
-        /* 배송 관리 모달 */
         .modal-overlay {
             display: none; position: fixed; inset: 0;
             background: rgba(0,0,0,0.45); backdrop-filter: blur(4px);
@@ -205,8 +159,7 @@
         }
         .modal-close {
             position: absolute; top: 16px; right: 20px;
-            border: none; background: none;
-            font-size: 22px; color: #ccc; cursor: pointer; transition: color 0.2s;
+            border: none; background: none; font-size: 22px; color: #ccc; cursor: pointer;
         }
         .modal-close:hover { color: #888; }
         .modal-title {
@@ -218,8 +171,7 @@
         .delivery-option {
             display: flex; align-items: center; gap: 14px;
             padding: 14px 18px; border-radius: 12px;
-            border: 2px solid #e8e8e8; cursor: pointer;
-            transition: all 0.2s; background: #fff;
+            border: 2px solid #e8e8e8; cursor: pointer; transition: all 0.2s; background: #fff;
         }
         .delivery-option:hover { border-color: #7c8cfb; background: #f7f8ff; }
         .delivery-option.selected { border-color: #7c8cfb; background: #f0f2ff; }
@@ -241,7 +193,6 @@
             transition: all 0.3s; box-shadow: 0 4px 16px rgba(124,140,251,0.3);
         }
         .btn-confirm:hover { transform: translateY(-2px); }
-
         @keyframes slideUp {
             from { opacity: 0; transform: translateY(30px); }
             to   { opacity: 1; transform: translateY(0); }
@@ -253,13 +204,13 @@
     <div class="detail-wrapper">
 
         <a href="/business/order/history" class="back-btn">&larr; 주문 목록으로</a>
-
         <h2 class="page-title">주문 상세</h2>
         <p class="page-subtitle" th:text="${order.orderNo}">ORDER_...</p>
 
         <!-- 주문 정보 -->
         <div class="info-card">
             <div class="info-card-title">주문 정보</div>
+
             <div class="info-row">
                 <span class="info-label">주문번호</span>
                 <span class="info-value" th:text="${order.orderNo}"></span>
@@ -293,6 +244,7 @@
                       th:if="${order.acceptStatus == 'REJECTED'}">거절됨</span>
             </div>
 
+            <!-- 배송 상태 -->
             <div class="info-row">
                 <span class="info-label">배송 상태</span>
                 <span class="delivery-badge delivery-checking"
@@ -313,8 +265,15 @@
                       th:text="${#numbers.formatInteger(order.totalAmount, 3, 'COMMA') + '원'}"></span>
             </div>
 
-            <!-- 배송 단계 트래커 (취소 아닐 때) -->
-            <th:block th:if="${order.deliveryStatus != 9}">
+            <!-- 판매자 예상 완료일 -->
+            <div class="info-row" th:if="${order.bidId != null and order.dueDate != null}">
+                <span class="info-label">예상 완료일</span>
+                <span class="info-value"
+                      th:text="${#temporals.format(order.dueDate, 'yyyy-MM-dd')}"></span>
+            </div>
+
+            <!-- 배송 단계 트래커 -->
+            <th:block th:if="${order.deliveryStatus != 9 and order.acceptStatus != 'REJECTED'}">
                 <div class="delivery-tracker">
                     <div th:class="${order.deliveryStatus == 1} ? 'tracker-step current'
                                  : (${order.deliveryStatus > 1} ? 'tracker-step active' : 'tracker-step')">
@@ -339,7 +298,7 @@
             </th:block>
 
             <!-- 취소일 때 -->
-            <th:block th:if="${order.deliveryStatus == 9}">
+            <th:block th:if="${order.deliveryStatus == 9 or order.acceptStatus == 'REJECTED'}">
                 <div style="margin-top: 16px;">
                     <span class="delivery-badge delivery-cancel">이 주문은 취소되었습니다.</span>
                 </div>
@@ -374,13 +333,12 @@
         <!-- 액션 버튼 영역 -->
         <div class="action-area">
             <div class="action-area-left">
-                <!-- 배송 관리 버튼 -->
                 <button class="btn btn-blue"
+                        th:if="${order.acceptStatus != 'REJECTED'}"
                         th:data-order-id="${order.orderId}"
                         th:data-delivery-status="${order.deliveryStatus}"
                         onclick="openDeliveryModal(this)">배송 관리</button>
 
-                <!-- 채팅 보기 버튼 -->
                 <a class="btn btn-green"
                    th:if="${order.roomId != null}"
                    th:href="@{/chat(roomId=${order.roomId})}">채팅 보기</a>

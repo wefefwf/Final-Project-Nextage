@@ -8,9 +8,13 @@
             o.order_id, o.order_no, o.business_id, o.bid_id,
             o.total_amount, o.payment_status, o.delivery_status,
             o.accept_status, o.due_date, o.created_at, o.customer_id,
-            c.nickname AS customer_nickname, cr.room_id
+            c.nickname AS customer_nickname, cr.room_id,
+            b.expected_due_date AS bid_expected_due_date,
+            r.request_id
         FROM orders o
         JOIN customer c ON c.customer_id = o.customer_id
+        LEFT JOIN bids b ON b.bid_id = o.bid_id
+        LEFT JOIN request r ON r.request_id = b.request_id
         LEFT JOIN chat_room cr ON cr.bid_id      = o.bid_id
                                AND cr.business_id = o.business_id
                                AND cr.customer_id = o.customer_id
@@ -25,12 +29,12 @@
                 OR EXISTS (
                     SELECT 1 FROM order_items oi
                     LEFT JOIN kit k ON k.kit_id = oi.kit_id
-                    LEFT JOIN bids b ON b.bid_id = o.bid_id
-                    LEFT JOIN request r ON r.request_id = b.request_id
+                    LEFT JOIN bids b2 ON b2.bid_id = o.bid_id
+                    LEFT JOIN request r2 ON r2.request_id = b2.request_id
                     WHERE oi.order_id = o.order_id
                       AND (
                           k.name LIKE CONCAT('%', #{search.keyword}, '%')
-                          OR r.title LIKE CONCAT('%', #{search.keyword}, '%')
+                          OR r2.title LIKE CONCAT('%', #{search.keyword}, '%')
                       )
                 )
             )
@@ -83,9 +87,13 @@
             o.order_id, o.order_no, o.business_id, o.bid_id,
             o.total_amount, o.payment_status, o.delivery_status,
             o.accept_status, o.due_date, o.created_at, o.customer_id,
-            c.nickname AS customer_nickname, cr.room_id
+            c.nickname AS customer_nickname, cr.room_id,
+            b.expected_due_date AS bid_expected_due_date,
+            r.request_id
         FROM orders o
         JOIN customer c ON c.customer_id = o.customer_id
+        LEFT JOIN bids b ON b.bid_id = o.bid_id
+        LEFT JOIN request r ON r.request_id = b.request_id
         LEFT JOIN chat_room cr ON cr.bid_id      = o.bid_id
                                AND cr.business_id = o.business_id
                                AND cr.customer_id = o.customer_id
@@ -98,12 +106,12 @@
                 OR EXISTS (
                     SELECT 1 FROM order_items oi
                     LEFT JOIN kit k ON k.kit_id = oi.kit_id
-                    LEFT JOIN bids b ON b.bid_id = o.bid_id
-                    LEFT JOIN request r ON r.request_id = b.request_id
+                    LEFT JOIN bids b2 ON b2.bid_id = o.bid_id
+                    LEFT JOIN request r2 ON r2.request_id = b2.request_id
                     WHERE oi.order_id = o.order_id
                       AND (
                           k.name LIKE CONCAT('%', #{search.keyword}, '%')
-                          OR r.title LIKE CONCAT('%', #{search.keyword}, '%')
+                          OR r2.title LIKE CONCAT('%', #{search.keyword}, '%')
                       )
                 )
             )
@@ -154,9 +162,13 @@
             o.order_id, o.order_no, o.business_id, o.bid_id,
             o.total_amount, o.payment_status, o.delivery_status,
             o.accept_status, o.due_date, o.created_at, o.customer_id,
-            c.nickname AS customer_nickname, cr.room_id
+            c.nickname AS customer_nickname, cr.room_id,
+            b.expected_due_date AS bid_expected_due_date,
+            r.request_id
         FROM orders o
         JOIN customer c ON c.customer_id = o.customer_id
+        LEFT JOIN bids b ON b.bid_id = o.bid_id
+        LEFT JOIN request r ON r.request_id = b.request_id
         LEFT JOIN chat_room cr ON cr.bid_id      = o.bid_id
                                AND cr.business_id = o.business_id
                                AND cr.customer_id = o.customer_id
@@ -172,9 +184,13 @@
             o.order_id, o.order_no, o.business_id, o.bid_id,
             o.total_amount, o.payment_status, o.delivery_status,
             o.accept_status, o.due_date, o.created_at, o.customer_id,
-            c.nickname AS customer_nickname, cr.room_id
+            c.nickname AS customer_nickname, cr.room_id,
+            b.expected_due_date AS bid_expected_due_date,
+            r.request_id
         FROM orders o
         JOIN customer c ON c.customer_id = o.customer_id
+        LEFT JOIN bids b ON b.bid_id = o.bid_id
+        LEFT JOIN request r ON r.request_id = b.request_id
         LEFT JOIN chat_room cr ON cr.bid_id      = o.bid_id
                                AND cr.business_id = o.business_id
                                AND cr.customer_id = o.customer_id
@@ -189,9 +205,13 @@
             o.order_id, o.order_no, o.business_id, o.bid_id,
             o.total_amount, o.payment_status, o.delivery_status,
             o.accept_status, o.due_date, o.created_at, o.customer_id,
-            c.nickname AS customer_nickname, cr.room_id
+            c.nickname AS customer_nickname, cr.room_id,
+            b.expected_due_date AS bid_expected_due_date,
+            r.request_id
         FROM orders o
         JOIN customer c ON c.customer_id = o.customer_id
+        LEFT JOIN bids b ON b.bid_id = o.bid_id
+        LEFT JOIN request r ON r.request_id = b.request_id
         LEFT JOIN chat_room cr ON cr.bid_id      = o.bid_id
                                AND cr.business_id = o.business_id
                                AND cr.customer_id = o.customer_id
@@ -199,24 +219,27 @@
     </select>
 
     <select id="selectOrderItems" resultType="com.nextage.web.domain.OrderItemsDTO">
-	    SELECT
-	        oi.order_item_id,
-	        oi.kit_id,
-	        o.business_id,
-	        oi.quantity,
-	        oi.price,
-	        COALESCE(k.name, r.title, '개인거래 상품') AS product_name,
-	        COALESCE(k.main_image1, NULL) AS image_url,
-	        (SELECT COUNT(*) > 0
-	           FROM review r2
-	          WHERE r2.order_item_id = oi.order_item_id) AS reviewed
-	    FROM order_items oi
-	    JOIN orders o ON o.order_id = oi.order_id
-	    LEFT JOIN kit k ON k.kit_id = oi.kit_id
-	    LEFT JOIN bids b ON b.bid_id = o.bid_id
-	    LEFT JOIN request r ON r.request_id = b.request_id
-	    WHERE oi.order_id = #{orderId}
-	</select>
+        SELECT
+            oi.order_item_id,
+            oi.kit_id,
+            o.business_id,
+            oi.quantity,
+            oi.price,
+            COALESCE(k.name, r.title, '개인거래 상품') AS product_name,
+            COALESCE(k.main_image1, a.image_url) AS image_url,
+            (SELECT COUNT(*) > 0
+               FROM review r2
+              WHERE r2.order_item_id = oi.order_item_id) AS reviewed
+        FROM order_items oi
+        JOIN orders o ON o.order_id = oi.order_id
+        LEFT JOIN kit k ON k.kit_id = oi.kit_id
+        LEFT JOIN bids b ON b.bid_id = o.bid_id
+        LEFT JOIN request r ON r.request_id = b.request_id
+        LEFT JOIN attachment a ON a.ref_type = 'REQ'
+                               AND a.ref_id = r.request_id
+                               AND a.is_thumbnail = 1
+        WHERE oi.order_id = #{orderId}
+    </select>
 
     <select id="selectOrdersByBusinessId" resultType="com.nextage.web.domain.OrderHistoryDTO">
         SELECT
@@ -272,28 +295,29 @@
         UPDATE orders SET accept_status = #{acceptStatus}
         WHERE order_id = #{orderId}
     </update>
-    
-	<select id="selectScheduleOrders" resultType="com.nextage.web.domain.ScheduleOrderDTO">
-	    SELECT
-	        o.order_id        AS orderId,
-	        o.order_no        AS orderNo,
-	        o.due_date        AS dueDate,
-	        o.created_at      AS createdAt,
-	        r.title           AS requestTitle,
-	        c.nickname        AS customerNickname
-	    FROM orders o
-	    JOIN bids b ON o.bid_id = b.bid_id
-	    JOIN request r ON b.request_id = r.request_id
-	    JOIN customer c ON o.customer_id = c.customer_id
-	    WHERE o.business_id = #{businessId}
-	      AND o.bid_id IS NOT NULL
-	      AND o.payment_status = 'PAID'
-	      AND o.due_date IS NOT NULL
-	    ORDER BY o.due_date ASC
-	</select>
-	
-	<select id="selectRequestIdByBidId" resultType="Long">
-	    SELECT request_id FROM bids WHERE bid_id = #{bidId}
-	</select>
+
+    <select id="selectScheduleOrders" resultType="com.nextage.web.domain.ScheduleOrderDTO">
+        SELECT
+            o.order_id   AS orderId,
+            o.order_no   AS orderNo,
+            o.due_date   AS dueDate,
+            o.created_at AS createdAt,
+            r.title      AS requestTitle,
+            c.nickname   AS customerNickname
+        FROM orders o
+        JOIN bids b ON o.bid_id = b.bid_id
+        JOIN request r ON b.request_id = r.request_id
+        JOIN customer c ON o.customer_id = c.customer_id
+        WHERE o.business_id    = #{businessId}
+          AND o.bid_id IS NOT NULL
+          AND o.payment_status = 'PAID'
+          AND o.accept_status  = 'ACCEPTED'
+          AND o.due_date IS NOT NULL
+        ORDER BY o.due_date ASC
+    </select>
+
+    <select id="selectRequestIdByBidId" resultType="Long">
+        SELECT request_id FROM bids WHERE bid_id = #{bidId}
+    </select>
 
 </mapper>

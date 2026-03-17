@@ -5,17 +5,18 @@
 <mapper namespace="com.nextage.web.mapper.CustomerOrderMapper">
 
     <insert id="insertOrder">
-	    INSERT INTO orders (order_no, customer_id, business_id, total_amount, payment_status, accept_status, due_date, created_at)
-	    VALUES (
-	        #{orderNo},
-	        #{customerId},
-	        #{businessId, jdbcType=BIGINT},
-	        #{totalAmount},
-	        'READY',
-	        'PENDING',
-	        #{dueDate, jdbcType=TIMESTAMP},
-	        NOW()
-	    )
+	   INSERT INTO orders (order_no, customer_id, business_id, total_amount, 
+		                    payment_status, accept_status, 
+		                    buyer_requested_due_date,
+		                    due_date,
+		                    created_at)
+		VALUES (
+		    #{orderNo}, #{customerId}, #{businessId}, #{totalAmount},
+		    'READY', 'PENDING',
+		    #{dueDate, jdbcType=DATE},
+		    NULL,
+		    NOW()
+		)
 	</insert>
 
     <!-- 결제 후 imp_uid + payment_status 업데이트 -->
