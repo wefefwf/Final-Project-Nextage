@@ -999,7 +999,7 @@ function renderBidList(data) {
                         <a href="/business/portfolio/${bid.businessId}" class="menu-item">업체 정보</a>
                         ${isOtherBidLocked ? `` : `
                             <div class="menu-divider"></div>
-                            <a href="/chat/${bid.businessId}" class="menu-item">실시간 채팅</a>
+                            <a href="javascript:void(0);" onclick="goToChat(${bid.bidId}, ${requestOwnerCustomerId}, ${bid.businessId})" class="menu-item">실시간 채팅</a>
                         `}
                     </div>
 

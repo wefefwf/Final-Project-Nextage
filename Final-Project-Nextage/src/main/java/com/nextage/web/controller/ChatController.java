@@ -81,6 +81,53 @@ public class ChatController {
         return viewName;
     }
 
+    @GetMapping("/chat/global-info")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getGlobalInfo(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        Object principal = authentication.getPrincipal();
+        Long myId = null;
+        String userType = null;
+        if (authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_BADMIN"))) {
+            userType = "BADMIN"; myId = 0L;
+        } else if (principal instanceof CustomerUserDetails) {
+            myId = ((CustomerUserDetails) principal).getCustomer().getCustomerId(); userType = "CUSTOMER";
+        } else if (principal instanceof BusinessUserDetails) {
+            myId = ((BusinessUserDetails) principal).getBusiness().getBusinessId(); userType = "BUSINESS";
+        }
+        List<ChatRoomDTO> rooms = chatService.getMyRooms(myId, userType);
+        int totalUnread = rooms.stream().mapToInt(ChatRoomDTO::getUnreadCount).sum();
+        Map<String, Object> result = new HashMap<>();
+        result.put("myId", myId);
+        result.put("userType", userType);
+        result.put("unreadCount", totalUnread);
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/chat/mini/rooms")
+    @ResponseBody
+    public ResponseEntity<List<ChatRoomDTO>> getMiniRooms(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        Object principal = authentication.getPrincipal();
+        Long myId = null;
+        String userType = null;
+        if (authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_BADMIN"))) {
+            userType = "BADMIN"; myId = 0L;
+        } else if (principal instanceof CustomerUserDetails) {
+            myId = ((CustomerUserDetails) principal).getCustomer().getCustomerId(); userType = "CUSTOMER";
+        } else if (principal instanceof BusinessUserDetails) {
+            myId = ((BusinessUserDetails) principal).getBusiness().getBusinessId(); userType = "BUSINESS";
+        }
+        return ResponseEntity.ok(chatService.getMyRooms(myId, userType));
+    }
+
+    @GetMapping("/chat/mini/messages")
+    @ResponseBody
+    public ResponseEntity<List<ChatMessageDTO>> getMiniMessages(@RequestParam("roomId") Long roomId, Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        return ResponseEntity.ok(chatService.getRoomMessages(roomId));
+    }
+
     @PostMapping("/chat/get-or-create")
     @ResponseBody
     public ResponseEntity<Long> getOrCreateRoom(@RequestBody ChatRoomDTO chatRoomDTO, Authentication authentication) {

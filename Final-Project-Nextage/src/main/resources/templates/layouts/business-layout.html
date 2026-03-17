@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -37,20 +36,17 @@
         .mini-msg-time { font-size: 9px; color: #8e8e93; margin: 0 5px; }
         .mini-back-btn { cursor: pointer; font-size: 18px; color: #1c1c1e; margin-right: 10px; }
         .msg-image-only { background: transparent !important; padding: 0 !important; box-shadow: none !important; }
-        #miniPreviewContainer { display: none; padding: 10px; border-top: 1px solid #efeff4; background: #f8f8fa; position: relative; }
+        #miniPreviewContainer { display: none !important; padding: 10px; border-top: 1px solid #efeff4; background: #f8f8fa; position: relative; }
         #miniPreviewImg { max-width: 70px; max-height: 70px; border-radius: 4px; border: 1px solid #d1d1d6; }
         #miniClearImgBtn { position: absolute; top: 5px; left: 75px; background: #3a3a3c; color: #fff; border: none; border-radius: 50%; width: 18px; height: 18px; font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
-	<div class ="container-fluid px-5">
-		<div th:replace = "~{fragments/business-header::header}"></div>	
-   		 <main class="mt-4">
-		        <div layout:fragment="content"></div>
-		    </main>
-		<div th:replace = "~{fragments/business-footer::footer}"></div>	
-	</div>
-
+    <div class="container-fluid px-5">
+        <div th:replace="~{fragments/business-header::header}"></div>	
+        <main class="mt-4"><div layout:fragment="content"></div></main>
+        <div th:replace="~{fragments/business-footer::footer}"></div>	
+    </div>
     <div id="miniChatDrawer">
         <div class="mini-header">
             <div class="d-flex align-items-center">
@@ -63,10 +59,7 @@
             <div id="miniRoomList"></div>
             <div class="mini-chat-content" id="miniChatView">
                 <div class="mini-msg-area" id="miniMsgArea"></div>
-                <div id="miniPreviewContainer">
-                    <img id="miniPreviewImg" src="">
-                    <button id="miniClearImgBtn" onclick="clearMiniPreview()">✕</button>
-                </div>
+                <div id="miniPreviewContainer"><img id="miniPreviewImg" src=""><button id="miniClearImgBtn" onclick="clearMiniPreview()">✕</button></div>
                 <div class="mini-footer">
                     <div class="mini-input-wrap">
                         <input type="file" id="miniFileInput" style="display:none;" accept="image/*" onchange="previewMiniFile()">
@@ -78,12 +71,10 @@
             </div>
         </div>
     </div>
-
     <div id="globalChatBtn" onclick="toggleMiniChat()">
         <span id="globalChatBadge">0</span>
         <svg viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.145 2 11.25c0 2.457 1.082 4.67 2.85 6.27-.12.633-.6 2.053-1.35 2.93-.11.13-.15.31-.09.47.06.16.21.28.39.28 2.34 0 4.08-.94 4.89-1.54.98.24 2.02.36 3.09.36 5.523 0 10-4.145 10-9.25S17.523 2 12 2zm0 16.5c-.93 0-1.83-.11-2.69-.32-.19-.05-.39 0-.54.12-.55.4-1.6.99-3.15 1.25.4-.65.75-1.5 1-2.33.06-.2-.01-.4-.17-.54-1.57-1.31-2.52-3.13-2.52-5.18 0-4.14 3.96-7.5 8.83-7.5s8.83 3.36 8.83 7.5-3.96 7.5-8.83 7.5z"/></svg>
     </div>
-
     <script th:src="@{/bootstrap/bootstrap.bundle.min.js}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
@@ -93,56 +84,53 @@
         let currentMiniRoomId = null;
         let currentMiniSub = null;
         let selectedMiniFile = null;
-
         function toggleMiniChat() {
             const drawer = document.getElementById('miniChatDrawer');
+            if(!drawer) return;
             const isVisible = drawer.style.display === 'flex';
             drawer.style.display = isVisible ? 'none' : 'flex';
             if (!isVisible) loadMiniRooms();
         }
-
         function loadMiniRooms() {
-            if(currentMiniSub) { currentMiniSub.unsubscribe(); currentMiniSub = null; }
-            currentMiniRoomId = null;
-            clearMiniPreview();
-            document.getElementById('miniBackBtn').style.display = 'none';
-            document.getElementById('miniChatView').style.display = 'none';
-            document.getElementById('miniHeaderTitle').innerText = 'BUSINESS MESSAGES';
-            fetch('/chat/mini/rooms').then(res => res.json()).then(rooms => {
-                const list = document.getElementById('miniRoomList');
-                if(!list) return;
-                list.innerHTML = rooms.map(r => `
-                    <div class="mini-room-item" onclick="openMiniChat(${r.roomId}, '${r.partnerName}')">
-                        <div class="d-flex justify-content-between">
-                            <span style="font-weight:700; font-size:13px; color:#1c1c1e;">${r.partnerName}</span>
-                            ${r.unreadCount > 0 ? `<span class="badge bg-danger rounded-pill">${r.unreadCount}</span>` : ''}
-                        </div>
-                        <div style="font-size:12px; color:#8e8e93; margin-top:2px;" class="text-truncate">${r.lastMessage || '대화 없음'}</div>
-                    </div>
-                `).join('');
-            }).catch(e => console.error(e));
+            const list = document.getElementById('miniRoomList');
+            if(!list) return;
+            list.innerHTML = '<div style="padding:20px; text-align:center;">데이터 불러오는 중...</div>';
+            
+            fetch('/chat/mini/rooms')
+            .then(res => {
+                if(!res.ok) { throw new Error('서버응답 에러: ' + res.status); }
+                return res.json();
+            })
+            .then(rooms => {
+                list.innerHTML = '';
+                if(!rooms || rooms.length === 0) { list.innerHTML = '<div style="padding:50px; text-align:center; color:#8e8e93; font-size:13px;">채팅방이 0개입니다.</div>'; return; }
+                rooms.forEach(r => {
+                    const item = document.createElement('div');
+                    item.className = 'mini-room-item';
+                    item.innerHTML = `<div class="d-flex justify-content-between"><span style="font-weight:700; font-size:13px; color:#1c1c1e;">${r.partnerName}</span>${r.unreadCount > 0 ? `<span class="badge bg-danger rounded-pill">${r.unreadCount}</span>` : ''}</div><div style="font-size:12px; color:#8e8e93; margin-top:2px;" class="text-truncate">${r.lastMessage || '대화 없음'}</div>`;
+                    item.onclick = () => openMiniChat(r.roomId, r.partnerName);
+                    list.appendChild(item);
+                });
+            })
+            .catch(e => {
+                list.innerHTML = `<div style="padding:20px; color:red; font-size:12px; text-align:center;">에러발생: ${e.message}</div>`;
+            });
         }
-
         function openMiniChat(roomId, name) {
             if(currentMiniSub) { currentMiniSub.unsubscribe(); }
             currentMiniRoomId = roomId;
             document.getElementById('miniBackBtn').style.display = 'block';
             document.getElementById('miniChatView').style.display = 'flex';
             document.getElementById('miniHeaderTitle').innerText = name;
-            
-            currentMiniSub = miniStomp.subscribe('/sub/chat/room/' + roomId, function(msg) {
-                appendMiniMsg(JSON.parse(msg.body));
-            });
-
+            currentMiniSub = miniStomp.subscribe('/sub/chat/room/' + roomId, function(msg) { appendMiniMsg(JSON.parse(msg.body)); });
             fetch('/chat/mini/messages?roomId=' + roomId).then(res => res.json()).then(msgs => {
                 const area = document.getElementById('miniMsgArea');
                 if(!area) return;
                 area.innerHTML = '';
-                msgs.forEach(m => appendMiniMsg(m));
+                if(msgs) msgs.forEach(m => appendMiniMsg(m));
                 area.scrollTop = area.scrollHeight;
-            }).catch(e => console.error(e));
+            });
         }
-
         function previewMiniFile() {
             const fileInput = document.getElementById('miniFileInput');
             selectedMiniFile = fileInput.files[0];
@@ -150,39 +138,33 @@
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     document.getElementById('miniPreviewImg').src = e.target.result;
-                    document.getElementById('miniPreviewContainer').style.display = 'block';
+                    document.getElementById('miniPreviewContainer').setAttribute('style', 'display: block !important');
                 };
                 reader.readAsDataURL(selectedMiniFile);
             }
         }
-
         function clearMiniPreview() {
             selectedMiniFile = null;
-            document.getElementById('miniFileInput').value = '';
-            document.getElementById('miniPreviewImg').src = '';
-            document.getElementById('miniPreviewContainer').style.display = 'none';
+            const fileInput = document.getElementById('miniFileInput');
+            if(fileInput) fileInput.value = '';
+            const img = document.getElementById('miniPreviewImg');
+            if(img) img.src = '';
+            const container = document.getElementById('miniPreviewContainer');
+            if(container) container.setAttribute('style', 'display: none !important');
         }
-
         function appendMiniMsg(m) {
             const area = document.getElementById('miniMsgArea');
             if(!area || !userData) return;
-            const existing = area.querySelector(`[data-mid="${m.messageId}"]`);
-            if(existing && m.messageId) return;
-
             const isMy = m.senderId === userData.myId && m.senderType === userData.userType;
             const row = document.createElement('div');
             row.className = `mini-msg-row ${isMy ? 'right' : 'left'}`;
-            if(m.messageId) row.setAttribute('data-mid', m.messageId);
-
-            let content = `<div class="mini-msg-bubble ${isMy ? 'mini-msg-right' : 'mini-msg-left'} ${m.messageType === 'IMAGE' ? 'msg-image-only' : ''}">`;
-            if(m.messageType === 'IMAGE') { content += `<img src="${m.content}" style="max-width:100%; border-radius:8px;">`; }
-            else { content += `<span>${m.content}</span>`; }
-            content += `</div><span class="mini-msg-time">${m.sendAt || '방금'}</span>`;
-            row.innerHTML = content;
+            let contentHtml = `<div class="mini-msg-bubble ${isMy ? 'mini-msg-right' : 'mini-msg-left'} ${m.messageType === 'IMAGE' ? 'msg-image-only' : ''}">`;
+            if(m.messageType === 'IMAGE') { contentHtml += `<img src="${m.content}" style="max-width:100%; border-radius:8px;">`; }
+            else { contentHtml += `<span>${m.content}</span>`; }
+            row.innerHTML = contentHtml + `</div><span class="mini-msg-time">${m.sendAt || '방금'}</span>`;
             area.appendChild(row);
             area.scrollTop = area.scrollHeight;
         }
-
         function sendMiniMsg() {
             const input = document.getElementById('miniInput');
             if(!miniStomp || !userData) return;
@@ -190,27 +172,19 @@
                 const formData = new FormData();
                 formData.append("file", selectedMiniFile);
                 fetch('/chat/upload', { method: 'POST', body: formData }).then(res => res.text()).then(url => {
-                    const dto = { roomId: currentMiniRoomId, senderId: userData.myId, senderType: userData.userType, content: url, messageType: 'IMAGE' };
-                    miniStomp.send("/pub/chat/send", {}, JSON.stringify(dto));
+                    miniStomp.send("/pub/chat/send", {}, JSON.stringify({ roomId: currentMiniRoomId, senderId: userData.myId, senderType: userData.userType, content: url, messageType: 'IMAGE' }));
                     clearMiniPreview();
-                    if (input.value) { sendMiniText(input.value); input.value = ''; }
+                    if (input.value) { miniStomp.send("/pub/chat/send", {}, JSON.stringify({ roomId: currentMiniRoomId, senderId: userData.myId, senderType: userData.userType, content: input.value, messageType: 'TEXT' })); input.value = ''; }
                 });
             } else if (input.value) {
-                sendMiniText(input.value);
+                miniStomp.send("/pub/chat/send", {}, JSON.stringify({ roomId: currentMiniRoomId, senderId: userData.myId, senderType: userData.userType, content: input.value, messageType: 'TEXT' }));
                 input.value = '';
             }
         }
-
-        function sendMiniText(txt) {
-            const dto = { roomId: currentMiniRoomId, senderId: userData.myId, senderType: userData.userType, content: txt, messageType: 'TEXT' };
-            miniStomp.send("/pub/chat/send", {}, JSON.stringify(dto));
-        }
-
         document.getElementById('miniBackBtn').onclick = loadMiniRooms;
         document.getElementById('miniInput').onkeypress = (e) => { if(e.key === 'Enter') sendMiniMsg(); };
-
         (function init() {
-            if (window.location.pathname.includes('/chat')) { document.getElementById('globalChatBtn').style.display = 'none'; return; }
+            if (window.location.pathname.includes('/chat')) { const btn = document.getElementById('globalChatBtn'); if(btn) btn.style.display = 'none'; return; }
             fetch('/chat/global-info').then(res => res.json()).then(data => {
                 userData = data;
                 const badge = document.getElementById('globalChatBadge');

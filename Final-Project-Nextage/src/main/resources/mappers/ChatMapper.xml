@@ -5,6 +5,7 @@
     <select id="selectMyChatRooms" resultType="com.nextage.web.domain.ChatRoomDTO">
         SELECT 
             cr.room_id as roomId,
+            cr.bid_id as bidId,
             <choose>
                 <when test="userType == 'BADMIN'">
                     CONCAT(c.nickname, ' &amp; ', b.company_name) as partnerName,
@@ -28,10 +29,15 @@
                 WHEN DATE(m.send_at) = CURDATE() THEN DATE_FORMAT(m.send_at, '%H:%i')
                 ELSE DATE_FORMAT(m.send_at, '%m-%d')
             END as lastMessageTime,
-            (SELECT COUNT(*) FROM chat_message cm WHERE cm.room_id = cr.room_id AND cm.is_read = 0) as unreadCount
+            (SELECT COUNT(*) FROM chat_message cm WHERE cm.room_id = cr.room_id AND cm.is_read = 0) as unreadCount,
+            req.request_id as requestId,
+            req.title as requestTitle,
+            bd.price as bidPrice
         FROM chat_room cr
         JOIN business b ON cr.business_id = b.business_id
         JOIN customer c ON cr.customer_id = c.customer_id
+        JOIN bids bd ON cr.bid_id = bd.bid_id
+        JOIN request req ON bd.request_id = req.request_id
         LEFT JOIN (
             SELECT t1.room_id, t1.message_type, t1.content, t1.send_at
             FROM chat_message t1
@@ -57,24 +63,58 @@
         ORDER BY IFNULL(m.send_at, cr.created_at) DESC
     </select>
 
-    <select id="selectTotalUnreadCount" resultType="int">
-        SELECT COUNT(*)
-        FROM chat_message cm
-        JOIN chat_room cr ON cm.room_id = cr.room_id
-        WHERE cm.is_read = 0
+    <select id="selectMessages" resultType="com.nextage.web.domain.ChatMessageDTO">
+        SELECT 
+            message_id as messageId,
+            room_id as roomId,
+            sender_id as senderId,
+            sender_type as senderType,
+            message_type as messageType,
+            content,
+            is_read as isRead,
+            send_at as sendAt
+        FROM chat_message
+        WHERE room_id = #{roomId}
+        ORDER BY send_at ASC
+    </select>
+
+    <insert id="insertMessage">
+        INSERT INTO chat_message (room_id, sender_id, sender_type, message_type, content, send_at)
+        VALUES (#{roomId}, #{senderId}, #{senderType}, #{messageType}, #{content}, NOW())
+    </insert>
+
+    <update id="updateMessageReadStatus">
+        UPDATE chat_message
+        SET is_read = 1
+        WHERE room_id = #{roomId} 
         <choose>
-            <when test="userType == 'BADMIN'">
-                AND 1=0
-            </when>
             <when test="userType == 'CUSTOMER'">
-                AND cr.customer_id = #{myId}
-                AND cm.sender_type != 'CUSTOMER'
+                AND sender_type != 'CUSTOMER'
             </when>
             <otherwise>
-                AND cr.business_id = #{myId}
-                AND cm.sender_type != 'BUSINESS'
+                AND sender_type != 'BUSINESS'
             </otherwise>
         </choose>
+        AND is_read = 0
+    </update>
+
+    <select id="selectRoomById" resultType="com.nextage.web.domain.ChatRoomDTO">
+        SELECT 
+            room_id as roomId,
+            bid_id as bidId,
+            customer_id as customerId,
+            business_id as businessId
+        FROM chat_room 
+        WHERE room_id = #{roomId}
     </select>
-    
+
+    <select id="selectRoomByBidId" resultType="Long">
+        SELECT room_id FROM chat_room WHERE bid_id = #{bidId} LIMIT 1
+    </select>
+
+    <insert id="insertChatRoom" useGeneratedKeys="true" keyProperty="roomId">
+        INSERT INTO chat_room (bid_id, customer_id, business_id, created_at)
+        VALUES (#{bidId}, #{customerId}, #{businessId}, NOW())
+    </insert>
+
 </mapper>
