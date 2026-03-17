@@ -292,7 +292,7 @@ document.addEventListener('DOMContentLoaded', function() {
         locale: 'ko',
         fixedWeekCount: false,
         showNonCurrentDates: false,
-        dayMaxEvents: false,        // ← 변경
+        dayMaxEvents: 1,
         eventDisplay: 'block',     // ← 추가
         headerToolbar: { left: '', center: '', right: '' },
         dayCellContent: function(info) { return info.date.getDate(); },
