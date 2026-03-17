@@ -107,4 +107,5 @@ public class BusinessOrderHistoryController {
         model.addAttribute("order", order);
         return "views/orderhistory/business-order-detail"; // 상세 페이지 뷰
     }
+    
 }
