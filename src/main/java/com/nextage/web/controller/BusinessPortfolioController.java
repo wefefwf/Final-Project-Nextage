@@ -82,7 +82,8 @@ public class BusinessPortfolioController {
 	//portfolio페이지 가기 -customer
 	@GetMapping("/business/portfolio/{businessId}")
 		public String viewPortfolio(@PathVariable("businessId") Long businessId, Model model,
-				@RequestParam(value="page", defaultValue = "0") int page) {
+				@RequestParam(value="page", defaultValue = "0") int page,
+				@RequestParam(value="reviewId", required = false) Long reviewId) {
 		
 		 int size = 6;
 		 int offset = page * size;
@@ -103,6 +104,16 @@ public class BusinessPortfolioController {
         // 끝 페이지 계산 (전체 페이지 수를 넘지 않게)
         int endPage = Math.min(startPage + blockLimit - 1, totalPages - 1);
         if (endPage < 0) endPage = 0;
+        
+
+        // reviewId로 비공개 여부 체크
+        if (reviewId != null) {
+            String status = portfolioService.getReviewStatus(reviewId);
+            if ("HIDDEN".equals(status)) {
+                model.addAttribute("hiddenAlert", true);
+            }
+        }
+        
         
 		model.addAttribute("bizinfo",bizinfo);
 		model.addAttribute("reviewList",reviewList);

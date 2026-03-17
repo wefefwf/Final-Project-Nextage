@@ -126,4 +126,9 @@ public class BusinessPortfolioService {
     public void addCareer(long businessId,String workDescription){
     	portfolioMapper.addCareer(businessId,workDescription);
     }
+    
+   //비공개 게시물 상태 가져오기 -alert띄우려고
+    public String getReviewStatus(Long reviewId) {
+        return portfolioMapper.getReviewStatus(reviewId);
+    }
 }

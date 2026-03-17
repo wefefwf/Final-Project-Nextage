@@ -49,4 +49,7 @@ public interface BusinessPortfolioMapper {
 	
 	//이미지 수정
 	public void updateProfile(@Param("businessId")long businessId,@Param("profileImage") String profileImage);
+	
+	//상태들고오기
+	public String getReviewStatus(@Param("reviewId")long reviewId);
 }

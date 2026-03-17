@@ -207,6 +207,13 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
     <script th:src="@{/js/portfolio/portfolio.js}"></script>
+    <script th:if="${hiddenAlert}">
+	    window.onload = function() {
+	        setTimeout(function() {
+	            alert('해당 게시물은 비공개 처리된 게시물입니다.');
+	        }, 800);
+	    };
+	</script>
 </th:block>
 </body>
 </html>
