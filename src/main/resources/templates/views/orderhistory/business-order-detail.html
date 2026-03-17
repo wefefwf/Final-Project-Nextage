@@ -93,7 +93,9 @@
         .item-img {
             width: 72px; height: 72px; object-fit: cover;
             border-radius: 12px; border: 1px solid #eee; flex-shrink: 0;
+            transition: opacity 0.2s;
         }
+        .item-img:hover { opacity: 0.85; }
         .item-placeholder {
             width: 72px; height: 72px; border-radius: 12px;
             background: linear-gradient(135deg, #f0f2ff, #e8eeff); flex-shrink: 0;
@@ -102,7 +104,9 @@
         .item-name {
             font-size: 15px; font-weight: 700; color: #222; margin-bottom: 5px;
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            cursor: pointer; transition: color 0.2s;
         }
+        .item-name:hover { color: #7c8cfb; }
         .item-qty { font-size: 13px; color: #bbb; }
         .item-price {
             font-family: 'Montserrat', sans-serif;
@@ -210,7 +214,6 @@
         <!-- 주문 정보 -->
         <div class="info-card">
             <div class="info-card-title">주문 정보</div>
-
             <div class="info-row">
                 <span class="info-label">주문번호</span>
                 <span class="info-value" th:text="${order.orderNo}"></span>
@@ -232,47 +235,31 @@
                 <span class="info-label">결제상태</span>
                 <span class="info-value paid">결제완료</span>
             </div>
-
-            <!-- 개인거래일 때만 수락 상태 표시 -->
             <div class="info-row" th:if="${order.bidId != null}">
                 <span class="info-label">수락 상태</span>
-                <span class="accept-badge accept-pending"
-                      th:if="${order.acceptStatus == 'PENDING'}">검토중</span>
-                <span class="accept-badge accept-accepted"
-                      th:if="${order.acceptStatus == 'ACCEPTED'}">수락됨</span>
-                <span class="accept-badge accept-rejected"
-                      th:if="${order.acceptStatus == 'REJECTED'}">거절됨</span>
+                <span class="accept-badge accept-pending"  th:if="${order.acceptStatus == 'PENDING'}">검토중</span>
+                <span class="accept-badge accept-accepted" th:if="${order.acceptStatus == 'ACCEPTED'}">수락됨</span>
+                <span class="accept-badge accept-rejected" th:if="${order.acceptStatus == 'REJECTED'}">거절됨</span>
             </div>
-
-            <!-- 배송 상태 -->
             <div class="info-row">
                 <span class="info-label">배송 상태</span>
-                <span class="delivery-badge delivery-checking"
-                      th:if="${order.deliveryStatus == 1}">결제확인중</span>
-                <span class="delivery-badge delivery-ready"
-                      th:if="${order.deliveryStatus == 2}">배송준비</span>
-                <span class="delivery-badge delivery-ing"
-                      th:if="${order.deliveryStatus == 3}">배송중</span>
-                <span class="delivery-badge delivery-done"
-                      th:if="${order.deliveryStatus == 4}">배송완료</span>
-                <span class="delivery-badge delivery-cancel"
-                      th:if="${order.deliveryStatus == 9}">취소</span>
+                <span class="delivery-badge delivery-checking" th:if="${order.deliveryStatus == 1}">결제확인중</span>
+                <span class="delivery-badge delivery-ready"    th:if="${order.deliveryStatus == 2}">배송준비</span>
+                <span class="delivery-badge delivery-ing"      th:if="${order.deliveryStatus == 3}">배송중</span>
+                <span class="delivery-badge delivery-done"     th:if="${order.deliveryStatus == 4}">배송완료</span>
+                <span class="delivery-badge delivery-cancel"   th:if="${order.deliveryStatus == 9}">취소</span>
             </div>
-
             <div class="info-row">
                 <span class="info-label">결제금액</span>
                 <span class="info-value"
                       th:text="${#numbers.formatInteger(order.totalAmount, 3, 'COMMA') + '원'}"></span>
             </div>
-
-            <!-- 판매자 예상 완료일 -->
             <div class="info-row" th:if="${order.bidId != null and order.dueDate != null}">
                 <span class="info-label">예상 완료일</span>
                 <span class="info-value"
                       th:text="${#temporals.format(order.dueDate, 'yyyy-MM-dd')}"></span>
             </div>
 
-            <!-- 배송 단계 트래커 -->
             <th:block th:if="${order.deliveryStatus != 9 and order.acceptStatus != 'REJECTED'}">
                 <div class="delivery-tracker">
                     <div th:class="${order.deliveryStatus == 1} ? 'tracker-step current'
@@ -297,7 +284,6 @@
                 </div>
             </th:block>
 
-            <!-- 취소일 때 -->
             <th:block th:if="${order.deliveryStatus == 9 or order.acceptStatus == 'REJECTED'}">
                 <div style="margin-top: 16px;">
                     <span class="delivery-badge delivery-cancel">이 주문은 취소되었습니다.</span>
@@ -309,33 +295,35 @@
         <div class="info-card">
             <div class="info-card-title">주문 상품</div>
 
-            <!-- ✅ 이미지에 링크 -->
-		    <a th:href="${order.bidId != null}
-		               ? '/business/request/detail/' + ${order.requestId}
-		               : '/customer/shop/kit/' + ${item.kitId}"
-		       style="text-decoration:none; flex-shrink:0; display:block;">
-		        <div class="item-placeholder" th:if="${item.imageUrl == null}"></div>
-		        <img class="item-img"
-		             th:if="${item.imageUrl != null}"
-		             th:src="${item.imageUrl}"
-		             th:alt="${item.productName}">
-		    </a>
-		
-		    <div class="item-info">
-		        <!-- ✅ 상품명에 링크 -->
-		        <a th:href="${order.bidId != null}
-		                   ? '/business/request/detail/' + ${order.requestId}
-		                   : '/customer/shop/kit/' + ${item.kitId}"
-		           style="text-decoration:none; color:inherit;">
-		            <div class="item-name" th:text="${item.productName}"
-		                 style="cursor:pointer;">상품명</div>
-		        </a>
-		        <div class="item-qty" th:text="${item.quantity} + '개'">1개</div>
-		    </div>
-		
-		    <div class="item-price"
-		         th:text="${#numbers.formatInteger(item.price * item.quantity, 3, 'COMMA') + '원'}"></div>
-		</div>
+            <!-- ✅ th:each 안에 링크 포함 -->
+            <div th:each="item : ${order.items}" class="order-item-row">
+
+                <!-- 이미지에 링크 -->
+                <a th:href="${order.bidId != null}
+                           ? '/business/request/detail/' + ${order.requestId}
+                           : '/customer/shop/detail?id=' + ${item.kitId}"
+                   style="text-decoration:none; flex-shrink:0; display:block;">
+                    <div class="item-placeholder" th:if="${item.imageUrl == null}"></div>
+                    <img class="item-img"
+                         th:if="${item.imageUrl != null}"
+                         th:src="${item.imageUrl}"
+                         th:alt="${item.productName}">
+                </a>
+
+                <div class="item-info">
+                    <!-- 상품명에 링크 -->
+                    <a th:href="${order.bidId != null}
+                               ? '/business/request/detail/' + ${order.requestId}
+                               : '/customer/shop/detail?id=' + ${item.kitId}"
+                       style="text-decoration:none; color:inherit;">
+                        <div class="item-name" th:text="${item.productName}">상품명</div>
+                    </a>
+                    <div class="item-qty" th:text="${item.quantity} + '개'">1개</div>
+                </div>
+
+                <div class="item-price"
+                     th:text="${#numbers.formatInteger(item.price * item.quantity, 3, 'COMMA') + '원'}"></div>
+            </div>
 
             <div class="total-row">
                 <span class="total-label">총 결제 금액</span>
@@ -352,7 +340,6 @@
                         th:data-order-id="${order.orderId}"
                         th:data-delivery-status="${order.deliveryStatus}"
                         onclick="openDeliveryModal(this)">배송 관리</button>
-
                 <a class="btn btn-green"
                    th:if="${order.roomId != null}"
                    th:href="@{/chat(roomId=${order.roomId})}">채팅 보기</a>
