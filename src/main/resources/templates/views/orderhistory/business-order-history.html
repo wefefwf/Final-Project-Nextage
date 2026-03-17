@@ -54,6 +54,10 @@
 
         .order-row { background: #fff; border: 1px solid #e8e8e8; border-radius: 12px; padding: 22px 20px; display: flex; align-items: center; gap: 14px; margin-bottom: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); transition: box-shadow 0.2s; cursor: pointer; }
         .order-row:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.09); }
+        .order-row.rejected {
+		    background: #f5f5f5;
+		    opacity: 0.7;
+		}
         .order-thumb { width: 50px; height: 50px; border-radius: 10px; flex-shrink: 0; background: linear-gradient(135deg, #f2f6fa, #e8edf3); overflow: hidden; }
         .order-thumb img { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; }
         .order-info { flex: 1; min-width: 0; }
@@ -231,9 +235,9 @@
     </div>
 
     <div th:each="order : ${acceptedOrders}"
-         class="order-row"
-         th:data-order-id="${order.orderId}"
-         onclick="goOrderDetail(this)">
+	     th:class="${order.acceptStatus == 'REJECTED'} ? 'order-row rejected' : 'order-row'"
+	     th:data-order-id="${order.orderId}"
+	     onclick="goOrderDetail(this)">
 
         <div class="order-thumb">
             <img th:if="${order.items != null and !#lists.isEmpty(order.items) and order.items[0].imageUrl != null}"
@@ -260,16 +264,16 @@
         <div class="order-amount"
              th:text="${#numbers.formatInteger(order.totalAmount, 3, 'COMMA') + '원'}"></div>
 
-        <span class="status-badge status-checking" th:if="${order.deliveryStatus == 1}">결제확인중</span>
-        <span class="status-badge status-ready"    th:if="${order.deliveryStatus == 2}">배송준비</span>
-        <span class="status-badge status-ing"      th:if="${order.deliveryStatus == 3}">배송중</span>
-        <span class="status-badge status-done"     th:if="${order.deliveryStatus == 4}">배송완료</span>
-        <span class="status-badge status-cancel"   th:if="${order.deliveryStatus == 9}">취소</span>
+	        <span class="status-badge status-checking" th:if="${order.deliveryStatus == 1}">결제확인중</span>
+	        <span class="status-badge status-ready"    th:if="${order.deliveryStatus == 2}">배송준비</span>
+	        <span class="status-badge status-ing"      th:if="${order.deliveryStatus == 3}">배송중</span>
+	        <span class="status-badge status-done"     th:if="${order.deliveryStatus == 4}">배송완료</span>
+	        <span class="status-badge status-cancel"   th:if="${order.deliveryStatus == 9}">취소</span>
 
         <!-- 수정: BADMIN은 배송관리 버튼 숨김 -->
 		<div class="order-btns">
 		    <button class="btn btn-blue"
-		            th:if="${!isAdmin}"
+		            th:if="${!isAdmin and order.acceptStatus != 'REJECTED'}"
 		            th:data-order-id="${order.orderId}"
 		            th:data-delivery-status="${order.deliveryStatus}"
 		            onclick="openDeliveryModal(event, this)">배송관리</button>

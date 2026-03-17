@@ -111,6 +111,16 @@
             box-shadow: 0 6px 20px rgba(189,147,249,0.12);
             transform: translateY(-2px);
         }
+        
+        .order-card.rejected {
+		    background: #f5f5f5;
+		    opacity: 0.7;
+		}
+		.order-card.rejected:hover {
+		    border-color: #e0e0e0;
+		    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+		    transform: none;
+		}
 
         .order-card-header {
             display: flex;
@@ -297,8 +307,8 @@
 
         <!-- 주문 목록 -->
         <div th:each="order : ${orders}" class="order-card-wrapper">
-            <a class="order-card"
-   					th:href="@{/customer/order/detail/{orderId}(orderId=${order.orderId})}">
+            <a th:class="${order.acceptStatus == 'REJECTED' or order.deliveryStatus == 9} ? 'order-card rejected' : 'order-card'"
+   				th:href="@{/customer/order/detail/{orderId}(orderId=${order.orderId})}">
 
                 <div class="order-card-header">
                     <div>

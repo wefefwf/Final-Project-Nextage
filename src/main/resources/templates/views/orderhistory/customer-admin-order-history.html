@@ -128,12 +128,20 @@
         .btn-confirm:hover { transform: translateY(-2px); }
         
         .pagination {
-	    display: flex;
-	    justify-content: center;
-	    align-items: center;
-	    gap: 6px;
-	    margin-top: 24px;
-	}
+		    display: flex;
+		    justify-content: center;
+		    align-items: center;
+		    gap: 6px;
+		    margin-top: 24px;
+		}
+			
+		.order-row.rejected {
+		    background: #f5f5f5;
+		    opacity: 0.7;
+		}
+		.order-row.rejected:hover {
+		    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+		}
     </style>
 </head>
 <body>
@@ -246,9 +254,8 @@
 
     <!-- ✅ order-row 클릭 시 상세 페이지로 이동, 버튼 클릭은 이벤트 전파 차단 -->
     <div th:each="order : ${orders}"
-         class="order-row"
-         th:classappend="${order.acceptStatus == 'REJECTED'} ? 'rejected'"
-         th:onclick="'location.href=\'/customer/admin/order/detail/' + ${order.orderId} + '\''">
+	     th:class="${order.acceptStatus == 'REJECTED' or order.deliveryStatus == 9} ? 'order-row rejected' : 'order-row'"
+	     th:onclick="'location.href=\'/customer/admin/order/detail/' + ${order.orderId} + '\''">
         <div class="order-thumb">
             <img th:if="${order.items != null and !#lists.isEmpty(order.items) and order.items[0].imageUrl != null}"
                  th:src="${order.items[0].imageUrl}">
@@ -281,9 +288,6 @@
 		    <span class="delivery-badge delivery-cancel"
 		          th:if="${order.deliveryStatus == 9}">취소</span>
 		</th:block>
-
-        <span class="accept-badge accept-accepted" th:if="${order.acceptStatus == 'ACCEPTED'}">수락됨</span>
-        <span class="accept-badge accept-rejected" th:if="${order.acceptStatus == 'REJECTED'}">거절됨</span>
 
         <!-- 수정: business처럼 event 전달 방식으로 변경 -->
 		<div class="order-btns">

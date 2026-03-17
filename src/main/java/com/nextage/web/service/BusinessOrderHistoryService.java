@@ -89,6 +89,7 @@ public class BusinessOrderHistoryService {
     @Transactional
     public void rejectOrder(Long orderId) {
         mapper.updateAcceptStatus(orderId, "REJECTED");
+        mapper.updateDeliveryStatus(orderId, 9);
         log.info("주문 거절 - orderId: {}", orderId);
 
         OrderHistoryDTO order = mapper.selectOrderDetail(orderId);
