@@ -14,4 +14,5 @@ public interface CustomerMapper {
   int countByPhone(String phoneNumber);
   int countByEmail(String email);
   int updateCustomer(CustomerDTO customer);
+  void updateRoleToNull(String loginId);
 }

@@ -3,10 +3,7 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/customer-layout}"> <!-- 사용하시는 레이아웃 파일 경로로 맞추세요 -->
       
- <th:block layout:fragment="script">
-    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
-    <script th:src="@{/js/joinmypage/cmypage.js}"></script>
-</th:block>
+ 
 
 <head>
     <title>내 정보 수정</title>
@@ -15,6 +12,11 @@
 
 <body>
 <div layout:fragment="content">
+
+	<th:block layout:fragment="script">
+	    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+	    <script th:src="@{/js/joinmypage/cmypage.js}"></script>
+	</th:block>
     
     <div class="container d-flex justify-content-center align-items-center min-vh-100">
         <div class="edit-wrapper text-center">
@@ -37,20 +39,6 @@
                     <label for="nickname" class="label-required">닉네임</label>
                 </div>
 
-                <div class="text-start mb-2 mt-2" style="border-top: 1px dashed #eee; padding-top: 1.5rem;">
-                    <span style="color: #888; font-size: 0.85rem; font-weight: 600;">※ 비밀번호를 변경하시려면 아래에 입력해주세요.</span>
-                </div>
-
-
-                <div class="form-floating mb-3 text-start">
-                    <input type="password" class="form-control" id="newPassword" name="newPassword" placeholder="새 비밀번호">
-                    <label for="newPassword" class="label-optional">새 비밀번호 (변경 시에만 입력)</label>
-                </div>
-                <div class="form-floating mb-4 text-start">
-                    <input type="password" class="form-control" id="passwordCheck" placeholder="새 비밀번호 확인">
-                    <label for="passwordCheck" class="label-optional">새 비밀번호 확인</label>
-                </div>
-
     
                 <div class="row g-2 mb-4">
                     <div class="col-8 form-floating text-start">
@@ -62,9 +50,6 @@
                     </div>
                 </div>
                 
-                <div class="text-start mb-2 mt-4" style="border-top: 1px dashed #eee; padding-top: 1.5rem;">
-                    <span style="color: var(--optional-color); font-size: 0.85rem; font-weight: 600;">.</span>
-                </div>
 
                 <!-- 이메일 분할 출력 -->
                 <div class="row g-2 mb-3 align-items-center" 
@@ -89,27 +74,50 @@
                     </div>
                 </div>
                 
-                <!-- 주소 분할 출력 -->
-                <div th:with="addrArr=${customer.address != null ? #strings.arraySplit(customer.address, '#') : new String[]{'','',''}}">
-                    <div class="row g-2 mb-3">
-                        <div class="col-8 form-floating text-start">
-                            <input type="text" class="form-control" id="postcode" name="postcode" th:value="${addrArr.length > 0 ? addrArr[0] : ''}" readonly>
-                            <label for="postcode" class="label-optional" style="left: 0.25rem;">우편번호</label>
-                        </div>
-                        <div class="col-4">
-                            <button type="button" class="btn-inline" onclick="execDaumPostcode()">우편번호 찾기</button>
-                        </div>
-                    </div>
-                    <div class="form-floating mb-2 text-start">
-                        <input type="text" class="form-control" id="address" name="address" th:value="${addrArr.length > 1 ? addrArr[1] : ''}" readonly>
-                        <label for="address" class="label-optional">기본 주소</label>
-                    </div>
-                    <div class="form-floating mb-4 text-start">
-                        <input type="text" class="form-control" id="addressDetail" name="addressDetail" th:value="${addrArr.length > 2 ? addrArr[2] : ''}">
-                        <label for="addressDetail" class="label-optional">상세 주소 입력</label>
-                    </div>
+                <div th:with="addrArr=${!#strings.isEmpty(customer.address) ? #strings.arraySplit(customer.address, '#') : {}}">
+    
+				    <div class="row g-2 mb-3">
+				        <div class="col-8 form-floating text-start">
+				            <input type="text" class="form-control" id="postcode" name="postcode" 
+				                   th:value="${#arrays.length(addrArr) > 0 ? addrArr[0] : ''}" readonly>
+				            <label for="postcode" class="label-optional" style="left: 0.25rem;">우편번호</label>
+				        </div>
+				        <div class="col-4">
+				            <button type="button" class="btn-inline" onclick="execDaumPostcode()">우편번호 찾기</button>
+				        </div>
+				    </div>
+
+				    <div class="form-floating mb-2 text-start">
+
+				        <input type="text" class="form-control" id="address" name="address" 
+				               th:value="${#arrays.length(addrArr) > 1 ? addrArr[1] : ''}" readonly>
+				        <label for="address" class="label-optional">기본 주소</label>
+				    </div>
+				    
+				    <div class="form-floating mb-4 text-start">
+				        <input type="text" class="form-control" id="addressDetail" name="addressDetail" 
+				               th:value="${#arrays.length(addrArr) > 2 ? addrArr[2] : ''}">
+				        <label for="addressDetail" class="label-optional">상세 주소 입력</label>
+				    </div>
+				    
+				    
+				    
+                <div class="text-start mb-2 mt-2" style="border-top: 1px dashed #eee; padding-top: 1.5rem;">
+                    <span style="color: #888; font-size: 0.85rem; font-weight: 600;">※ 비밀번호를 변경하시려면 아래에 입력해주세요.</span>
                 </div>
-            
+
+
+                <div class="form-floating mb-3 text-start">
+                    <input type="password" class="form-control" id="newPassword" name="newPassword" placeholder="새 비밀번호">
+                    <label for="newPassword" class="label-required">새 비밀번호 (변경 시에만 입력)</label>
+                </div>
+                <div class="form-floating mb-4 text-start">
+                    <input type="password" class="form-control" id="passwordCheck" placeholder="새 비밀번호 확인">
+                    <label for="passwordCheck" class="label-required">새 비밀번호 확인</label>
+                </div>
+				    
+				    
+				</div>
        
                 <button type="submit" class="btn btn-gradient w-100 mb-4">정보 수정하기</button>
             </form>

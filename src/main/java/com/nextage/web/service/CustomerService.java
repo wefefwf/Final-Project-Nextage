@@ -52,6 +52,10 @@ public class CustomerService {
         customerMapper.updateCustomer(dto);
     }
 
+    public void withdraw(String loginId) {
+        customerMapper.updateRoleToNull(loginId);
+    }
+    
     
     
 }

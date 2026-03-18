@@ -6,6 +6,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +20,8 @@ import com.nextage.web.service.CustomerService;
 import com.nextage.web.userDetails.BusinessUserDetails;
 import com.nextage.web.userDetails.CustomerUserDetails;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 
@@ -79,8 +82,19 @@ public class CustomerLoginController {
 	        return "redirect:/customer/mypage"; 
 	    }
 	    
-	    
-	    
+	    @PostMapping("/customer/mypage/withdrawProc")
+	    public String withdrawProc(@AuthenticationPrincipal CustomerUserDetails userDetails,
+	                               HttpServletRequest request,
+	                               HttpServletResponse response) {
+	        customerService.withdraw(userDetails.getUsername());
+	        
+	        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+	        if (auth != null) {
+	            new SecurityContextLogoutHandler().logout(request, response, auth);
+	        }
+	        
+	        return "redirect:/customer/main";
+	    }
 	    
 	    
 	    
