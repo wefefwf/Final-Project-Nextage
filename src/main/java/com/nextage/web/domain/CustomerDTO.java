@@ -22,4 +22,9 @@ public class CustomerDTO {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LocalDateTime deleted_at;
+    
+    private String emailDomain;  
+    private String postcode;      
+    private String addressDetail; 
+    private String newPassword;
 }

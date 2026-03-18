@@ -1,8 +1,11 @@
 package com.nextage.web.controller;
 
 
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -46,6 +49,40 @@ public class CustomerLoginController {
         return "views/login/customer-mypage";
     }
     
+	    @PostMapping("/customer/mypage/editProc")
+	    public String editProfileProc(CustomerDTO dto, @AuthenticationPrincipal CustomerUserDetails userDetails) {
+	        
+
+	        dto.setLoginId(userDetails.getUsername());
+
+	        if (dto.getEmail() != null && dto.getEmailDomain() != null) {
+	            dto.setEmail(dto.getEmail() + "@" + dto.getEmailDomain());
+	        }
+
+	        if (dto.getAddress() != null && !dto.getAddress().isEmpty()) {
+	            dto.setAddress(dto.getPostcode() + "#" + dto.getAddress() + "#" + dto.getAddressDetail());
+	        }
+
+	        customerService.updateCustomer(dto);
+
+	        //  시큐리티 세션갱신 
+	        CustomerDTO updatedCustomer = customerService.getCustomerByLoginId(dto.getLoginId());
+	        CustomerUserDetails newUserDetails = new CustomerUserDetails(updatedCustomer);
+	        
+	        Authentication newAuth = new UsernamePasswordAuthenticationToken(
+	                newUserDetails, 
+	                SecurityContextHolder.getContext().getAuthentication().getCredentials(), 
+	                newUserDetails.getAuthorities()
+	        );
+	        SecurityContextHolder.getContext().setAuthentication(newAuth);
+
+	        return "redirect:/customer/mypage"; 
+	    }
+	    
+	    
+	    
+	    
+	    
 	    
 	    @PostMapping("/auth/customer/registerProc")
 	    public String joinProc(CustomerDTO dto,@RequestParam("emailDomain") String emailDomain,

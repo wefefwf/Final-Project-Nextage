@@ -1,0 +1,100 @@
+@charset "UTF-8";
+
+:root {
+    --grad-start: #fbc2eb;
+    --grad-end: #a6c1ee;
+    --main-gradient: linear-gradient(to right, var(--grad-start), var(--grad-end));
+    --optional-color: #f807fc; 
+}
+
+/* 폼 컨테이너 */
+.edit-wrapper {
+    max-width: 550px; 
+    width: 100%;
+    padding: 3rem 2.5rem;
+    background: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+    margin: 4rem auto; 
+}
+
+.brand-title {
+    color: #333;
+    font-weight: 800;
+    font-size: 2rem;
+    letter-spacing: -1px;
+    background: var(--main-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.sub-title { color: #888; font-size: 0.95rem; margin-bottom: 2rem; }
+
+/* 그라데이션 메인 버튼 */
+.btn-gradient {
+    background: var(--main-gradient);
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 0.9rem;
+    border: none;
+    border-radius: 25px;
+    transition: opacity 0.3s ease;
+}
+.btn-gradient:hover { opacity: 0.85; color: #ffffff; box-shadow: 0 4px 15px rgba(166, 193, 238, 0.4); }
+
+/* 인라인 서브 버튼 */
+.btn-inline {
+    height: 58px; 
+    width: 100%;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+    border: 1px solid #ced4da;
+    color: #555;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+}
+.btn-inline:hover {
+    background-color: #e9ecef;
+    color: var(--grad-end);
+    border-color: var(--grad-end);
+}
+
+/* 셀렉트 박스 글자 중앙 정렬 */
+.custom-select-center {
+    height: 58px; 
+    border-radius: 8px;
+    text-align: center;      
+    text-align-last: center; 
+    color: #555;
+    font-size: 0.95rem;
+    cursor: pointer;
+}
+
+/* 포커스 효과 */
+.form-control, .form-select { border-radius: 8px; }
+.form-control:focus, .form-select:focus {
+    border-color: var(--grad-end);
+    box-shadow: 0 0 0 0.25rem rgba(166, 193, 238, 0.3);
+}
+
+/* 읽기 전용 입력창 */
+.form-control[readonly] { background-color: #f8f9fa; color: #777;}
+
+/* 라벨 색상 */
+.label-required { color: #888; }
+.label-optional { color: var(--optional-color); }
+
+/* 회원탈퇴 버튼 (작고 은은하게) */
+.btn-withdraw {
+    background: none;
+    border: none;
+    color: #adb5bd;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: underline;
+    padding: 0;
+    transition: color 0.2s;
+}
+.btn-withdraw:hover { color: #dc3545; /* 마우스 올렸을 때만 빨간색 */ }

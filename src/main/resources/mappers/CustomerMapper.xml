@@ -50,7 +50,10 @@
             nickname = #{nickname},
             phone_number = #{phoneNumber},
             address = #{address},
-            updated_at = CURRENT_TIMESTAMP
+            updated_at = NOW()
+            <if test="passwordHash != null and passwordHash != ''">
+                , password_hash = #{passwordHash}
+            </if>
         WHERE login_id = #{loginId}
     </update>
   

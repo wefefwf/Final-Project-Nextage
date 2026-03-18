@@ -37,5 +37,21 @@ public class CustomerService {
     	email = email.toLowerCase().trim();
         return customerMapper.countByEmail(email) > 0 ;
     }
+    
+    
+    public CustomerDTO getCustomerByLoginId(String loginId) {
+        return customerMapper.findByLoginId(loginId);
+    }
 
+    public void updateCustomer(CustomerDTO dto) {
+ 
+        if (dto.getNewPassword() != null && !dto.getNewPassword().trim().isEmpty()) {
+            dto.setPasswordHash(passwordEncoder.encode(dto.getNewPassword()));
+        }
+        
+        customerMapper.updateCustomer(dto);
+    }
+
+    
+    
 }
