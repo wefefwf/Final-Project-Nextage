@@ -6,5 +6,12 @@ import com.nextage.web.domain.CustomerDTO;
 
 @Mapper
 public interface CustomerMapper {
+  int insertCustomer(CustomerDTO customer); 
+
   CustomerDTO findByLoginId(String loginId);
+  int countByLoginId(String loginId);
+  int countByNickname(String nickname);
+  int countByPhone(String phoneNumber);
+  int countByEmail(String email);
+  int updateCustomer(CustomerDTO customer);
 }

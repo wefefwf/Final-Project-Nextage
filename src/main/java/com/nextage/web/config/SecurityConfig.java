@@ -24,15 +24,12 @@ public class SecurityConfig {
     private final CustomerUserDetailsService customerUserDetailsService;
     private final BusinessUserDetailsService businessUserDetailsService;
 
-    // @Bean
-    // public BCryptPasswordEncoder passwordEncoder() {
-    //     return new BCryptPasswordEncoder();
-    // }
+     @Bean
+     public BCryptPasswordEncoder passwordEncoder() {
+         return new BCryptPasswordEncoder();
+     }
 
-    @Bean
-public PasswordEncoder passwordEncoder() {
-    return org.springframework.security.crypto.password.NoOpPasswordEncoder.getInstance();
-}
+    
 
     @Bean
 public WebSecurityCustomizer webSecurityCustomizer() {
@@ -56,7 +53,7 @@ public WebSecurityCustomizer webSecurityCustomizer() {
             .securityMatcher("/business/**", "/auth/business/**") // 기업 경로만 담당
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/business/login", "/auth/business/loginProc","/business/main","/business/request/**","/business/portfolio/**","/business/request/detail/**").permitAll()
+                .requestMatchers("/business/login", "/auth/business/loginProc","/auth/business/registerProc","/business/main","/business/request/**","/business/portfolio/**","/business/request/detail/**","/business/join","/auth/business/check/**").permitAll()
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
@@ -82,7 +79,7 @@ public WebSecurityCustomizer webSecurityCustomizer() {
         http
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/customer/login", "/auth/customer/loginProc", "/auth/join","/customer/main","/customer/shop","/customer/shop/detail","/customer/request/detail/**","/customer/request","/customer/cart","/customer/request/list","/api/bids/request/**").permitAll()//로그인안해도 접속가능한링크
+                .requestMatchers("/customer/login", "/auth/customer/loginProc","/auth/customer/registerProc","/auth/join","/customer/main","/customer/shop","/customer/shop/detail","/customer/request/detail/**","/customer/request","/customer/cart","/customer/request/list","/api/bids/request/**","/customer/join","/auth/customer/check/**").permitAll()//로그인안해도 접속가능한링크
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form

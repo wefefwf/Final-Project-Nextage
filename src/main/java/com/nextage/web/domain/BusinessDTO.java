@@ -16,7 +16,7 @@ public class BusinessDTO {
     private String companyName;
     private String phoneNumber;
     private String role;   
-    private String status; 
+    private String status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LocalDateTime deleted_at;

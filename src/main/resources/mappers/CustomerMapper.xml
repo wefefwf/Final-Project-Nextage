@@ -2,16 +2,56 @@
 <!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.nextage.web.mapper.CustomerMapper">
-  <select id="findByLoginId" resultType="com.nextage.web.domain.CustomerDTO">
-       SELECT * FROM customer WHERE login_id = #{loginId} AND deleted_at IS NULL
-   </select>
- <!--  <insert id="insertCustomer">
-        INSERT INTO customer (login_id, email, nickname, password_hash, phone_number, address, role)
-        VALUES (#{loginId}, #{email}, #{nickname}, #{passwordHash}, #{phoneNumber}, #{address}, 'CUSER')
+<select id="findByLoginId" resultType="com.nextage.web.domain.CustomerDTO">
+        SELECT 
+            customer_id AS customerId,
+            login_id AS loginId,
+            email,
+            nickname,
+            password_hash AS passwordHash,
+            phone_number AS phoneNumber,
+            address,
+            role,
+            status,  
+            created_at AS createdAt,
+            updated_at AS updatedAt
+        FROM customer 
+        WHERE login_id = #{loginId}
+    </select>
+
+    <insert id="insertCustomer">
+        INSERT INTO customer (
+            login_id, email, nickname, password_hash, phone_number, address, role, status
+        ) VALUES (
+            #{loginId}, #{email}, #{nickname}, #{passwordHash}, #{phoneNumber}, #{address}, #{role},#{status}
+        )
     </insert>
 
+    <select id="countByLoginId" resultType="int">
+        SELECT COUNT(*) FROM customer WHERE login_id = #{loginId}
+    </select>
+    
+    <select id="countByNickname" resultType="int">
+        SELECT COUNT(*) FROM customer WHERE nickname = #{nickname}
+    </select>
+    
+    <select id="countByPhone" resultType="int">
+        SELECT COUNT(*) FROM customer WHERE phone_number = #{phoneNumber}
+    </select>
+    
+    <select id="countByEmail" resultType="int">
+        SELECT COUNT(*) FROM customer WHERE email = #{email}
+    </select>
+    
+
     <update id="updateCustomer">
-        UPDATE customer SET nickname = #{nickname}, phone_number = #{phoneNumber}, address = #{address}
-        WHERE login_id = #{loginId} AND deleted_at IS NULL
-    </update>-->
+        UPDATE customer 
+        SET 
+            nickname = #{nickname},
+            phone_number = #{phoneNumber},
+            address = #{address},
+            updated_at = CURRENT_TIMESTAMP
+        WHERE login_id = #{loginId}
+    </update>
+  
 </mapper>

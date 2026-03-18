@@ -55,6 +55,6 @@ public class BusinessUserDetails implements UserDetails{
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return "ACTIVE".equals(business.getStatus());
     }
 }

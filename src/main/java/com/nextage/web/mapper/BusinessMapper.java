@@ -6,6 +6,13 @@ import com.nextage.web.domain.BusinessDTO;
 
 @Mapper
 public interface BusinessMapper {
-  BusinessDTO findByLoginId(String loginId);
+	int insertBusiness(BusinessDTO business);
+
+    BusinessDTO findByLoginId(String loginId);
+    int countByLoginId(String loginId);
+    int countByPhoneNumber(String phoneNumber);
+    int countByCompanyName(String companyName);
+    
+    int updateBusiness(BusinessDTO business);
   
 }

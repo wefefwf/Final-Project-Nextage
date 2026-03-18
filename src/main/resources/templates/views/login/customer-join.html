@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>nextage - 고객 회원가입</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="//t1.kakaocdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <script th:src="@{/js/joinmypage/cjoin.js}"></script>
+
+    <style>
+        :root {
+            --grad-start: #fbc2eb;
+            --grad-end: #a6c1ee;
+            --main-gradient: linear-gradient(to right, var(--grad-start), var(--grad-end));
+            --optional-color: #888; /* 선택항목 핑크색 지정 */
+        }
+
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Pretendard', sans-serif;
+        }
+
+        .register-wrapper {
+            max-width: 500px; 
+            width: 100%;
+            padding: 2.5rem 2.5rem;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+            margin: 3rem auto; 
+        }
+
+        .logo-image { height: 45px; width: auto; margin-bottom: 0.5rem; }
+        .sub-title { color: #666666; font-size: 0.95rem; margin-bottom: 2rem; }
+
+        /* 둥근 그라데이션 버튼 */
+        .btn-gradient {
+            background: var(--main-gradient);
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: bold;
+            padding: 0.9rem;
+            border: none;
+            border-radius: 25px;
+            transition: opacity 0.3s ease;
+        }
+        .btn-gradient:hover { opacity: 0.85; color: #ffffff; box-shadow: 0 4px 15px rgba(166, 193, 238, 0.4); }
+
+        /* 인라인 버튼 (인증하기, 우편번호 등) */
+        .btn-inline {
+            height: 58px; 
+            width: 100%;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+            border: 1px solid #ced4da;
+            color: #555;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+        }
+        .btn-inline:hover {
+            background-color: #e9ecef;
+            color: var(--grad-end);
+            border-color: var(--grad-end);
+        }
+
+        /* 포커스 효과 */
+        .form-control, .form-select { border-radius: 8px; }
+        .form-control:focus, .form-select:focus {
+            border-color: var(--grad-end);
+            box-shadow: 0 0 0 0.25rem rgba(166, 193, 238, 0.3);
+        }
+        
+        /* 읽기 전용(readonly) 입력창 배경색 자연스럽게 */
+        .form-control[readonly] {
+            background-color: #f8f9fa;
+        }
+
+        /* 텍스트 그라데이션 */
+        .text-gradient {
+            background: var(--main-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+            text-decoration: none;
+        }
+
+        /* 라벨 색상 */
+        .label-required { color: #888; }
+        .label-optional { color: var(--optional-color); }
+        
+        /* 🌟 셀렉트 박스 라벨 제거용 커스텀 디자인 */
+		.custom-select-center {
+		    height: 58px; /* 옆의 form-floating 입력창과 높이 완벽 통일 */
+		    border-radius: 8px;
+		    text-align: center;      /* 글자 중앙 정렬 */
+		    text-align-last: center; /* select 태그는 text-align-last를 써야 완벽히 중앙에 옵니다 */
+		    color: #555;
+		    font-size: 0.95rem;
+		    cursor: pointer;
+		}
+		.custom-select-center:focus {
+		    border-color: var(--grad-end);
+		    box-shadow: 0 0 0 0.25rem rgba(166, 193, 238, 0.3);
+		}
+		#domainSelect {
+		  font-size: 13px;
+		}
+	
+    </style>
+</head>
+
+<body class="d-flex min-vh-100 justify-content-center align-items-center">
+
+    <div class="register-wrapper text-center">
+        <img th:src="@{/images/logo.png}" alt="Nextage Logo" class="logo-image">
+        <p class="sub-title">개인 서비스 회원가입</p>
+   
+        <form action="/auth/customer/registerProc" method="post">
+            
+            <div class="form-floating mb-3 text-start">
+                <input type="text" class="form-control" id="loginId" name="loginId" placeholder="아이디" required>
+                <label for="loginId" class="label-required">아이디</label>
+            </div>
+
+            <div class="form-floating mb-3 text-start">
+                <input type="password" class="form-control" id="passwordHash" name="passwordHash" placeholder="비밀번호" required>
+                <label for="passwordHash" class="label-required">비밀번호-숫자,영어조합 6자 이상</label>
+            </div>
+
+            <div class="form-floating mb-4 text-start">
+                <input type="password" class="form-control" id="passwordCheck" name="passwordCheck" placeholder="비밀번호 확인" required>
+                <label for="passwordCheck" class="label-required">비밀번호 확인</label>
+            </div>
+            
+            <div class="form-floating mb-3 text-start">
+                <input type="text" class="form-control" id="nickname" name="nickname" placeholder="닉네임" required>
+                <label for="nickname" class="label-required">닉네임</label>
+            </div>
+
+            <!-- 전화번호 -->
+            <div class="row g-2 mb-4">
+                <div class="col-8 form-floating text-start">
+                    <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" placeholder="전화번호" required>
+                    <label for="phoneNumber" class="label-required" style="left: 0.25rem;">전화번호('-' 제외)</label>
+                </div>
+                <div class="col-4">
+                    <button type="button" class="btn-inline" onclick="phoneCheck()">인증하기</button>
+                </div>
+            </div>
+                        <!-- 🌟 이메일 입력 (아이디 + @ + 도메인 + 셀렉트박스) -->
+			<div class="row g-2 mb-3 align-items-center">
+			    
+			    <!-- 이메일 아이디 -->
+			    <div class="col-5 form-floating text-start">
+			        <input type="text" class="form-control" id="email" name="email" placeholder="이메일">
+			        <label for="email" class="label-optional" style="left: 0.25rem;">이메일</label>
+			    </div>
+			    
+			    <!-- @ 기호 -->
+			    <div class="col-auto text-center px-0" style="width: 20px; font-weight: 600; color: #888;">
+			        @
+			    </div>
+			    
+			    <!-- 이메일 도메인 (직접입력) -->
+			    <div class="col form-floating text-start">
+			        <input type="text" class="form-control" id="emailDomain" name="emailDomain" placeholder="도메인 입력">
+			        <label for="emailDomain" class="label-optional" style="left: 0.25rem;">도메인 입력</label>
+			    </div>
+			    
+			    <!-- 🌟 이메일 선택 드롭다운 (라벨 제거 & 중앙 정렬 적용) -->
+			    <div class="col-3">  
+			        <select class="form-select custom-select-center" id="domainSelect" onchange="updateDomain()">
+			            <option value="type" >직접입력</option>
+			            <option value="naver.com">네이버</option>
+			            <option value="gmail.com">구글</option>
+			            <option value="daum.net">다음</option>
+			        </select>
+			    </div>
+			    
+			</div>
+			            
+            <!-- 선택 항목 구분선 -->
+            <div class="text-start mb-2 mt-4" style="border-top: 1px dashed #eee; padding-top: 1.5rem;">
+                <span style="color: var(--optional-color); font-size: 0.85rem; font-weight: 600;">※ 아래는 선택 입력 사항입니다.</span>
+            </div>
+
+
+            
+            <!-- 우편번호 -->
+            <div class="row g-2 mb-3">
+                <div class="col-8 form-floating text-start">
+                    <input type="text" class="form-control" id="postcode"  name="postcode" placeholder="우편번호" readonly>
+                    <label for="postcode" class="label-optional" style="left: 0.25rem;">우편번호</label>
+                </div>
+                <div class="col-4">
+                    <button type="button" class="btn-inline" onclick="execDaumPostcode()">우편번호 찾기</button>
+                </div>
+            </div>
+
+            <!-- 주소 -->
+            <div class="form-floating mb-2 text-start">
+                <input type="text" class="form-control" id="address" name="address" placeholder="주소" readonly>
+                <label for="address" class="label-optional">기본 주소</label>
+            </div>
+            <div class="form-floating mb-5 text-start">
+                <input type="text" class="form-control" id="addressDetail" name="addressDetail" placeholder="상세주소">
+                <label for="addressDetail" class="label-optional">상세 주소 입력</label>
+            </div>
+		
+            <button type="submit" class="btn btn-gradient w-100">가입하기</button>
+        </form>
+
+        <div class="mt-4">
+            <span style="color: #888; font-size: 0.9rem;">이미 계정이 있으신가요? </span>
+            <a href="/customer/login" class="text-gradient" style="font-size: 0.95rem;">로그인</a>
+        </div>
+    </div>
+
+
+    
+
+</body>
+</html>
