@@ -9,8 +9,7 @@ public class ChatRoomDTO {
     private String lastMessage;
     private String lastMessageTime;
     private Integer unreadCount;
-    
-    private Long requestId; // 링크 이동용 추가
+    private Long requestId;
     private String requestTitle;
     private Long bidPrice;
 

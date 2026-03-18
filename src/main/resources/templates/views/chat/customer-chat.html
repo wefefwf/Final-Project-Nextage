@@ -105,7 +105,6 @@
         const userType = [[${userType}]];
         const initialMessages = [[${messages}]];
         let selectedFile = null;
-        let lastDisplayedDate = null;
         let currentPage = 1;
         let isLoading = false;
         let isLastPage = false;
@@ -127,6 +126,29 @@
             const d = new Date(dateStr);
             if (isNaN(d.getTime())) return '';
             return d.getHours().toString().padStart(2, '0') + ':' + d.getMinutes().toString().padStart(2, '0');
+        }
+
+        function updateDateDividers() {
+            document.querySelectorAll('.date-divider').forEach(el => el.remove());
+            let lastDate = null;
+            const messages = chatBody.querySelectorAll('.msg-row');
+            
+            messages.forEach(row => {
+                const rawTime = row.dataset.rawTime;
+                if(!rawTime) return;
+                
+                const d = new Date(parseInt(rawTime));
+                const dateStr = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+                
+                if (lastDate !== dateStr) {
+                    const divider = document.createElement('div');
+                    divider.className = 'date-divider';
+                    const days = ['일', '월', '화', '수', '목', '금', '토'];
+                    divider.innerHTML = `<span>${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일 ${days[d.getDay()]}요일</span>`;
+                    row.parentNode.insertBefore(divider, row);
+                    lastDate = dateStr;
+                }
+            });
         }
 
         function markAsRead(roomId) {
@@ -160,6 +182,8 @@
             if(!chatBody) return;
             const dateObj = message.sendAt ? new Date(message.sendAt) : new Date();
             const row = document.createElement('div');
+            row.dataset.rawTime = dateObj.getTime();
+            
             const isMy = message.senderId === myId && message.senderType === userType;
             row.className = `msg-row ${isMy ? 'right' : 'left'}`;
             let content = '';
@@ -175,6 +199,7 @@
                 chatBody.appendChild(row);
             }
             if(!isInitial && !isPrepend) {
+                updateDateDividers();
                 chatBody.scrollTop = chatBody.scrollHeight;
                 updateSidebar(message.roomId, message.content, message.messageType, message.sendAt);
             }
@@ -190,6 +215,7 @@
                     if (data.length < 20) isLastPage = true;
                     if (data.length > 0) {
                         data.forEach(msg => appendMessageToScreen(msg, true, true));
+                        updateDateDividers();
                         chatBody.scrollTop = chatBody.scrollHeight - prevHeight;
                         currentPage++;
                     }
@@ -255,7 +281,11 @@
             connect();
             if(currentRoomId) {
                 markAsRead(currentRoomId);
-                if(initialMessages) { initialMessages.forEach(m => appendMessageToScreen(m, true)); chatBody.scrollTop = chatBody.scrollHeight; }
+                if(initialMessages) { 
+                    initialMessages.forEach(m => appendMessageToScreen(m, true)); 
+                    updateDateDividers();
+                    chatBody.scrollTop = chatBody.scrollHeight; 
+                }
             }
             chatBody.addEventListener('scroll', () => { if (chatBody.scrollTop === 0) loadMoreMessages(); });
             document.getElementById('messageInput')?.addEventListener('keypress', e => { if(e.key === 'Enter') sendMessage(); });
