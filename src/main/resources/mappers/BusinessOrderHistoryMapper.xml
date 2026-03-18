@@ -19,7 +19,7 @@
                                AND cr.business_id = o.business_id
                                AND cr.customer_id = o.customer_id
         WHERE o.business_id    = #{businessId}
-          AND o.payment_status = 'PAID'
+          AND o.payment_status IN ('PAID', 'CANCELLED')
           AND o.accept_status IN ('ACCEPTED', 'REJECTED')
           AND o.bid_id IS NOT NULL
         <if test="search != null and search.keyword != null and search.keyword != ''">
@@ -97,7 +97,7 @@
         LEFT JOIN chat_room cr ON cr.bid_id      = o.bid_id
                                AND cr.business_id = o.business_id
                                AND cr.customer_id = o.customer_id
-        WHERE o.payment_status = 'PAID'
+        WHERE o.payment_status IN ('PAID', 'CANCELLED')
           AND o.bid_id IS NOT NULL
         <if test="search != null and search.keyword != null and search.keyword != ''">
             AND (
