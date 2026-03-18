@@ -207,9 +207,12 @@ public class BidService {
 
     	// 1. bid 상태 WITHDRAWN으로 변경
     	bidsMapper.updateBidStatus(bidId, "WITHDRAWN");
-
+    	
+    	// 2. 의뢰글(request) 상태 OPEN으로 변경 
+    	requestMapper.updateStatus(bid.getRequestId(), "OPEN");
+    	
     	// TODO: 포트원 환불 API 연동 후 아래 구현
-    	// 2. 결제 환불 처리
+    	// 결제 환불 처리
 //    	String orderNo = bidsMapper.selectOrderNoByBidId(bidId);
 //    	if (orderNo == null) throw new IllegalArgumentException("주문 정보를 찾을 수 없습니다.");
 
