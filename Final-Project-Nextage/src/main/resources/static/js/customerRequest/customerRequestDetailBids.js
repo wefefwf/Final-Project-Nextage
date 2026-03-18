@@ -1276,4 +1276,5 @@ function renderBidPricePresets() {
             ${formatPrice(price)}원
         </button>
     `).join('');
+		
 }
