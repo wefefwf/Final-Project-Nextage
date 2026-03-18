@@ -48,43 +48,61 @@
         <main class="mt-4"><div layout:fragment="content"></div></main>
         <div th:replace="~{fragments/customer-footer::footer}"></div>	
     </div>
-    <div id="miniChatDrawer">
-        <div class="mini-header">
-            <div class="d-flex align-items-center">
-                <span class="mini-back-btn" id="miniBackBtn" style="display:none;">&larr;</span>
-                <h6 id="miniHeaderTitle">메시지</h6>
+
+    <div th:if="${#authorization.expression('isAuthenticated()')}">
+        <div id="miniChatDrawer">
+            <div class="mini-header">
+                <div class="d-flex align-items-center">
+                    <span class="mini-back-btn" id="miniBackBtn" style="display:none;">&larr;</span>
+                    <h6 id="miniHeaderTitle">메시지</h6>
+                </div>
+                <span style="cursor:pointer; color:#8e8e93; font-size:14px;" onclick="toggleMiniChat()">✕</span>
             </div>
-            <span style="cursor:pointer; color:#8e8e93; font-size:14px;" onclick="toggleMiniChat()">✕</span>
-        </div>
-        <div class="mini-body" id="miniBody">
-            <div id="miniRoomList"></div>
-            <div class="mini-chat-content" id="miniChatView">
-                <div class="mini-msg-area" id="miniMsgArea"></div>
-                <div id="miniPreviewContainer"><img id="miniPreviewImg" src=""><button id="miniClearImgBtn" onclick="clearMiniPreview()">✕</button></div>
-                <div class="mini-footer">
-                    <div class="mini-input-wrap">
-                        <input type="file" id="miniFileInput" style="display:none;" accept="image/*" onchange="previewMiniFile()">
-                        <span class="mini-photo-btn" onclick="document.getElementById('miniFileInput').click()">⊕</span>
-                        <input type="text" id="miniInput" placeholder="메시지 입력...">
-                        <span class="mini-send-btn" onclick="sendMiniMsg()">보내기</span>
+            <div class="mini-body" id="miniBody">
+                <div id="miniRoomList"></div>
+                <div class="mini-chat-content" id="miniChatView">
+                    <div class="mini-msg-area" id="miniMsgArea"></div>
+                    <div id="miniPreviewContainer"><img id="miniPreviewImg" src=""><button id="miniClearImgBtn" onclick="clearMiniPreview()">✕</button></div>
+                    <div class="mini-footer">
+                        <div class="mini-input-wrap">
+                            <input type="file" id="miniFileInput" style="display:none;" accept="image/*" onchange="previewMiniFile()">
+                            <span class="mini-photo-btn" onclick="document.getElementById('miniFileInput').click()">⊕</span>
+                            <input type="text" id="miniInput" placeholder="메시지 입력...">
+                            <span class="mini-send-btn" onclick="sendMiniMsg()">보내기</span>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+        <div id="globalChatBtn" onclick="toggleMiniChat()">
+            <span id="globalChatBadge">0</span>
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.145 2 11.25c0 2.457 1.082 4.67 2.85 6.27-.12.633-.6 2.053-1.35 2.93-.11.13-.15.31-.09.47.06.16.21.28.39.28 2.34 0 4.08-.94 4.89-1.54.98.24 2.02.36 3.09.36 5.523 0 10-4.145 10-9.25S17.523 2 12 2zm0 16.5c-.93 0-1.83-.11-2.69-.32-.19-.05-.39 0-.54.12-.55.4-1.6.99-3.15 1.25.4-.65.75-1.5 1-2.33.06-.2-.01-.4-.17-.54-1.57-1.31-2.52-3.13-2.52-5.18 0-4.14 3.96-7.5 8.83-7.5s8.83 3.36 8.83 7.5-3.96 7.5-8.83 7.5z"/></svg>
+        </div>
     </div>
-    <div id="globalChatBtn" onclick="toggleMiniChat()">
-        <span id="globalChatBadge">0</span>
-        <svg viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.145 2 11.25c0 2.457 1.082 4.67 2.85 6.27-.12.633-.6 2.053-1.35 2.93-.11.13-.15.31-.09.47.06.16.21.28.39.28 2.34 0 4.08-.94 4.89-1.54.98.24 2.02.36 3.09.36 5.523 0 10-4.145 10-9.25S17.523 2 12 2zm0 16.5c-.93 0-1.83-.11-2.69-.32-.19-.05-.39 0-.54.12-.55.4-1.6.99-3.15 1.25.4-.65.75-1.5 1-2.33.06-.2-.01-.4-.17-.54-1.57-1.31-2.52-3.13-2.52-5.18 0-4.14 3.96-7.5 8.83-7.5s8.83 3.36 8.83 7.5-3.96 7.5-8.83 7.5z"/></svg>
-    </div>
+
     <script th:src="@{/bootstrap/bootstrap.bundle.min.js}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
-    <script>
+    <script th:inline="javascript">
         let miniStomp = null;
         let userData = null;
         let currentMiniRoomId = null;
         let currentMiniSub = null;
         let selectedMiniFile = null;
+
+        function formatDisplayDate(dateStr) {
+            if (!dateStr) return '';
+            const d = new Date(dateStr);
+            if (isNaN(d.getTime())) return '';
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const targetDate = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+            const diffDays = Math.floor((today - targetDate) / (24 * 60 * 60 * 1000));
+            if (diffDays === 0) return d.getHours().toString().padStart(2, '0') + ':' + d.getMinutes().toString().padStart(2, '0');
+            if (diffDays === 1) return '어제';
+            return d.getFullYear() + '-' + (d.getMonth() + 1).toString().padStart(2, '0') + '-' + d.getDate().toString().padStart(2, '0');
+        }
+
         function toggleMiniChat() {
             const drawer = document.getElementById('miniChatDrawer');
             if(!drawer) return;
@@ -92,12 +110,15 @@
             drawer.style.display = isVisible ? 'none' : 'flex';
             if (!isVisible) loadMiniRooms();
         }
+
         function loadMiniRooms() {
             if(currentMiniSub) { currentMiniSub.unsubscribe(); currentMiniSub = null; }
             currentMiniRoomId = null;
             clearMiniPreview();
-            document.getElementById('miniBackBtn').style.display = 'none';
-            document.getElementById('miniChatView').style.display = 'none';
+            const backBtn = document.getElementById('miniBackBtn');
+            if(backBtn) backBtn.style.display = 'none';
+            const chatView = document.getElementById('miniChatView');
+            if(chatView) chatView.style.display = 'none';
             document.getElementById('miniHeaderTitle').innerText = '메시지';
             fetch('/chat/mini/rooms').then(res => res.json()).then(rooms => {
                 const list = document.getElementById('miniRoomList');
@@ -107,31 +128,93 @@
                 rooms.forEach(r => {
                     const item = document.createElement('div');
                     item.className = 'mini-room-item';
-                    const badgeHtml = r.unreadCount > 0 ? `<span class="badge bg-danger rounded-pill">${r.unreadCount}</span>` : '';
-                    item.innerHTML = `<div class="d-flex justify-content-between"><span style="font-weight:700; font-size:14px; color:#1c1c1e;">${r.partnerName}</span>${badgeHtml}</div><div style="font-size:12px; color:#8e8e93; margin-top:2px;" class="text-truncate">${r.lastMessage || '대화 없음'}</div>`;
+                    const badgeHtml = r.unreadCount > 0 ? `<span class="badge bg-danger rounded-pill" id="mini-unread-${r.roomId}">${r.unreadCount}</span>` : '';
+                    const displayMsg = (r.lastMessage && r.lastMessage.startsWith('/images/')) ? '(사진)' : (r.lastMessage || '대화 없음');
+                    item.innerHTML = `<div class="d-flex justify-content-between"><span style="font-weight:700; font-size:14px; color:#1c1c1e;">${r.partnerName}</span>${badgeHtml}</div><div class="d-flex justify-content-between mt-1"><div style="font-size:12px; color:#8e8e93;" class="text-truncate">${displayMsg}</div><small style="font-size:10px; color:#aeaeae;">${formatDisplayDate(r.lastMessageTime)}</small></div>`;
                     item.onclick = () => openMiniChat(r.roomId, r.partnerName);
                     list.appendChild(item);
                 });
-            }).catch(e => console.error(e));
+            });
         }
+
+        function markAsRead(roomId) {
+            if(!roomId || !userData) return;
+            fetch(`/chat/read/${roomId}?userType=${userData.userType}`, { method: 'POST' }).then(() => {
+                const badge = document.getElementById('mini-unread-' + roomId);
+                if(badge) { badge.innerText = '0'; badge.style.display = 'none'; }
+                updateGlobalBadge();
+            });
+        }
+
+        function updateGlobalBadge() {
+            const badge = document.getElementById('globalChatBadge');
+            if(!badge) return;
+            fetch('/chat/global-info').then(res => res.json()).then(data => {
+                badge.innerText = data.unreadCount;
+                badge.style.display = data.unreadCount > 0 ? 'flex' : 'none';
+            });
+        }
+
         function openMiniChat(roomId, name) {
             if(currentMiniSub) { currentMiniSub.unsubscribe(); }
             currentMiniRoomId = roomId;
-            document.getElementById('miniBackBtn').style.display = 'block';
+            const backBtn = document.getElementById('miniBackBtn');
+            if(backBtn) backBtn.style.display = 'block';
             document.getElementById('miniChatView').style.display = 'flex';
             document.getElementById('miniHeaderTitle').innerText = name;
-            currentMiniSub = miniStomp.subscribe('/sub/chat/room/' + roomId, function(msg) { appendMiniMsg(JSON.paFrse(msg.body)); });
+            markAsRead(roomId);
+            currentMiniSub = miniStomp.subscribe('/sub/chat/room/' + roomId, function(msg) {
+                const received = JSON.parse(msg.body);
+                appendMiniMsg(received);
+                if(received.senderType !== userData.userType) markAsRead(roomId);
+            });
             fetch('/chat/mini/messages?roomId=' + roomId).then(res => res.json()).then(msgs => {
                 const area = document.getElementById('miniMsgArea');
                 if(!area) return;
                 area.innerHTML = '';
                 if(msgs) msgs.forEach(m => appendMiniMsg(m));
                 area.scrollTop = area.scrollHeight;
-            }).catch(e => console.error(e));
+            });
         }
+
+        function appendMiniMsg(m) {
+            const area = document.getElementById('miniMsgArea');
+            if(!area || !userData) return;
+            const dateObj = m.sendAt ? new Date(m.sendAt) : new Date();
+            const isMy = m.senderId === userData.myId && m.senderType === userData.userType;
+            const row = document.createElement('div');
+            row.className = `mini-msg-row ${isMy ? 'right' : 'left'}`;
+            let contentHtml = `<div class="mini-msg-bubble ${isMy ? 'mini-msg-right' : 'mini-msg-left'} ${m.messageType === 'IMAGE' ? 'msg-image-only' : ''}">`;
+            if(m.messageType === 'IMAGE') { contentHtml += `<img src="${m.content}" style="max-width:100%; border-radius:8px;">`; }
+            else { contentHtml += `<span>${m.content}</span>`; }
+            row.innerHTML = contentHtml + `</div><span class="mini-msg-time">${String(dateObj.getHours()).padStart(2, '0')}:${String(dateObj.getMinutes()).padStart(2, '0')}</span>`;
+            area.appendChild(row);
+            area.scrollTop = area.scrollHeight;
+        }
+
+        function sendMiniMsg() {
+            const input = document.getElementById('miniInput');
+            if(!miniStomp || !userData || (!input.value.trim() && !selectedMiniFile)) return;
+            if (selectedMiniFile) {
+                const formData = new FormData();
+                formData.append("file", selectedMiniFile);
+                fetch('/chat/upload', { method: 'POST', body: formData }).then(res => res.text()).then(url => {
+                    miniStomp.send("/pub/chat/send", {}, JSON.stringify({ roomId: currentMiniRoomId, senderId: userData.myId, senderType: userData.userType, content: url, messageType: 'IMAGE' }));
+                    clearMiniPreview();
+                    if (input.value.trim()) { sendMiniText(input.value.trim()); input.value = ''; }
+                });
+            } else {
+                sendMiniText(input.value.trim());
+                input.value = '';
+            }
+        }
+
+        function sendMiniText(txt) {
+            miniStomp.send("/pub/chat/send", {}, JSON.stringify({ roomId: currentMiniRoomId, senderId: userData.myId, senderType: userData.userType, content: txt, messageType: 'TEXT' }));
+        }
+
         function previewMiniFile() {
-            const fileInput = document.getElementById('miniFileInput');
-            selectedMiniFile = fileInput.files[0];
+            selectedMiniFile = document.getElementById('miniFileInput').files[0];
             if (selectedMiniFile) {
                 const reader = new FileReader();
                 reader.onload = (e) => {
@@ -141,6 +224,7 @@
                 reader.readAsDataURL(selectedMiniFile);
             }
         }
+
         function clearMiniPreview() {
             selectedMiniFile = null;
             const fileInput = document.getElementById('miniFileInput');
@@ -150,73 +234,39 @@
             const container = document.getElementById('miniPreviewContainer');
             if(container) container.setAttribute('style', 'display: none !important');
         }
-        function appendMiniMsg(m) {
-            const area = document.getElementById('miniMsgArea');
-            if(!area || !userData) return;
-            const isMy = m.senderId === userData.myId && m.senderType === userData.userType;
-            const row = document.createElement('div');
-            row.className = `mini-msg-row ${isMy ? 'right' : 'left'}`;
-            let contentHtml = `<div class="mini-msg-bubble ${isMy ? 'mini-msg-right' : 'mini-msg-left'} ${m.messageType === 'IMAGE' ? 'msg-image-only' : ''}">`;
-            if(m.messageType === 'IMAGE') { contentHtml += `<img src="${m.content}" style="max-width:100%; border-radius:8px;">`; }
-            else { contentHtml += `<span>${m.content}</span>`; }
-            contentHtml += `</div><span class="mini-msg-time">${m.sendAt || '방금'}</span>`;
-            row.innerHTML = contentHtml;
-            area.appendChild(row);
-            area.scrollTop = area.scrollHeight;
-        }
-        function sendMiniMsg() {
-            const input = document.getElementById('miniInput');
-            if(!miniStomp || !userData) return;
-            if (selectedMiniFile) {
-                const formData = new FormData();
-                formData.append("file", selectedMiniFile);
-                fetch('/chat/upload', { method: 'POST', body: formData }).then(res => res.text()).then(url => {
-                    const dto = { roomId: currentMiniRoomId, senderId: userData.myId, senderType: userData.userType, content: url, messageType: 'IMAGE' };
-                    miniStomp.send("/pub/chat/send", {}, JSON.stringify(dto));
-                    clearMiniPreview();
-                    if (input.value) { sendMiniText(input.value); input.value = ''; }
-                });
-            } else if (input.value) {
-                sendMiniText(input.value);
-                input.value = '';
-            }
-        }
-        function sendMiniText(txt) {
-            const dto = { roomId: currentMiniRoomId, senderId: userData.myId, senderType: userData.userType, content: txt, messageType: 'TEXT' };
-            miniStomp.send("/pub/chat/send", {}, JSON.stringify(dto));
-        }
+
         function goToChat(bidId, customerId, businessId) {
-            if(!bidId || !customerId || !businessId) { alert("채팅 연결 정보가 부족합니다."); return; }
             fetch('/chat/get-or-create', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ bidId: bidId, customerId: customerId, businessId: businessId })
-            })
-            .then(res => res.json())
-            .then(roomId => { location.href = '/chat?roomId=' + roomId; })
-            .catch(err => { alert("채팅방 연결에 실패했습니다."); });
+            }).then(res => res.json()).then(roomId => { location.href = '/chat?roomId=' + roomId; });
         }
-        document.getElementById('miniBackBtn').onclick = loadMiniRooms;
-        document.getElementById('miniInput').onkeypress = (e) => { if(e.key === 'Enter') sendMiniMsg(); };
+
         (function init() {
-            if (window.location.pathname.includes('/chat')) { const btn = document.getElementById('globalChatBtn'); if(btn) btn.style.display = 'none'; return; }
-            fetch('/chat/global-info').then(res => res.json()).then(data => {
+            const chatBtn = document.getElementById('globalChatBtn');
+            if (!chatBtn || window.location.pathname.includes('/chat')) { if(chatBtn) chatBtn.style.display = 'none'; return; }
+            const backBtn = document.getElementById('miniBackBtn');
+            if(backBtn) backBtn.onclick = loadMiniRooms;
+            const miniInput = document.getElementById('miniInput');
+            if(miniInput) miniInput.onkeypress = (e) => { if(e.key === 'Enter') sendMiniMsg(); };
+            fetch('/chat/global-info').then(res => {
+                if(!res.ok) throw new Error();
+                return res.json();
+            }).then(data => {
                 userData = data;
-                const badge = document.getElementById('globalChatBadge');
-                if (data.unreadCount > 0 && badge) { badge.innerText = data.unreadCount; badge.style.display = 'flex'; }
+                updateGlobalBadge();
                 const socket = new SockJS('/ws-chat');
                 miniStomp = Stomp.over(socket);
                 miniStomp.debug = null;
                 miniStomp.connect({}, function() {
                     miniStomp.subscribe('/sub/chat/user/' + data.userType + '/' + data.myId, function(msg) {
                         const m = JSON.parse(msg.body);
-                        if (currentMiniRoomId !== m.roomId) {
-                            if(badge) { let count = parseInt(badge.innerText) || 0; badge.innerText = count + 1; badge.style.display = 'flex'; }
-                            if (document.getElementById('miniChatDrawer').style.display === 'flex' && !currentMiniRoomId) loadMiniRooms();
-                        }
+                        updateGlobalBadge();
+                        if (document.getElementById('miniChatDrawer').style.display === 'flex' && !currentMiniRoomId) loadMiniRooms();
                     });
                 });
-            }).catch(e => console.error(e));
+            }).catch(() => { if(chatBtn) chatBtn.style.display = 'none'; });
         })();
     </script>
     <th:block layout:fragment="script"></th:block>

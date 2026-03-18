@@ -14,6 +14,8 @@ public interface ChatMapper {
 
     List<ChatMessageDTO> findMessagesByRoomId(Long roomId);
 
+    List<ChatMessageDTO> findMessagesByRoomIdPaged(@Param("roomId") Long roomId, @Param("limit") int limit, @Param("offset") int offset);
+
     void insertMessage(ChatMessageDTO message);
 
     ChatRoomDTO findRoomById(Long roomId);

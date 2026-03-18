@@ -11,7 +11,6 @@
         .chat-list { flex: 1; overflow-y: auto; }
         .chat-item { padding: 20px; border-bottom: 1px solid #eee; cursor: pointer; transition: 0.2s; }
         .chat-item.active { background: #333 !important; color: #fff !important; border-left: 6px solid #ffc107; }
-        .chat-item.active .text-muted { color: #ccc !important; }
         .chat-main { flex: 1; display: flex; flex-direction: column; background: #fff; min-width: 0; }
         .chat-body { flex: 1; overflow-y: auto; padding: 25px; display: flex; flex-direction: column; gap: 12px; background: #f4f4f4; }
         .msg-row { display: flex; align-items: flex-end; width: 100%; margin-bottom: 5px; }
@@ -22,15 +21,15 @@
         .msg-left { background: #fff; border: 1px solid #ddd; color: #333; border-bottom-left-radius: 2px; }
         .msg-time { font-size: 11px; color: #999; margin: 0 8px; white-space: nowrap; }
         .chat-footer { padding: 20px; background: #fff; border-top: 1px solid #eee; }
-        .btn-dark-custom { background: #222; color: #fff; border: none; padding: 10px 25px; font-weight: bold; border-radius: 8px; transition: 0.3s; }
+        .btn-dark-custom { background: #222; color: #fff; border: none; padding: 10px 25px; font-weight: bold; border-radius: 8px; }
         .photo-btn { background: none; border: none; padding: 0 10px; cursor: pointer; color: #6c757d; font-size: 1.5rem; }
         #messageInput { border-radius: 20px; padding: 10px 15px; border: 1px solid #ced4da; }
-        .msg-image-only { background: transparent !important; padding: 0 !important; border: none !important; box-shadow: none !important; }
+        .msg-image-only { background: transparent !important; padding: 0 !important; border: none !important; }
         .date-divider { width: 100%; text-align: center; border-bottom: 1px solid #ddd; line-height: 0.1em; margin: 25px 0; }
         .date-divider span { background:#f4f4f4; padding:0 15px; color: #888; font-size: 12px; font-weight: bold; }
         #imagePreviewContainer { display: none !important; padding: 10px; border-top: 1px solid #eee; background: #f9f9f9; position: relative; }
         #imagePreview { max-width: 100px; max-height: 100px; border-radius: 8px; border: 1px solid #ddd; }
-        #clearImageBtn { position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.5); color: #fff; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        #clearImageBtn { position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.5); color: #fff; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
     </style>
 
     <div class="chat-page-container">
@@ -56,7 +55,8 @@
                         <span th:if="${room.requestTitle != null}" style="color: #b8860b; font-weight: bold;" th:text="'[' + ${room.requestTitle} + '] '"></span>
                         <span th:if="${room.bidPrice != null}" style="color: #b8860b;" th:text="${#numbers.formatInteger(room.bidPrice, 0, 'COMMA')} + '원'"></span>
                     </div>
-                    <div class="text-muted small text-truncate mt-1" th:id="'room-msg-' + ${room.roomId}" th:text="${room.lastMessage}"></div>
+                    <div class="text-muted small text-truncate mt-1" th:id="'room-msg-' + ${room.roomId}" 
+                         th:text="${room.lastMessage != null && #strings.startsWith(room.lastMessage, '/images/') ? '(사진)' : room.lastMessage}"></div>
                 </div>
             </div>
         </div>
@@ -79,14 +79,11 @@
             </div>
 
             <div class="chat-body" id="chatBody">
-                <div th:if="${currentRoomId == null}" class="m-auto text-center">
-                    <p class="text-muted">응대할 고객을 선택해 주세요.</p>
-                </div>
+                <div th:if="${currentRoomId == null}" class="m-auto text-center"><p class="text-muted">응대할 고객을 선택해 주세요.</p></div>
             </div>
 
             <div id="imagePreviewContainer">
-                <img id="imagePreview" src="" alt="">
-                <button id="clearImageBtn" onclick="clearImagePreview()">X</button>
+                <img id="imagePreview" src=""><button id="clearImageBtn" onclick="clearImagePreview()">X</button>
             </div>
 
             <div class="chat-footer" th:if="${currentRoomId != null}">
@@ -111,10 +108,14 @@
         const initialMessages = [[${messages}]];
         let selectedFile = null;
         let lastDisplayedDate = null;
+        let currentPage = 1;
+        let isLoading = false;
+        let isLastPage = false;
 
         function formatDisplayDate(dateStr) {
             if (!dateStr) return '';
             const d = new Date(dateStr);
+            if (isNaN(d.getTime())) return '';
             const now = new Date();
             const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
             const targetDate = new Date(d.getFullYear(), d.getMonth(), d.getDate());
@@ -126,19 +127,16 @@
 
         function formatBubbleTime(dateStr) {
             const d = new Date(dateStr);
+            if (isNaN(d.getTime())) return '';
             return d.getHours().toString().padStart(2, '0') + ':' + d.getMinutes().toString().padStart(2, '0');
         }
 
-        function formatDate(dateStr) {
-            const date = new Date(dateStr);
-            return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일 ${['일', '월', '화', '수', '목', '금', '토'][date.getDay()]}요일`;
-        }
-
-        function addDateDivider(dateStr) {
-            const divider = document.createElement('div');
-            divider.className = 'date-divider';
-            divider.innerHTML = `<span>${formatDate(dateStr)}</span>`;
-            chatBody.appendChild(divider);
+        function markAsRead(roomId) {
+            if(!roomId) return;
+            fetch(`/chat/read/${roomId}?userType=${userType}`, { method: 'POST' }).then(() => {
+                const badge = document.getElementById('unread-count-' + roomId);
+                if(badge) badge.style.display = 'none';
+            });
         }
 
         function connect() {
@@ -152,19 +150,17 @@
                 });
                 if (currentRoomId) {
                     stompClient.subscribe('/sub/chat/room/' + currentRoomId, function (message) {
-                        appendMessageToScreen(JSON.parse(message.body));
+                        const msg = JSON.parse(message.body);
+                        appendMessageToScreen(msg);
+                        if(msg.senderType !== userType) markAsRead(currentRoomId);
                     });
                 }
             });
         }
 
-        function appendMessageToScreen(message, isInitial = false) {
+        function appendMessageToScreen(message, isInitial = false, isPrepend = false) {
             if(!chatBody) return;
-            const msgDate = new Date(message.sendAt).toDateString();
-            if (lastDisplayedDate !== msgDate) {
-                addDateDivider(message.sendAt);
-                lastDisplayedDate = msgDate;
-            }
+            const dateObj = message.sendAt ? new Date(message.sendAt) : new Date();
             const row = document.createElement('div');
             const isMy = message.senderId === myId && message.senderType === userType;
             row.className = `msg-row ${isMy ? 'right' : 'left'}`;
@@ -174,12 +170,33 @@
             } else {
                 content = `<div class="msg-bubble ${isMy ? 'msg-right' : 'msg-left'}"><span>${message.content}</span></div>`;
             }
-            row.innerHTML = content + `<span class="msg-time">${formatBubbleTime(message.sendAt)}</span>`;
-            chatBody.appendChild(row);
-            if(!isInitial) {
+            row.innerHTML = content + `<span class="msg-time">${formatBubbleTime(dateObj)}</span>`;
+            if (isPrepend) {
+                chatBody.prepend(row);
+            } else {
+                chatBody.appendChild(row);
+            }
+            if(!isInitial && !isPrepend) {
                 chatBody.scrollTop = chatBody.scrollHeight;
                 updateSidebar(message.roomId, message.content, message.messageType, message.sendAt);
             }
+        }
+
+        function loadMoreMessages() {
+            if (isLoading || isLastPage || !currentRoomId) return;
+            isLoading = true;
+            const prevHeight = chatBody.scrollHeight;
+            fetch(`/chat/messages/paging?roomId=${currentRoomId}&page=${currentPage}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.length < 20) isLastPage = true;
+                    if (data.length > 0) {
+                        data.forEach(msg => appendMessageToScreen(msg, true, true));
+                        chatBody.scrollTop = chatBody.scrollHeight - prevHeight;
+                        currentPage++;
+                    }
+                    isLoading = false;
+                });
         }
 
         function updateSidebar(roomId, content, messageType, sendAt) {
@@ -187,7 +204,7 @@
             if(roomItem) {
                 const msgSpan = document.getElementById('room-msg-' + roomId);
                 const timeSpan = document.getElementById('room-time-' + roomId);
-                if(msgSpan) msgSpan.innerText = (messageType === 'IMAGE') ? '(사진)' : content;
+                if(msgSpan) msgSpan.innerText = (messageType === 'IMAGE' || content.startsWith('/images/')) ? '(사진)' : content;
                 if(timeSpan) timeSpan.innerText = formatDisplayDate(sendAt || new Date());
                 document.getElementById('chatListContainer')?.prepend(roomItem);
             }
@@ -230,10 +247,7 @@
             const input = document.getElementById('fileInput');
             if(input) input.value = '';
             selectedFile = null;
-            const img = document.getElementById('imagePreview');
-            if(img) img.src = '';
-            const container = document.getElementById('imagePreviewContainer');
-            if(container) container.setAttribute('style', 'display: none !important');
+            document.getElementById('imagePreviewContainer').setAttribute('style', 'display: none !important');
         }
 
         window.onload = function() {
@@ -241,9 +255,12 @@
                 el.innerText = formatDisplayDate(el.getAttribute('data-time'));
             });
             connect();
-            if(initialMessages) { initialMessages.forEach(m => appendMessageToScreen(m, true)); chatBody.scrollTop = chatBody.scrollHeight; }
+            if(currentRoomId) {
+                markAsRead(currentRoomId);
+                if(initialMessages) { initialMessages.forEach(m => appendMessageToScreen(m, true)); chatBody.scrollTop = chatBody.scrollHeight; }
+            }
+            chatBody.addEventListener('scroll', () => { if (chatBody.scrollTop === 0) loadMoreMessages(); });
             document.getElementById('messageInput')?.addEventListener('keypress', e => { if(e.key === 'Enter') sendMessage(); });
-            clearImagePreview();
         };
     </script>
 </div>

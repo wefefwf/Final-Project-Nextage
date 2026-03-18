@@ -1,5 +1,6 @@
 package com.nextage.web.service;
 
+import java.util.Collections;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +27,14 @@ public class ChatService {
 
     public List<ChatMessageDTO> getRoomMessages(Long roomId) {
         return chatMapper.findMessagesByRoomId(roomId);
+    }
+
+    public List<ChatMessageDTO> getRoomMessagesPaged(Long roomId, int page) {
+        int limit = 20;
+        int offset = page * limit;
+        List<ChatMessageDTO> messages = chatMapper.findMessagesByRoomIdPaged(roomId, limit, offset);
+        Collections.reverse(messages);
+        return messages;
     }
 
     public void saveMessage(ChatMessageDTO message) {

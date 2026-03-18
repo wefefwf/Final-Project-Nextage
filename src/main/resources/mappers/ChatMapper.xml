@@ -65,6 +65,22 @@
         ORDER BY send_at ASC
     </select>
 
+    <select id="findMessagesByRoomIdPaged" resultType="com.nextage.web.domain.ChatMessageDTO">
+        SELECT 
+            message_id as messageId,
+            room_id as roomId,
+            sender_id as senderId,
+            sender_type as senderType,
+            content,
+            message_type as messageType,
+            send_at as sendAt,
+            is_read as isRead
+        FROM chat_message
+        WHERE room_id = #{roomId}
+        ORDER BY send_at DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
     <insert id="insertMessage" useGeneratedKeys="true" keyProperty="messageId">
         INSERT INTO chat_message (room_id, sender_id, sender_type, content, message_type, send_at, is_read)
         VALUES (#{roomId}, #{senderId}, #{senderType}, #{content}, #{messageType}, NOW(), 0)

@@ -8,6 +8,7 @@ public class ChatMessageDTO {
     private String messageType;
     private String content;
     private String sendAt;
+    private Integer isRead;
 
     public Long getMessageId() { return messageId; }
     public void setMessageId(Long messageId) { this.messageId = messageId; }
@@ -29,4 +30,7 @@ public class ChatMessageDTO {
 
     public String getSendAt() { return sendAt; }
     public void setSendAt(String sendAt) { this.sendAt = sendAt; }
+
+    public Integer getIsRead() { return isRead; }
+    public void setIsRead(Integer isRead) { this.isRead = isRead; }
 }
