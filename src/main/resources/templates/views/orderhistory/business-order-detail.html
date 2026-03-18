@@ -331,20 +331,6 @@
                       th:text="${#numbers.formatInteger(order.totalAmount, 3, 'COMMA') + '원'}"></span>
             </div>
         </div>
-		
-		<!-- 액션 버튼 영역 -->
-		<div class="action-area" th:if="${order.deliveryStatus != 9 and order.acceptStatus != 'REJECTED'}">
-		    <div class="action-area-left">
-		        <button class="btn btn-blue"
-		                th:data-order-id="${order.orderId}"
-		                th:data-delivery-status="${order.deliveryStatus}"
-		                onclick="openDeliveryModal(this)">배송 관리</button>
-		        <a class="btn btn-green"
-		           th:if="${order.roomId != null}"
-		           th:href="@{/chat(roomId=${order.roomId})}">채팅 보기</a>
-		    </div>
-		</div>
-
     </div>
 
     <!-- 배송 관리 모달 -->
