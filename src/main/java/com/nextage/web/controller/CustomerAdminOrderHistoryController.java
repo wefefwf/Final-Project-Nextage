@@ -51,7 +51,7 @@ public class CustomerAdminOrderHistoryController {
 
         Long customerId = userDetails.getCustomerId();
 
-        // CADMIN → CustomerOrderHistoryService.getOrderHistory 내부에서 selectAllOrders 호출
+        
         List<OrderHistoryDTO> orders = service.getOrderHistory(customerId, "CADMIN", search, page);
         int totalPages = service.getTotalPages(customerId, "CADMIN", search);
 

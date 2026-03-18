@@ -18,6 +18,7 @@ public class OrderHistoryDTO {
     private int           totalAmount;
     private String        paymentStatus;
     private int unreadCount;
+    private String businessNickname;
 
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime createdAt;

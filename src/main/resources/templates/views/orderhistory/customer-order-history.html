@@ -256,50 +256,38 @@
         <h2 class="page-title">구매내역</h2>
         <p class="page-subtitle">결제가 완료된 구매 내역을 확인하세요.</p>
 
-        <div class="search-box">
-            <form th:action="@{/customer/order/history}" method="get">
-
-                <div class="search-row" th:if="${isAdmin}">
-                    <select name="searchType" class="search-select">
-                        <option value="loginId"  th:selected="${search.searchType == 'loginId'}">아이디</option>
-                        <option value="nickname" th:selected="${search.searchType == 'nickname'}">닉네임</option>
-                        <option value="phone"    th:selected="${search.searchType == 'phone'}">전화번호</option>
-                        <option value="orderId"  th:selected="${search.searchType == 'orderId'}">주문번호</option>
-                    </select>
-                    <input type="text" name="keyword" class="search-input"
-                           th:value="${search.keyword}"
-                           placeholder="검색어를 입력하세요">
-                    <button type="submit" class="btn-search">검색</button>
-                </div>
-
-                <div class="search-row" th:if="${!isAdmin}">
-                    <input type="text" name="keyword" class="search-input"
-                           th:value="${search.keyword}"
-                           placeholder="상품명으로 검색">
-                    <button type="submit" class="btn-search">검색</button>
-                </div>
-
-                <div class="search-row">
-                    <span style="font-size:13px; color:#aaa; font-weight:600;">빠른 선택</span>
-                    <button type="submit" name="period" value="1w" class="period-btn"
-                            th:classappend="${search.period == '1w'} ? ' active'">1주일</button>
-                    <button type="submit" name="period" value="1m" class="period-btn"
-                            th:classappend="${search.period == '1m'} ? ' active'">1개월</button>
-                    <button type="submit" name="period" value="3m" class="period-btn"
-                            th:classappend="${search.period == '3m'} ? ' active'">3개월</button>
-                </div>
-
-                <div class="search-row">
-                    <span style="font-size:13px; color:#aaa; font-weight:600;">직접 입력</span>
-                    <input type="date" name="startDate" class="date-input" th:value="${search.startDate}">
-                    <span style="color:#aaa;">~</span>
-                    <input type="date" name="endDate" class="date-input" th:value="${search.endDate}">
-                    <button type="submit" class="btn-search">검색</button>
-                    <a href="/customer/order/history" class="btn-reset">초기화</a>
-                </div>
-
-            </form>
-        </div>
+		<div class="search-box">
+		    <form th:action="@{/customer/order/history}" method="get">
+		
+		        <!-- ✅ 통합 검색 하나로 -->
+		        <div class="search-row">
+		            <input type="text" name="keyword" class="search-input"
+		                   th:value="${search.keyword}"
+		                   placeholder="상품명, 판매자명, 주문번호로 검색">
+		            <button type="submit" class="btn-search">검색</button>
+		        </div>
+		
+		        <div class="search-row">
+		            <span style="font-size:13px; color:#aaa; font-weight:600;">빠른 선택</span>
+		            <button type="submit" name="period" value="1w" class="period-btn"
+		                    th:classappend="${search.period == '1w'} ? ' active'">1주일</button>
+		            <button type="submit" name="period" value="1m" class="period-btn"
+		                    th:classappend="${search.period == '1m'} ? ' active'">1개월</button>
+		            <button type="submit" name="period" value="3m" class="period-btn"
+		                    th:classappend="${search.period == '3m'} ? ' active'">3개월</button>
+		        </div>
+		
+		        <div class="search-row">
+		            <span style="font-size:13px; color:#aaa; font-weight:600;">직접 입력</span>
+		            <input type="date" name="startDate" class="date-input" th:value="${search.startDate}">
+		            <span style="color:#aaa;">~</span>
+		            <input type="date" name="endDate" class="date-input" th:value="${search.endDate}">
+		            <button type="submit" class="btn-search">검색</button>
+		            <a href="/customer/order/history" class="btn-reset">초기화</a>
+		        </div>
+		
+		    </form>
+		</div>
 
         <div class="empty-state" th:if="${#lists.isEmpty(orders)}">
             <div class="empty-text">구매 내역이 없어요.</div>
@@ -323,8 +311,12 @@
                             <span th:if="${#lists.isEmpty(order.items)}" style="color:#ccc;">상품 정보 없음</span>
                         </div>
                         <div class="order-no" th:text="${order.orderNo}">ORDER_...</div>
-                        <div class="order-date"
-                             th:text="${#temporals.format(order.createdAt, 'yyyy-MM-dd HH:mm')}"></div>
+                        <div class="order-date">
+						    <span th:text="${#temporals.format(order.createdAt, 'yyyy-MM-dd HH:mm')}"></span>
+						    <span th:if="${order.businessNickname != null}"
+						          style="margin-left:6px; color:#bd93f9; font-weight:600;"
+						          th:text="'· ' + ${order.businessNickname}"></span>
+						</div>
                     </div>
                     <div class="badge-group">
                         <span class="order-status">결제완료</span>

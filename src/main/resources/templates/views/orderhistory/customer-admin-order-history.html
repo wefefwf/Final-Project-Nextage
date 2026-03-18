@@ -153,33 +153,38 @@
     </div>
 
     <!-- 검색 영역 -->
-    <div class="search-box">
-        <form th:action="@{/customer/admin/order/history}" method="get">
-            <div class="search-row">
-                <input type="text" name="keyword" class="search-input"
-                       th:value="${search.keyword}"
-                       placeholder="고객 닉네임 또는 주문번호 검색">
-                <button type="submit" class="btn-search">검색</button>
-            </div>
-            <div class="search-row">
-                <span style="font-size:13px; color:#aaa; font-weight:600;">빠른 선택</span>
-                <button type="submit" name="period" value="1w" class="period-btn"
-                        th:classappend="${search.period == '1w'} ? ' active'">1주일</button>
-                <button type="submit" name="period" value="1m" class="period-btn"
-                        th:classappend="${search.period == '1m'} ? ' active'">1개월</button>
-                <button type="submit" name="period" value="3m" class="period-btn"
-                        th:classappend="${search.period == '3m'} ? ' active'">3개월</button>
-            </div>
-            <div class="search-row">
-                <span style="font-size:13px; color:#aaa; font-weight:600;">직접 입력</span>
-                <input type="date" name="startDate" class="date-input" th:value="${search.startDate}">
-                <span style="color:#aaa;">~</span>
-                <input type="date" name="endDate" class="date-input" th:value="${search.endDate}">
-                <button type="submit" class="btn-search">검색</button>
-                <a href="/customer/admin/order/history" class="btn-reset">초기화</a>
-            </div>
-        </form>
-    </div>
+	<div class="search-box">
+	    <form th:action="@{/customer/admin/order/history}" method="get">
+	
+	        <!-- ✅ 셀렉트 없이 keyword 하나로 통합 검색 -->
+	        <div class="search-row">
+	            <input type="text" name="keyword" class="search-input"
+	                   th:value="${search.keyword}"
+	                   placeholder="고객 닉네임, 상품명, 주문번호로 검색">
+	            <button type="submit" class="btn-search">검색</button>
+	        </div>
+	
+	        <div class="search-row">
+	            <span style="font-size:13px; color:#aaa; font-weight:600;">빠른 선택</span>
+	            <button type="submit" name="period" value="1w" class="period-btn"
+	                    th:classappend="${search.period == '1w'} ? ' active'">1주일</button>
+	            <button type="submit" name="period" value="1m" class="period-btn"
+	                    th:classappend="${search.period == '1m'} ? ' active'">1개월</button>
+	            <button type="submit" name="period" value="3m" class="period-btn"
+	                    th:classappend="${search.period == '3m'} ? ' active'">3개월</button>
+	        </div>
+	
+	        <div class="search-row">
+	            <span style="font-size:13px; color:#aaa; font-weight:600;">직접 입력</span>
+	            <input type="date" name="startDate" class="date-input" th:value="${search.startDate}">
+	            <span style="color:#aaa;">~</span>
+	            <input type="date" name="endDate" class="date-input" th:value="${search.endDate}">
+	            <button type="submit" class="btn-search">검색</button>
+	            <a href="/customer/admin/order/history" class="btn-reset">초기화</a>
+	        </div>
+	
+	    </form>
+	</div>
 
     <div class="top-section">
         <!-- 왼쪽: 새 주문 -->
@@ -211,7 +216,11 @@
 					</div>
 					<div class="pending-sub"
 					     th:if="${order.items == null or #lists.isEmpty(order.items)}">상품 정보 없음</div>
-                    </div>
+					<div class="pending-sub"
+					     th:if="${order.businessNickname != null}"
+					     style="color:#bd93f9;"
+					     th:text="'판매자: ' + ${order.businessNickname}"></div>
+					</div>
                     <div class="pending-price"
                          th:text="${#numbers.formatInteger(order.totalAmount, 3, 'COMMA') + '원'}"></div>
                 </div>
@@ -273,8 +282,12 @@
 		<div class="order-name"
 		     th:if="${order.items == null or #lists.isEmpty(order.items)}">주문</div>
             <div class="order-sub"
-                 th:text="${order.customerNickname} + ' · ' + ${#temporals.format(order.createdAt, 'yyyy-MM-dd HH:mm')}"></div>
-        </div>
+			     th:text="'주문번호: ' + ${order.orderNo} + ' · ' 
+			              + ${order.customerNickname} + ' · ' 
+			              + ${#temporals.format(order.createdAt, 'yyyy-MM-dd HH:mm')}
+			              + (${order.businessNickname != null} ? ' · 판매자: ' + ${order.businessNickname} : '')">
+			</div>
+    	    </div>
         <div class="order-amount"
              th:text="${#numbers.formatInteger(order.totalAmount, 3, 'COMMA') + '원'}"></div>
 
@@ -292,9 +305,9 @@
         <!-- 수정: business처럼 event 전달 방식으로 변경 -->
 		<div class="order-btns">
 		    <button class="btn btn-blue"
-		    		th:if="${order.acceptStatus != 'REJECTED'}"
-		            th:attr="data-order-id=${order.orderId},data-delivery-status=${order.deliveryStatus}"
-		            onclick="openDeliveryModal(event, this)">배송 관리</button>
+		        th:if="${order.acceptStatus != 'REJECTED' and order.bidId == null}"
+		        th:attr="data-order-id=${order.orderId},data-delivery-status=${order.deliveryStatus}"
+		        onclick="openDeliveryModal(event, this)">배송 관리</button>
 		    <a class="btn btn-green"
 		       th:if="${order.roomId != null}"
 		       th:href="@{/chat(roomId=${order.roomId})}"

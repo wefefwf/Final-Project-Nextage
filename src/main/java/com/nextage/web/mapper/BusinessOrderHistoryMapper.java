@@ -71,4 +71,9 @@ public interface BusinessOrderHistoryMapper {
     int selectChatFunctionExists(@Param("roomId") Long roomId);
     
     int selectUnreadCount(@Param("roomId") Long roomId);
+    
+    void updatePaymentStatus(@Param("orderId") Long orderId, 
+            @Param("paymentStatus") String paymentStatus);
+    
+    void updateRequestStatusToComplete(@Param("bidId") Long bidId);
 }

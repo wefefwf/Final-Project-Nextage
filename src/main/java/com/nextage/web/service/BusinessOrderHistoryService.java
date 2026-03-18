@@ -21,6 +21,7 @@ public class BusinessOrderHistoryService {
     private static final int PAGE_SIZE = 6;
     private final CustomerRequestMapper requestMapper;
     private final BusinessSettlementMapper settlementMapper;
+    private final BidService bidService;
 
     @Transactional(readOnly = true)
     public List<OrderHistoryDTO> getPendingOrders(Long businessId, String role) {
@@ -101,13 +102,12 @@ public class BusinessOrderHistoryService {
     public void rejectOrder(Long orderId) {
         mapper.updateAcceptStatus(orderId, "REJECTED");
         mapper.updateDeliveryStatus(orderId, 9);
+        mapper.updatePaymentStatus(orderId, "CANCELLED"); // ✅ 결제 상태 취소로 변경
         log.info("주문 거절 - orderId: {}", orderId);
 
         OrderHistoryDTO order = mapper.selectOrderDetail(orderId);
         if (order.getBidId() != null) {
-            // request status → OPEN으로 복구
-            Long requestId = mapper.selectRequestIdByBidId(order.getBidId());
-            requestMapper.updateStatus(requestId, "OPEN");
+            bidService.rejectByBusiness(order.getBidId()); // ✅ request OPEN + 댓글 상태 변경
         }
     }
 
@@ -116,13 +116,21 @@ public class BusinessOrderHistoryService {
         mapper.updateDeliveryStatus(orderId, deliveryStatus);
         log.info("배송 상태 변경 - orderId: {}, status: {}", orderId, deliveryStatus);
 
-        // ✅ 배송완료(4)이고 아직 정산 데이터 없으면 자동 생성
         if (deliveryStatus == 4) {
+            OrderHistoryDTO order = mapper.selectOrderDetail(orderId);
+
+            // ✅ request 상태 COMPLETE로 변경
+            if (order.getBidId() != null) {
+                Long requestId = mapper.selectRequestIdByBidId(order.getBidId());
+                requestMapper.updateStatus(requestId, "COMPLETE");
+                log.info("의뢰 완료 처리 - requestId: {}", requestId);
+            }
+
+            // 기존 정산 로직
             int exists = settlementMapper.existsSettlement(orderId);
             if (exists == 0) {
-                OrderHistoryDTO order = mapper.selectOrderDetail(orderId);
                 int sales      = order.getTotalAmount();
-                int commission = (int) Math.round(sales * 0.1); // 10% 수수료
+                int commission = (int) Math.round(sales * 0.1);
                 int settlement = sales - commission;
 
                 settlementMapper.insertSettlement(

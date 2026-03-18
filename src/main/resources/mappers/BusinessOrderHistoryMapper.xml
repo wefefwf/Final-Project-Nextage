@@ -333,4 +333,17 @@
 	      AND is_read = 0
 	      AND sender_type = 'CUSTOMER'
 	</select>
+	
+	<update id="updatePaymentStatus">
+	    UPDATE orders 
+	    SET payment_status = #{paymentStatus}
+	    WHERE order_id = #{orderId}
+	</update>
+	
+	<update id="updateRequestStatusToComplete">
+	    UPDATE request r
+	    JOIN bids b ON b.request_id = r.request_id
+	    SET r.status = 'COMPLETE'
+	    WHERE b.bid_id = #{bidId}
+	</update>
 </mapper>

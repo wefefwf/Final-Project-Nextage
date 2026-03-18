@@ -241,3 +241,13 @@ body {
     background: #d2d2d7;
     border-radius: 10px;
 }
+
+.status-badge {
+    font-size: 10px; padding: 4px 12px; border-radius: 20px;
+    font-weight: 800; letter-spacing: 0.8px;
+}
+.status-open     { background: #fdf2f8; color: #ff79c6; border: 1px solid #ffb8e0; }
+.status-selected { background: #eefbf3; color: #2ecc71; border: 1px solid #a7f3d0; }
+.status-paid     { background: #e8f0fe; color: #4285f4; border: 1px solid #c5d8fd; }
+.status-complete { background: #f5f0ff; color: #bd93f9; border: 1px solid #d8b4fe; }
+.status-default  { background: #f0f0f0; color: #888;    border: 1px solid #e0e0e0; }

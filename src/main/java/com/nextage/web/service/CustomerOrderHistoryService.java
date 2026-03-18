@@ -22,6 +22,7 @@ public class CustomerOrderHistoryService {
     private final CustomerOrderHistoryMapper customerOrderHistoryMapper;
     private final CustomerReviewMapper       customerReviewMapper;
     private final BusinessOrderHistoryMapper businessOrderHistoryMapper;
+    // ✅ BidService 제거 - Kit 구매만 다루므로 불필요
     private static final int PAGE_SIZE = 5;
 
     @Transactional(readOnly = true)
@@ -29,13 +30,12 @@ public class CustomerOrderHistoryService {
         int offset = (page - 1) * PAGE_SIZE;
         List<OrderHistoryDTO> orders;
         if ("CADMIN".equals(role)) {
-            orders = customerOrderHistoryMapper.selectAllOrders(search, offset, PAGE_SIZE);
+            orders = customerOrderHistoryMapper.selectOrdersForAdmin(search, offset, PAGE_SIZE);
         } else {
             orders = customerOrderHistoryMapper.selectOrdersByCustomerId(customerId, search, offset, PAGE_SIZE);
         }
         orders.forEach(order -> {
             order.setItems(customerOrderHistoryMapper.selectOrderItems(order.getOrderId()));
-            // ✅ 개인거래이고 거절 아닌 경우 unread count 세팅
             if (order.getBidId() != null && order.getAcceptStatus() != null
                     && !"REJECTED".equals(order.getAcceptStatus())) {
                 order.setUnreadCount(
@@ -50,7 +50,7 @@ public class CustomerOrderHistoryService {
     public int getTotalPages(Long customerId, String role, OrderSearchDTO search) {
         int total;
         if ("CADMIN".equals(role)) {
-            total = customerOrderHistoryMapper.countAllOrders(search);
+            total = customerOrderHistoryMapper.countOrdersForAdmin(search);
         } else {
             total = customerOrderHistoryMapper.countOrdersByCustomerId(customerId, search);
         }
@@ -91,6 +91,7 @@ public class CustomerOrderHistoryService {
 
     @Transactional
     public void updateDeliveryStatus(Long orderId, int deliveryStatus) {
+        // ✅ Kit 구매만 다루므로 COMPLETE 로직 불필요
         customerOrderHistoryMapper.updateDeliveryStatus(orderId, deliveryStatus);
         log.info("배송 상태 변경 - orderId: {}, status: {}", orderId, deliveryStatus);
     }
@@ -98,17 +99,17 @@ public class CustomerOrderHistoryService {
     @Transactional
     public void acceptOrder(Long orderId) {
         customerOrderHistoryMapper.updateAcceptStatus(orderId, "ACCEPTED");
-        customerOrderHistoryMapper.updateDeliveryStatus(orderId, 2);
+        updateDeliveryStatus(orderId, 2);
         log.info("주문 수락 - orderId: {}", orderId);
     }
 
     @Transactional
     public void rejectOrder(Long orderId) {
+        // ✅ Kit 구매만 다루므로 bidService 호출 불필요
         customerOrderHistoryMapper.updateAcceptStatus(orderId, "REJECTED");
         customerOrderHistoryMapper.updateDeliveryStatus(orderId, 9);
         log.info("주문 취소 - orderId: {}", orderId);
     }
-
 
     /* ─────────────────────────────────────────
        주문 삭제
@@ -130,7 +131,6 @@ public class CustomerOrderHistoryService {
 
         if (order.getBidId() == null) throw new IllegalArgumentException("개인거래 주문이 아닙니다.");
 
-        // chat_room 생성
         businessOrderHistoryMapper.insertChatRoom(
             order.getBidId(),
             customerId,
@@ -142,7 +142,6 @@ public class CustomerOrderHistoryService {
             order.getBusinessId()
         );
 
-        // ✅ chat_function 중복 체크 후 INSERT
         int exists = businessOrderHistoryMapper.selectChatFunctionExists(roomId);
         if (exists == 0) {
             businessOrderHistoryMapper.insertChatFunction(roomId, order.getBusinessId(), customerId);
