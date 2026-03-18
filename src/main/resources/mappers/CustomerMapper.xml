@@ -56,5 +56,11 @@
             </if>
         WHERE login_id = #{loginId}
     </update>
+    
+    <update id="updateRoleToNull" parameterType="String">
+	    UPDATE customer
+	    SET status = NULL
+	    WHERE login_id = #{loginId}
+	</update>
   
 </mapper>

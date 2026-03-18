@@ -80,7 +80,7 @@ function execDaumPostcode() {
 
 function withdrawCustomer() {
 
-    if(confirm("정말로 회원 탈퇴를 진행하시겠습니까?\n탈퇴 시 모든 정보가 삭제되며 복구할 수 없습니다.")) {
+    if(confirm("정말로 회원 탈퇴를 진행하시겠습니까?\n한달 후 데이터가 삭제됩니다.")) {
 
         const form = document.createElement("form");
         form.method = "POST";
