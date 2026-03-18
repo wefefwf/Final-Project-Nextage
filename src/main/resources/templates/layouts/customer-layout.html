@@ -120,7 +120,7 @@
             document.getElementById('miniBackBtn').style.display = 'block';
             document.getElementById('miniChatView').style.display = 'flex';
             document.getElementById('miniHeaderTitle').innerText = name;
-            currentMiniSub = miniStomp.subscribe('/sub/chat/room/' + roomId, function(msg) { appendMiniMsg(JSON.parse(msg.body)); });
+            currentMiniSub = miniStomp.subscribe('/sub/chat/room/' + roomId, function(msg) { appendMiniMsg(JSON.paFrse(msg.body)); });
             fetch('/chat/mini/messages?roomId=' + roomId).then(res => res.json()).then(msgs => {
                 const area = document.getElementById('miniMsgArea');
                 if(!area) return;
@@ -219,5 +219,6 @@
             }).catch(e => console.error(e));
         })();
     </script>
+    <th:block layout:fragment="script"></th:block>
 </body>
 </html>
