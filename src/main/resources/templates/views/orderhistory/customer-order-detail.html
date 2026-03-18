@@ -313,12 +313,6 @@
                 <span class="total-value"
                       th:text="${#numbers.formatInteger(order.totalAmount, 3, 'COMMA') + '원'}"></span>
             </div>
-
-            <!-- 채팅보기 버튼 -->
-            <div class="action-row" th:if="${order.bidId != null and order.roomId != null}">
-                <a class="btn-chat"
-                   th:href="@{/chat(roomId=${order.roomId})}">채팅 보기</a>
-            </div>
         </div>
 
         <!-- 구매내역 삭제 영역 -->
