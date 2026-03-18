@@ -1,19 +1,26 @@
 package com.nextage.web.mapper;
 
 import java.util.List;
-
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-
 import com.nextage.web.domain.ChatMessageDTO;
 import com.nextage.web.domain.ChatRoomDTO;
 
 @Mapper
 public interface ChatMapper {
-    List<ChatRoomDTO> selectMyChatRooms(@Param("myId") Long myId, @Param("userType") String userType);
-    List<ChatMessageDTO> selectMessages(Long roomId);
-    void insertMessage(ChatMessageDTO message);
-    void updateMessageReadStatus(@Param("roomId") Long roomId, @Param("userType") String userType);
+    List<ChatRoomDTO> findRoomsByUserId(@Param("userId") Long userId, @Param("userType") String userType);
     
-    ChatRoomDTO selectRoomById(Long roomId);
+    List<ChatRoomDTO> findAllRooms();
+
+    List<ChatMessageDTO> findMessagesByRoomId(Long roomId);
+
+    void insertMessage(ChatMessageDTO message);
+
+    ChatRoomDTO findRoomById(Long roomId);
+
+    ChatRoomDTO findRoomByBidId(Long bidId);
+
+    void insertChatRoom(ChatRoomDTO chatRoomDTO);
+
+    void updateReadStatus(@Param("roomId") Long roomId, @Param("userType") String userType);
 }
