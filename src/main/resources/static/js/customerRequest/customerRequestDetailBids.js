@@ -524,7 +524,7 @@ function openCompareModal() {
 		return `
 			<th class="cmp-th ${isBest ? 'cmp-th-best' : ''}">
 				${isBest ? '<span class="cmp-best-badge">👑 최저가</span>' : ''}
-				<span class="cmp-vendor">${bid.businessLoginId || '전문가 #' + bid.businessId}</span>
+				<span class="cmp-vendor">${bid.companyName || bid.businessLoginId || '전문가 #' + bid.businessId}</span>
 			</th>`;
 	}).join('');
 
@@ -705,23 +705,23 @@ function fillSelectConfirm(info) {
 	const content = document.getElementById('select-confirm-content');
 
 	// 의뢰 정보
-	document.getElementById('ci-request-title').textContent = info.request?.title || '❌정보 조회 실패❌';
-	document.getElementById('ci-request-desc').textContent = info.request?.description || '❌정보 조회 실패❌';
+	document.getElementById('ci-request-title').textContent = info.request?.title || '❌';
+	document.getElementById('ci-request-desc').textContent = info.request?.description || '❌';
 	document.getElementById('ci-hope-price').textContent =
-		info.request?.hopePrice ? `₩ ${formatPrice(info.request.hopePrice)}` : '❌정보 조회 실패❌';
-	document.getElementById('ci-requested-due-date').textContent = info.request?.requestedDueDate || '❌정보 조회 실패❌';
+		info.request?.hopePrice ? `₩ ${formatPrice(info.request.hopePrice)}` : '❌';
+	document.getElementById('ci-requested-due-date').textContent = info.request?.requestedDueDate || '❌';
 	document.getElementById('ci-dimensions').textContent =
 		document.getElementById('select-modal-size').value.trim() || '-';
 
 	// 업체 제안
 	document.getElementById('ci-vendor-name').textContent =
-		info.bid?.businessLoginId || (info.bid?.businessId ? `전문가 #${info.bid.businessId}` : '❌정보 조회 실패❌');
+		info.bid?.companyName || info.bid?.businessLoginId || '❌'
 	document.getElementById('ci-bid-price').textContent =
-		info.bid?.price ? `₩ ${formatPrice(info.bid.price)}` : '❌정보 조회 실패❌';
-	document.getElementById('ci-bid-due-date').textContent = info.bid?.expectedDueDate || '❌정보 조회 실패❌';
+		info.bid?.price ? `₩ ${formatPrice(info.bid.price)}` : '❌';
+	document.getElementById('ci-bid-due-date').textContent = info.bid?.expectedDueDate || '❌';
 	document.getElementById('ci-as-available').textContent =
-		info.bid == null ? '❌정보 조회 실패❌' : (info.bid.asAvailable ? '✔ 가능' : '✖ 불가');
-	document.getElementById('ci-bid-desc').textContent = info.bid?.description || '❌정보 조회 실패❌';
+		info.bid == null ? '❌' : (info.bid.asAvailable ? '✔ 가능' : '✖ 불가');
+	document.getElementById('ci-bid-desc').textContent = info.bid?.description || '❌';
 
 	// 배송 정보
 	const addressEl = document.getElementById('ci-address');
@@ -801,7 +801,7 @@ function requestBidPayment(orderNo, dimensions) {
 		storeId	: 'store-86babd64-b87f-4d03-8a11-45d711b38212',
 		channelKey : 'channel-key-0b04d459-1cc2-4ee0-83a8-b8fef7d753eb',
 		paymentId  : orderNo,
-		orderName  : `${currentSelectedBid.businessLoginId || '전문가 #' + currentSelectedBid.businessId} 수선 서비스`,
+		orderName  : `${currentSelectedBid.businessLoginId || currentSelectedBid.businessId}`,
 		totalAmount: currentSelectedBid.price,
 		currency   : 'KRW',
 		payMethod  : 'EASY_PAY',
@@ -1169,7 +1169,7 @@ function renderBidList(data) {
 								<img src="/image/default-profile.png" alt="업체 프로필">
 							</div>
 							<div class="pro-text">
-								<span class="pro-name">${bid.businessLoginId || '전문가 #' + bid.businessId}</span>
+								<span class="pro-name">${bid.companyName || bid.businessLoginId || '전문가 #' + bid.businessId}</span>
 								<span class="bid-date">${formatDate(bid.createdAt)}</span>
 							</div>
 							<span class="pro-arrow">▼</span>

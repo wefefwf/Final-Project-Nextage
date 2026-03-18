@@ -23,5 +23,6 @@ public class BidDTO {
 	private LocalDateTime updatedAt;
 	
 	private String businessLoginId;
+	private String companyName;
 
 }

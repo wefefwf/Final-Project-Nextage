@@ -26,7 +26,7 @@
 	<!-- 업체/유저(페이지): 특정 request_id에 달린 모든 bids 조회 -->
 	<select id="selectBidsByRequestId" parameterType="long"
 		resultType="com.nextage.web.domain.BidDTO">
-		SELECT b.*, bs.login_id AS businessLoginId
+		SELECT b.*, bs.login_id AS businessLoginId, bs.company_name AS companyName
 		FROM bids b
 		LEFT JOIN business bs ON bs.business_id = b.business_id
 		WHERE b.request_id = #{requestId}
@@ -47,7 +47,7 @@
 
 	<select id="selectBidById" parameterType="long"
 		resultType="com.nextage.web.domain.BidDTO">
-		SELECT b.*, bs.login_id AS businessLoginId
+		SELECT b.*, bs.login_id AS businessLoginId, bs.company_name AS companyName
 		FROM bids b
 		LEFT JOIN business bs ON bs.business_id = b.business_id
 		WHERE b.bid_id = #{bidId}
@@ -138,6 +138,16 @@
 		FROM customer c
 		JOIN request r ON r.customer_id = c.customer_id
 		WHERE r.request_id = #{requestId}
+	</select>
+	
+	<!-- 업체 거절 시 해당 bid 주문번호 조회 -->
+	<select id="selectOrderNoByBidId" resultType="String">
+		SELECT order_no
+		FROM orders
+		WHERE bid_id = #{bidId}
+		AND payment_status = 'PAID'
+		ORDER BY created_at DESC
+		LIMIT 1
 	</select>
 
 </mapper>

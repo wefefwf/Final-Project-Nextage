@@ -42,5 +42,8 @@ public interface BidsMapper {
 	Long selectOrderIdByOrderNo(@Param("orderNo") String orderNo);
 	
 	Map<String, Object> selectCustomerInfoByRequestId(@Param("requestId") Long requestId);
+	
+	// 업체 거절 시 해당 bid 주문번호 조회
+	String selectOrderNoByBidId(@Param("bidId") Long bidId);
 
 }

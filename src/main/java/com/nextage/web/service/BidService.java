@@ -194,5 +194,28 @@ public class BidService {
     	return true;
     }
     
+    
+    /**
+     * 업체가 주문을 거절했을 때 호출
+     * - 해당 bid 상태 → WITHDRAWN
+     * - 결제 환불 처리 (TODO: 환불 API 연동 후 구현)
+     */
+    @Transactional
+    public void rejectByBusiness(Long bidId) {
+    	BidDTO bid = bidsMapper.selectBidById(bidId);
+    	if (bid == null) throw new IllegalArgumentException("제안 정보를 찾을 수 없습니다.");
+
+    	// 1. bid 상태 WITHDRAWN으로 변경
+    	bidsMapper.updateBidStatus(bidId, "WITHDRAWN");
+
+    	// TODO: 포트원 환불 API 연동 후 아래 구현
+    	// 2. 결제 환불 처리
+//    	String orderNo = bidsMapper.selectOrderNoByBidId(bidId);
+//    	if (orderNo == null) throw new IllegalArgumentException("주문 정보를 찾을 수 없습니다.");
+
+    	// portOneService.refund(orderNo);
+    	// bidsMapper.updateBidOrderStatus(orderNo, null, "REFUNDED");
+    }
+    
 
 }
