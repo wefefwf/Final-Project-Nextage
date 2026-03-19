@@ -63,16 +63,6 @@
                         </a>
                     </div>
 
-                    <div class="content-group">
-                        <h4 class="group-label">BEST REVIEWS</h4>
-                        <a th:each="review : ${bestReviews}" href="#" class="trending-item-card">
-                            <div class="rank-tag" style="font-size: 24px; color: #ffcc00;">★</div>
-                            <div class="item-info-group">
-                                <div class="item-title" th:text="${review.content}">후기 내용</div>
-                            </div>
-                        </a>
-                    </div>
-
                     <div th:if="${#lists.isEmpty(urgentRequests) and #lists.isEmpty(newRequests)}" class="empty-state-msg" style="text-align: center; padding: 100px 0; color: #bbb;">
                         <i class="bi bi-fire" style="font-size: 3rem; margin-bottom: 20px; display: block; color: #ff79c6;"></i>
                         <p style="font-weight: 600;">데이터를 분석 중입니다.</p>
