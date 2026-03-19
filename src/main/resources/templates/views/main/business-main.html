@@ -207,7 +207,9 @@
                          th:onclick="|location.href='/business/request/detail/' + ${post.requestId}|"
                          style="cursor: pointer;">
                         <div class="item-left">
-                            <img th:src="${post.thumbnailPath ?: '/image/no-image.png'}" class="mini-thumbnail">
+                            <img th:src="${post.thumbnailPath != null and !#strings.isEmpty(post.thumbnailPath) 
+					              ? post.thumbnailPath 
+					              : '/images/default-profile.png'}" class="mini-thumbnail">
                             <div class="item-text">
                                 <span class="item-cat" th:text="${post.categoryName}">Category</span>
                                 <h4 class="item-title" th:text="${post.title}">의뢰 제목</h4>
