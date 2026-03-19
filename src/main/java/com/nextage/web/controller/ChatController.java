@@ -53,7 +53,9 @@ public class ChatController {
 
         List<ChatRoomDTO> myRooms = isAdmin ? chatService.getAllRooms() : chatService.getMyRooms(myId, userType);
         if (roomId != null) {
-            chatService.updateReadStatus(roomId, userType);
+        	if (!"BADMIN".equals(userType)) {
+                chatService.updateReadStatus(roomId, userType);
+            }
             model.addAttribute("messages", chatService.getRoomMessagesPaged(roomId, 0));
             model.addAttribute("currentRoomId", roomId);
         }
