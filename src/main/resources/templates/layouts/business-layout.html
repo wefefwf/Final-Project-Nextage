@@ -148,50 +148,10 @@
         function updateGlobalBadge() {
             const badge = document.getElementById('globalChatBadge');
             if(!badge) return;
-            if(userData && userData.userType === 'BADMIN') return; // ✅ BADMIN은 뱃지 표시 안 함
             fetch('/chat/global-info').then(res => res.json()).then(data => {
                 badge.innerText = data.unreadCount;
                 badge.style.display = data.unreadCount > 0 ? 'flex' : 'none';
             });
-        }
-
-        // ✅ 신규: 주문 페이지 실시간 unread 뱃지 업데이트
-        function updateOrderPageBadge(roomId) {
-            if (!roomId) return;
-
-            // Order List의 채팅하기 버튼 옆 뱃지 업데이트
-            var rows = document.querySelectorAll('[data-room-id="' + roomId + '"]');
-            if (rows.length > 0) {
-                fetch('/business/order/chat/unread/' + roomId)
-                .then(function(r) { return r.json(); })
-                .then(function(data) {
-                    rows.forEach(function(wrap) {
-                        var badge = wrap.querySelector('.unread-badge');
-                        if (!badge) return;
-                        if (data.count > 0) {
-                            badge.textContent = data.count > 99 ? '99+' : data.count;
-                            badge.style.display = 'inline-flex';
-                        } else {
-                            badge.style.display = 'none';
-                        }
-                    });
-                });
-            }
-
-            // 상세 패널(pending 선택된 주문)의 뱃지 업데이트
-            var unreadBadge = document.getElementById('dUnreadBadge');
-            if (unreadBadge && typeof _selected !== 'undefined' && _selected && _selected.roomId == roomId) {
-                fetch('/business/order/chat/unread/' + roomId)
-                .then(function(r) { return r.json(); })
-                .then(function(data) {
-                    if (data.count > 0) {
-                        unreadBadge.textContent = data.count > 99 ? '99+' : data.count;
-                        unreadBadge.style.display = 'inline-flex';
-                    } else {
-                        unreadBadge.style.display = 'none';
-                    }
-                });
-            }
         }
 
         function openMiniChat(roomId, name) {
@@ -291,36 +251,11 @@
                 miniStomp = Stomp.over(socket);
                 miniStomp.debug = null;
                 miniStomp.connect({}, function() {
-                    // ✅ BADMIN은 폴링, 일반 BUSINESS는 STOMP 구독
-                    if (data.userType === 'BADMIN') {
-                        setInterval(function() {
-                            updateGlobalBadge();
-                            document.querySelectorAll('[data-room-id]').forEach(function(wrap) {
-                                var roomId = wrap.dataset.roomId;
-                                if (!roomId) return;
-                                fetch('/business/order/chat/unread/' + roomId)
-                                .then(function(r) { return r.ok ? r.json() : null; })
-                                .then(function(data) {
-                                    if (!data) return;
-                                    var badge = wrap.querySelector('.unread-badge');
-                                    if (!badge) return;
-                                    if (data.count > 0) {
-                                        badge.textContent = data.count > 99 ? '99+' : data.count;
-                                        badge.style.display = 'inline-flex';
-                                    } else {
-                                        badge.style.display = 'none';
-                                    }
-                                });
-                            });
-                        }, 5000);
-                    } else {
-                        miniStomp.subscribe('/sub/chat/user/' + data.userType + '/' + data.myId, function(msg) {
-                            const m = JSON.parse(msg.body);
-                            updateGlobalBadge();
-                            if (document.getElementById('miniChatDrawer').style.display === 'flex' && !currentMiniRoomId) loadMiniRooms();
-                            updateOrderPageBadge(m.roomId);
-                        });
-                    }
+                    miniStomp.subscribe('/sub/chat/user/' + data.userType + '/' + data.myId, function(msg) {
+                        const m = JSON.parse(msg.body);
+                        updateGlobalBadge();
+                        if (document.getElementById('miniChatDrawer').style.display === 'flex' && !currentMiniRoomId) loadMiniRooms();
+                    });
                 });
             }).catch(() => { if(chatBtn) chatBtn.style.display = 'none'; });
         })();
