@@ -27,6 +27,7 @@ import com.nextage.web.domain.ReviewDTO;
 import com.nextage.web.domain.ScheduleOrderDTO;
 import com.nextage.web.service.BusinessOrderHistoryService;
 import com.nextage.web.service.BusinessPortfolioService;
+import com.nextage.web.service.CustomerRequestService;
 import com.nextage.web.service.CustomerReviewService;
 import com.nextage.web.service.CustomerShopService;
 import com.nextage.web.userDetails.BusinessUserDetails;
@@ -39,6 +40,9 @@ public class CustomerReviewController {
 
 	@Autowired
 	public CustomerReviewService cService;
+	
+	@Autowired
+	public CustomerRequestService crService;
 
 	 //review가기 
 	 @PreAuthorize("hasAnyRole('CUSER','CADMIN')") 
@@ -78,6 +82,7 @@ public class CustomerReviewController {
 	     reviewDTO.setCustomerId(customerUserDetails.getCustomerId());
 	     
 	     cService.insertReview(reviewDTO, image1, image2, image3);
+	    
 	     return "redirect:/customer/order/detail/" + orderId;
 	 }
 }
