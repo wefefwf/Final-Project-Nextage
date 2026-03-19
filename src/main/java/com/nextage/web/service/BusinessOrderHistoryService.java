@@ -123,6 +123,8 @@ public class BusinessOrderHistoryService {
 
         if (deliveryStatus == 4) {
             OrderHistoryDTO order = mapper.selectOrderDetail(orderId);
+            
+            mapper.updateDueDate(orderId, java.time.LocalDateTime.now());
 
             // ✅ request 상태 COMPLETE로 변경
             if (order.getBidId() != null) {

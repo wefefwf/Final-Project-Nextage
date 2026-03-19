@@ -76,4 +76,7 @@ public interface BusinessOrderHistoryMapper {
             @Param("paymentStatus") String paymentStatus);
     
     void updateRequestStatusToComplete(@Param("bidId") Long bidId);
+    
+    void updateDueDate(@Param("orderId") Long orderId,
+            @Param("dueDate") java.time.LocalDateTime dueDate);
 }
