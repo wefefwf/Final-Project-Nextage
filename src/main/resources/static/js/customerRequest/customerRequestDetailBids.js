@@ -829,17 +829,24 @@ function fillSelectConfirm(info) {
 			${parsedAddress.address ? '변경' : '입력'}
 		</button>
 		<div id="ci-address-edit-zone" style="display:none; margin-top:8px;">
-			<div style="display:flex; flex-direction:column; gap:8px;">
-				<input type="text" id="ci-postcode-input" class="ci-address-input" placeholder="우편번호" value="${parsedAddress.postcode}" readonly />
-				<div style="display:flex; gap:6px;">
-					<input type="text" id="ci-address-input" class="ci-address-input" placeholder="기본 주소" value="${parsedAddress.address}" readonly />
-					<button type="button" class="btn-address-save" onclick="execSelectDaumPostcode()">주소 찾기</button>
-				</div>
-				<input type="text" id="ci-address-detail-input" class="ci-address-input" placeholder="상세 주소를 입력해주세요." value="${parsedAddress.addressDetail}" />
+			<div style="display:flex; gap:8px; align-items:center;">
+			  <input type="text" id="ci-postcode-input" class="ci-address-input" 
+			    placeholder="우편번호" value="${parsedAddress.postcode}" readonly
+			    style="flex:1; min-width:0; width:auto !important;" />
+			  <button type="button" onclick="execSelectDaumPostcode()"
+			    style="flex-shrink:0; width:90px; height:36px; border-radius:8px; 
+			           border:1px solid #d580c0; color:#c055a5; background:transparent; 
+			           cursor:pointer; font-size:13px; font-weight:500; white-space:nowrap; padding:0;">
+			    주소 찾기
+			  </button>
 			</div>
-			<div style="display:flex; gap:6px; margin-top:6px;">
-				<button type="button" class="btn-address-cancel" onclick="cancelAddressEdit()">취소</button>
-				<button type="button" class="btn-address-save" onclick="saveAddressEdit()">확인</button>
+			<input type="text" id="ci-address-input" class="ci-address-input"
+			  placeholder="기본 주소" value="${parsedAddress.address}" readonly />
+			<input type="text" id="ci-address-detail-input" class="ci-address-input"
+			  placeholder="상세 주소를 입력해주세요." value="${parsedAddress.addressDetail}" />
+			<div style="display:flex; gap:6px; margin-top:6px; justify-content:flex-end;">
+			    <button type="button" class="btn-address-cancel" onclick="cancelAddressEdit()">취소</button>
+			    <button type="button" class="btn-address-save" onclick="saveAddressEdit()">확인</button>
 			</div>
 		</div>
 	`;
