@@ -14,5 +14,6 @@ public interface BusinessMapper {
     int countByCompanyName(String companyName);
     
     int updateBusiness(BusinessDTO business);
+    void updateRoleToNull(String loginId);
   
 }

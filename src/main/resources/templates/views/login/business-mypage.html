@@ -1,23 +1,75 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/business-layout}"> <!-- 기업용 레이아웃 경로로 맞추세요 -->
+      
 <head>
-<meta charset="UTF-8">
-<title>Insert title here</title>
+    <title>기업 정보 수정</title>
+    <!-- 기업용 CSS 연결 (예: bmypage.css) -->
+    <link rel="stylesheet" th:href="@{/css/mypage/bmypage.css}">
 </head>
-<body>
-	<p>아이디: <span th:text="${business.loginId}">아이디</span></p>
-    <p>닉네임: <span th:text="${business.companyName}">닉네임</span></p>
-    <p>이메일: <span th:text="${business.phoneNumber}">전화번호</span></p>
-	<div class="actions">
-	
-    
-    <!-- 둘다보이게-->
-    <button class="btn"  sec:authorize="hasAnyRole('BUSER', 'BADMIN')">둘다보이는버튼</button>
-    
-    <!--  관리자  -->
-    <button class="btn btn-danger"  sec:authorize="hasRole('BADMIN')">어드민만보이는버튼</button>
-</div>
 
+<body>
+<div layout:fragment="content">
+
+	<th:block layout:fragment="script">
+	    <script th:src="@{/js/joinmypage/bmypage.js}"></script>
+	</th:block>
+    
+    <div class="container d-flex justify-content-center align-items-center min-vh-100">
+        <div class="edit-wrapper text-center">
+            
+            <h2 class="brand-title" style="color: #333;">Business Profile</h2>
+            <p class="sub-title">기업 정보 수정</p>
+       
+            <!-- 컨트롤러 처리 경로를 기업용으로 변경 -->
+            <form action="/business/mypage/editProc" method="post" id="editForm">
+                
+                <div class="form-floating mb-3 text-start">
+                    <!-- customer 대신 business 객체 사용 -->
+                    <input type="text" class="form-control bg-light" id="loginId" name="loginId" th:value="${business.loginId}" readonly>
+                    <label for="loginId" style="color: #666;">기업 아이디 (변경 불가)</label>
+                </div>
+
+                <div class="form-floating mb-4 text-start">
+                    <input type="text" class="form-control" id="companyName" name="companyName" th:value="${business.companyName}" required>
+                    <label for="companyName" style="color: #666;">기업명 / 상호명</label>
+                </div>
+    
+                <div class="row g-2 mb-4">
+                    <div class="col-8 form-floating text-start">
+                        <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" th:value="${business.phoneNumber}" required>
+                        <label for="phoneNumber" style="color: #666; left: 0.25rem;">담당자 연락처 ('-' 제외)</label>
+                    </div>
+                    <div class="col-4">
+                        <button type="button" class="btn-inline" onclick="phoneCheck()">번호 변경</button>
+                    </div>
+                </div>
+				    
+                <!-- 비밀번호 변경 구역 -->
+                <div class="text-start mb-2 mt-2" style="border-top: 1px dashed #eee; padding-top: 1.5rem;">
+                    <span style="color: #888; font-size: 0.85rem; font-weight: 600;">※ 비밀번호를 변경하시려면 아래에 입력해주세요.</span>
+                </div>
+
+                <div class="form-floating mb-3 text-start">
+                    <input type="password" class="form-control" id="newPassword" name="newPassword" placeholder="새 비밀번호">
+                    <label for="newPassword" style="color: #666;">새 비밀번호 (변경 시에만 입력)</label>
+                </div>
+                <div class="form-floating mb-4 text-start">
+                    <input type="password" class="form-control" id="passwordCheck" placeholder="새 비밀번호 확인">
+                    <label for="passwordCheck" style="color: #666;">새 비밀번호 확인</label>
+                </div>
+				    
+                <!-- 기업용 #333 버튼 클래스(btn-custom) 적용 -->
+                <button type="submit" class="btn btn-custom w-100 mb-4">기업 정보 수정하기</button>
+            </form>
+
+            <div class="text-end border-top pt-3">
+                <button type="button" class="btn-withdraw" onclick="withdrawBusiness()">기업 파트너 탈퇴</button>
+            </div>
+        </div>
+    </div>
+
+</div>
 </body>
 </html>

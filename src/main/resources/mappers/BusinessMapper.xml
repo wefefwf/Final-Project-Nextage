@@ -40,8 +40,17 @@
         SET 
             company_name = #{companyName},
             phone_number = #{phoneNumber},
-            updated_at = CURRENT_TIMESTAMP
+            updated_at = NOW()
+            <if test="passwordHash != null and passwordHash != ''">
+                , password_hash = #{passwordHash}
+            </if>
         WHERE login_id = #{loginId}
     </update>
+    
+    <update id="updateRoleToNull" parameterType="String">
+	    UPDATE business
+	    SET status = NULL
+	    WHERE login_id = #{loginId}
+	</update>
     
 </mapper>

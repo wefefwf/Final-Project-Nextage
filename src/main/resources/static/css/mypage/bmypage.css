@@ -1,0 +1,106 @@
+
+
+.edit-wrapper {
+    max-width: 550px; 
+    width: 100%;
+    padding: 3rem 2.5rem;
+    background: #ffffff;
+    border-radius: 12px; 
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05); 
+    margin: 4rem auto; 
+}
+
+
+.brand-title {
+    color: #333333; 
+    font-weight: 800;
+    font-size: 2.2rem;
+    letter-spacing: -1px;
+    margin-bottom: 0.2rem;
+}
+
+
+.sub-title { 
+    color: #666666; 
+    font-size: 0.95rem; 
+    margin-bottom: 2.5rem; 
+}
+
+
+.btn-custom {
+    background-color: #333333;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 0.9rem;
+    border: none;
+    border-radius: 6px; 
+    transition: all 0.2s ease-in-out;
+}
+
+
+.btn-custom:hover { 
+    background-color: #1a1a1a; 
+    color: #ffffff; 
+    box-shadow: 0 4px 12px rgba(51, 51, 51, 0.2); 
+}
+
+
+.btn-inline {
+    height: 58px; 
+    width: 100%;
+    border-radius: 6px; 
+    background-color: #ffffff;
+    border: 1px solid #333333; 
+    color: #333333;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+}
+
+
+.btn-inline:hover {
+    background-color: #333333; 
+    color: #ffffff;
+}
+
+
+.form-control { 
+    border-radius: 6px; 
+}
+
+.form-control:focus {
+    border-color: #333333;
+    box-shadow: 0 0 0 0.25rem rgba(51, 51, 51, 0.15); 
+}
+
+
+.form-control[readonly] { 
+    background-color: #f8f9fa; 
+    color: #555555;
+}
+
+.form-floating label { 
+    color: #666666; 
+}
+
+.label-optional { 
+    color: #888888 !important; 
+}
+
+
+.btn-withdraw {
+    background: none;
+    border: none;
+    color: #adb5bd; 
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: underline;
+    padding: 0;
+    transition: color 0.2s;
+}
+
+/* 마우스를 올려야만 빨간색 경고 표시 */
+.btn-withdraw:hover { 
+    color: #dc3545; 
+}

@@ -20,5 +20,7 @@ public class BusinessDTO {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LocalDateTime deleted_at;
+    
+    private String newPassword;
 
 }

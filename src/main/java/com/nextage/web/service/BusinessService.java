@@ -36,4 +36,24 @@ public class BusinessService {
     	
         return businessMapper.countByPhoneNumber(phoneNumber) > 0 ;
     }
+    
+    public BusinessDTO getBusinessByLoginId(String loginId) {
+        return businessMapper.findByLoginId(loginId);
+    }
+
+    
+    public void updateBusiness(BusinessDTO dto) {
+    	 
+        if (dto.getNewPassword() != null && !dto.getNewPassword().trim().isEmpty()) {
+            dto.setPasswordHash(passwordEncoder.encode(dto.getNewPassword()));
+        }
+        
+        businessMapper.updateBusiness(dto);
+    }
+    
+    
+    
+    public void withdraw(String loginId) {
+        businessMapper.updateRoleToNull(loginId);
+    }
 }

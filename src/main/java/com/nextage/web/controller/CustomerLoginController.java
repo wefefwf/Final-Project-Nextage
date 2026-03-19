@@ -14,10 +14,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.nextage.web.domain.BusinessDTO;
 import com.nextage.web.domain.CustomerDTO;
 import com.nextage.web.service.CustomerService;
-import com.nextage.web.userDetails.BusinessUserDetails;
 import com.nextage.web.userDetails.CustomerUserDetails;
 
 import jakarta.servlet.http.HttpServletRequest;
