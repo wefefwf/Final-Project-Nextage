@@ -60,20 +60,22 @@ function execSelectDaumPostcode() {
 }
 
 function parseCustomerAddress(rawAddress) {
-	if (!rawAddress) {
-		return {
-			postcode: '',
-			address: '',
-			addressDetail: ''
-		};
-	}
+    if (!rawAddress) {
+        return { postcode: '', address: '', addressDetail: '' };
+    }
 
-	const parts = String(rawAddress).split('#');
-	return {
-		postcode: parts[0] || '',
-		address: parts[1] || '',
-		addressDetail: parts[2] || ''
-	};
+    const parts = String(rawAddress).split('#');
+    
+    // # 구분자가 없으면 전체를 address로 처리
+    if (parts.length === 1) {
+        return { postcode: '', address: parts[0], addressDetail: '' };
+    }
+    
+    return {
+        postcode: parts[0] || '',
+        address: parts[1] || '',
+        addressDetail: parts[2] || ''
+    };
 }
 
 function formatCustomerAddress(rawAddress) {
