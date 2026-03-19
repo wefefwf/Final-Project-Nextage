@@ -51,7 +51,10 @@
                  th:data-date="${request.createdAt}"
                  th:onclick="|location.href='/customer/request/detail/' + ${request.requestId}|">
                 
-                <img th:src="${request.thumbnailPath ?: '/image/no-image.png'}" class="item-thumbnail">
+                <img th:src="${request.thumbnailPath != null and !#strings.isEmpty(request.thumbnailPath) 
+				              ? request.thumbnailPath 
+				              : '/images/default-profile.png'}" 
+				     class="item-thumbnail">
                 
                 <div class="item-info">
                     <div class="item-top-row">

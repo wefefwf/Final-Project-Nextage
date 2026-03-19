@@ -121,16 +121,15 @@
 
   <div class="content-layout">
 
-    <div class="img-card">
-      <img th:if="${request.thumbnailPath != null and !#strings.isEmpty(request.thumbnailPath)}"
-           th:src="${request.thumbnailPath}"
-           alt="의뢰 이미지">
-      <div class="no-img"
-           th:unless="${request.thumbnailPath != null and !#strings.isEmpty(request.thumbnailPath)}">
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.25"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
-        <span>첨부 이미지 없음</span>
-      </div>
-    </div>
+	   <div class="img-card">
+	  <img th:if="${request.thumbnailPath != null and !#strings.isEmpty(request.thumbnailPath)}"
+	       th:src="${request.thumbnailPath}"
+	       alt="의뢰 이미지">
+	  <img th:unless="${request.thumbnailPath != null and !#strings.isEmpty(request.thumbnailPath)}"
+	       src="/images/default-profile.png"
+	       alt="기본 이미지"
+	       style="width:100%;height:100%;object-fit:cover;display:block;">
+	</div>
 
     <div class="side-stack">
 
