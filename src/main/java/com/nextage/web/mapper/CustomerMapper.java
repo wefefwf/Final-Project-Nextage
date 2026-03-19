@@ -15,4 +15,8 @@ public interface CustomerMapper {
   int countByEmail(String email);
   int updateCustomer(CustomerDTO customer);
   void updateRoleToNull(String loginId);
+  
+  // 주소(배송지)변경
+  int updateCustomerAddress(CustomerDTO customer);
+  
 }

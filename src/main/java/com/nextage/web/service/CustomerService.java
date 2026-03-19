@@ -56,6 +56,23 @@ public class CustomerService {
         customerMapper.updateRoleToNull(loginId);
     }
     
+    // 주소(배송지)변경
+    public void updateCustomerAddress(String loginId, String postcode, String address, String addressDetail) {
+    	CustomerDTO dto = new CustomerDTO();
+    	dto.setLoginId(loginId);
+
+    	String fullAddress = null;
+    	if (address != null && !address.trim().isEmpty()) {
+    		fullAddress = 
+    			(postcode == null ? "" : postcode.trim()) + "#" +
+    			address.trim() + "#" +
+    			(addressDetail == null ? "" : addressDetail.trim());
+    	}
+
+    	dto.setAddress(fullAddress);
+    	customerMapper.updateCustomerAddress(dto);
+    }
+    
     
     
 }

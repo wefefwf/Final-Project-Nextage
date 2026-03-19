@@ -27,6 +27,63 @@ let currentRequestStatus = '';
 	document.body.appendChild(root);
 })();
 
+function execSelectDaumPostcode() {
+	new daum.Postcode({
+		oncomplete: function(data) {
+			let addr = '';
+			let extraAddr = '';
+
+			if (data.userSelectedType === 'R') {
+				addr = data.roadAddress;
+			} else {
+				addr = data.jibunAddress;
+			}
+
+			if (data.userSelectedType === 'R') {
+				if (data.bname !== '' && /[동|로|가]$/g.test(data.bname)) {
+					extraAddr += data.bname;
+				}
+				if (data.buildingName !== '' && data.apartment === 'Y') {
+					extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+				}
+				if (extraAddr !== '') {
+					extraAddr = ' (' + extraAddr + ')';
+				}
+				addr += extraAddr;
+			}
+
+			document.getElementById('ci-postcode-input').value = data.zonecode;
+			document.getElementById('ci-address-input').value = addr;
+			document.getElementById('ci-address-detail-input').focus();
+		}
+	}).open();
+}
+
+function parseCustomerAddress(rawAddress) {
+    if (!rawAddress) {
+        return { postcode: '', address: '', addressDetail: '' };
+    }
+
+    const parts = String(rawAddress).split('#');
+    
+    // # 구분자가 없으면 전체를 address로 처리
+    if (parts.length === 1) {
+        return { postcode: '', address: parts[0], addressDetail: '' };
+    }
+    
+    return {
+        postcode: parts[0] || '',
+        address: parts[1] || '',
+        addressDetail: parts[2] || ''
+    };
+}
+
+function formatCustomerAddress(rawAddress) {
+	const parsed = parseCustomerAddress(rawAddress);
+	const chunks = [parsed.address, parsed.addressDetail].filter(Boolean);
+	return chunks.length > 0 ? chunks.join(' ') : '등록된 배송지가 없습니다.';
+}
+
 function adminHideBid(bidId) {
     const actionsEl = document.getElementById('bid-actions-' + bidId);
     if (!actionsEl) return;
@@ -74,11 +131,50 @@ function cancelAddressEdit() {
 }
 
 function saveAddressEdit() {
-	const val = document.getElementById('ci-address-input').value.trim();
-	if (!val) { showToast('warn', '배송지를 입력해주세요.'); return; }
-	document.getElementById('ci-address-text').textContent = val;
-	document.querySelector('.btn-address-edit').textContent = '변경';
-	document.getElementById('ci-address-edit-zone').style.display = 'none';
+	const postcode = document.getElementById('ci-postcode-input')?.value.trim() || '';
+	const address = document.getElementById('ci-address-input')?.value.trim() || '';
+	const addressDetail = document.getElementById('ci-address-detail-input')?.value.trim() || '';
+
+	if (!address) {
+		showToast('warn', '기본 주소를 입력해주세요.');
+		return;
+	}
+
+	fetch('/api/customer/me/address', {
+		method: 'PATCH',
+		headers: {
+			'Content-Type': 'application/json'
+		},
+		body: JSON.stringify({
+			postcode,
+			address,
+			addressDetail
+		})
+	})
+	.then(async res => {
+		const data = await res.json();
+		if (!res.ok || data.success === false) {
+			throw new Error(data.message || '배송지 저장에 실패했습니다.');
+		}
+		return data;
+	})
+	.then(data => {
+		const rawAddress = data.address;
+		const displayAddress = formatCustomerAddress(rawAddress);
+
+		document.getElementById('ci-address-text').textContent = displayAddress;
+		document.querySelector('.btn-address-edit').textContent = '변경';
+		document.getElementById('ci-address-edit-zone').style.display = 'none';
+
+		if (cachedSelectInfo && cachedSelectInfo.customer) {
+			cachedSelectInfo.customer.address = rawAddress;
+		}
+
+		showToast('success', '배송지가 저장되었습니다.');
+	})
+	.catch(err => {
+		showToast('error', err.message);
+	});
 }
 
 function showToast(type, msg, duration) {
@@ -724,20 +820,35 @@ function fillSelectConfirm(info) {
 	document.getElementById('ci-bid-desc').textContent = info.bid?.description || '❌';
 
 	// 배송 정보
+	const rawAddress = info.customer?.address || '';
+	const parsedAddress = parseCustomerAddress(rawAddress);
+	const displayAddress = formatCustomerAddress(rawAddress);
+	
 	const addressEl = document.getElementById('ci-address');
-	const address = info.customer?.address;
 	addressEl.innerHTML = `
-		<span id="ci-address-text">${address || '등록된 배송지가 없습니다.'}</span>
+		<span id="ci-address-text">${displayAddress}</span>
 		<button type="button" class="btn-address-edit" onclick="toggleAddressEdit()">
-			${address ? '변경' : '입력'}
+			${parsedAddress.address ? '변경' : '입력'}
 		</button>
 		<div id="ci-address-edit-zone" style="display:none; margin-top:8px;">
+			<div style="display:flex; gap:8px; align-items:center;">
+			  <input type="text" id="ci-postcode-input" class="ci-address-input" 
+			    placeholder="우편번호" value="${parsedAddress.postcode}" readonly
+			    style="flex:1; min-width:0; width:auto !important;" />
+			  <button type="button" onclick="execSelectDaumPostcode()"
+			    style="flex-shrink:0; width:90px; height:36px; border-radius:8px; 
+			           border:1px solid #d580c0; color:#c055a5; background:transparent; 
+			           cursor:pointer; font-size:13px; font-weight:500; white-space:nowrap; padding:0;">
+			    주소 찾기
+			  </button>
+			</div>
 			<input type="text" id="ci-address-input" class="ci-address-input"
-				   placeholder="배송지를 입력해주세요."
-				   value="${address || ''}" />
-			<div style="display:flex; gap:6px; margin-top:6px;">
-				<button type="button" class="btn-address-cancel" onclick="cancelAddressEdit()">취소</button>
-				<button type="button" class="btn-address-save" onclick="saveAddressEdit()">확인</button>
+			  placeholder="기본 주소" value="${parsedAddress.address}" readonly />
+			<input type="text" id="ci-address-detail-input" class="ci-address-input"
+			  placeholder="상세 주소를 입력해주세요." value="${parsedAddress.addressDetail}" />
+			<div style="display:flex; gap:6px; margin-top:6px; justify-content:flex-end;">
+			    <button type="button" class="btn-address-cancel" onclick="cancelAddressEdit()">취소</button>
+			    <button type="button" class="btn-address-save" onclick="saveAddressEdit()">확인</button>
 			</div>
 		</div>
 	`;

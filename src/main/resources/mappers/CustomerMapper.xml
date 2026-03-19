@@ -62,5 +62,14 @@
 	    SET status = NULL
 	    WHERE login_id = #{loginId}
 	</update>
+	
+	<!-- 주소(배송지)변경 -->
+	<update id="updateCustomerAddress">
+		UPDATE customer
+		SET
+			address = #{address},
+			updated_at = NOW()
+		WHERE login_id = #{loginId}
+	</update>
   
 </mapper>

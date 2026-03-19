@@ -45,5 +45,9 @@ public interface BidsMapper {
 	
 	// 업체 거절 시 해당 bid 주문번호 조회
 	String selectOrderNoByBidId(@Param("bidId") Long bidId);
+	
+	int countSelectedBidByRequestId(Long requestId);
+
+	String selectPaymentStatusByOrderNo(String orderNo);
 
 }

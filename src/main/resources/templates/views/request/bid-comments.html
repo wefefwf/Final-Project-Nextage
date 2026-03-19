@@ -1,4 +1,5 @@
-<div th:fragment="bidCommentsFragment" id="bid-comments-wrapper" class="bid-comments-container" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<div th:fragment="bidCommentsFragment" id="bid-comments-wrapper" class="bid-comments-container"
+	 xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
 	<link rel="stylesheet" th:href="@{/css/customerRequest/customerRequestDetailBids.css}" />
 
 	<!-- 업체 제안 등록 폼 -->
@@ -355,6 +356,8 @@
 	<input type="hidden" sec:authorize="hasRole('BUSER')" id="auth-current-business-id-auth" th:value="${#authentication.principal.businessId}" />
 	<input type="hidden" sec:authorize="hasRole('CADMIN')" id="auth-is-customer-admin-auth" value="true" />
 
+	<!-- 주소 API -->
+	<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 	<!-- 포트원 v2 SDK -->
 	<script src="https://cdn.portone.io/v2/browser-sdk.js"></script>
 	<script th:src="@{/js/customerRequest/customerRequestDetailBids.js}"></script>

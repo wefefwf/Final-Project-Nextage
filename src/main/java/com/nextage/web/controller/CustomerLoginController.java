@@ -47,7 +47,17 @@ public class CustomerLoginController {
 	    @PreAuthorize("hasRole('CUSER')")
 	    @GetMapping("/customer/mypage")
     public String mypage(@AuthenticationPrincipal CustomerUserDetails customerUserDetails, Model model) {
-        CustomerDTO customer = customerUserDetails.getCustomer();
+	    CustomerDTO customer = customerService.getCustomerByLoginId(customerUserDetails.getUsername());
+	    
+	    CustomerUserDetails newUserDetails = new CustomerUserDetails(customer);
+	    Authentication newAuth = new UsernamePasswordAuthenticationToken(
+	            newUserDetails,
+	            SecurityContextHolder.getContext().getAuthentication().getCredentials(),
+	            newUserDetails.getAuthorities()
+	    );
+	    SecurityContextHolder.getContext().setAuthentication(newAuth);
+
+
         model.addAttribute("customer", customer);
         return "views/login/customer-mypage";
     }

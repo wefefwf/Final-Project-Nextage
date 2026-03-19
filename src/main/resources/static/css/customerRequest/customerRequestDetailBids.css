@@ -1959,7 +1959,6 @@ tbody tr:last-child .cmp-label-cell { border-bottom: none; }
 .btn-address-edit:hover { background: #f3e8ff; }
 
 .btn-address-cancel {
-	flex: 1;
 	background: #fff;
 	color: #888;
 	border: 1.5px solid #e8e8e8;
@@ -1971,7 +1970,6 @@ tbody tr:last-child .cmp-label-cell { border-bottom: none; }
 	font-family: inherit;
 }
 .btn-address-save {
-	flex: 1;
 	background: linear-gradient(135deg, #f472b6, #a855f7);
 	color: #fff;
 	border: none;
