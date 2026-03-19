@@ -12,7 +12,7 @@
             <nav class="header-nav">
                 <ul class="nav-list">
                     <li><a href="#">공지사항</a></li>
-                    <li><a href="#">회원가입</a></li>
+                    <li><a class="dropdown-item" th:href="@{/business/my-portfolio}">포트폴리오</a></li>
                     <li>
                     	<div class="dropdown">
 							<button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -37,7 +37,6 @@
 							  <li><a class="dropdown-item" href="#">정보수정</a></li>
 							  <li><a class="dropdown-item" href="#">내 제안</a></li>
 							  <li><a class="dropdown-item" th:href="@{/business/schedule}">내 일정</a></li>
-							  <li><a class="dropdown-item" th:href="@{/business/my-portfolio}">내 포트폴리오</a></li>
 							</ul>
 						</div>
 					</li>
