@@ -60,4 +60,6 @@ public interface CustomerOrderHistoryMapper {
             @Param("limit") int limit);
 
     int countOrdersForAdmin(@Param("search") OrderSearchDTO search);
+    
+    void decreaseKitStock(@Param("kitId") Long kitId, @Param("quantity") int quantity);
 }

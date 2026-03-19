@@ -81,6 +81,10 @@ public class CustomerPaymentService {
                 log.info("order_item 저장 - orderId: {}, kitId: {}, qty: {}, price: {}",
                         orderId, item.getKitId(), item.getQuantity(), item.getPrice());
                 customerOrderHistoryMapper.insertOrderItems(item);
+                
+                if (item.getKitId() != null) {
+                    customerOrderHistoryMapper.decreaseKitStock(item.getKitId(), item.getQuantity());
+                }
             }
         }
 

@@ -361,4 +361,10 @@
     </if>
     </select>
 
+	<update id="decreaseKitStock">
+	    UPDATE kit
+	    SET stock = stock - #{quantity}
+	    WHERE kit_id = #{kitId}
+	      AND stock >= #{quantity}
+	</update>
 </mapper>
