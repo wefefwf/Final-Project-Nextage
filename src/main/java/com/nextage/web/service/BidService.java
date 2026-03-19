@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.dao.DuplicateKeyException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nextage.web.domain.BidDTO;
@@ -77,8 +78,12 @@ public class BidService {
             throw new IllegalArgumentException("이미 해당 의뢰글에 제안한 업체입니다.");
         }
 
-        // 7. 저장
-        return bidsMapper.insertBid(bid);
+        // 7. 저장 (동시성 제어)
+        try {
+        	return bidsMapper.insertBid(bid);
+        } catch (DuplicateKeyException e) {
+        	throw new IllegalArgumentException("이미 해당 의뢰글에 제안한 업체입니다.");
+        }
     }
 
     public BidDTO getBidById(Long bidId) {
@@ -141,6 +146,12 @@ public class BidService {
     	BidDTO bid = bidsMapper.selectBidById(bidId);
     	if (bid == null) throw new IllegalArgumentException("제안 정보를 찾을 수 없습니다.");
     	
+    	// 이미 선정된 제안 있는지 체크 (동시성 제어)
+    	int selectedCount = bidsMapper.countSelectedBidByRequestId(bid.getRequestId());
+    	if (selectedCount > 0) {
+    		throw new IllegalArgumentException("이미 선정된 제안이 있습니다.");
+    	}
+    	
     	// 1. request.dimensions 저장
     	try {
     		String dimensionsJson = new ObjectMapper().writeValueAsString(dimensions);
@@ -180,7 +191,13 @@ public class BidService {
     	Integer savedAmount = bidsMapper.selectTotalAmountByOrderNo(orderNo);
     	if (savedAmount == null) return false;
     	if (savedAmount != paidAmount) return false;
-
+    	
+    	// 이미 처리된 주문인지 체크 (동시성 제어)
+    	String currentStatus = bidsMapper.selectPaymentStatusByOrderNo(orderNo);
+    	if ("PAID".equals(currentStatus)) {
+    		throw new IllegalStateException("이미 처리된 주문입니다.");
+    	}
+    	
     	bidsMapper.updateBidOrderStatus(orderNo, impUid, "PAID");
 
     	Long orderId = bidsMapper.selectOrderIdByOrderNo(orderNo);
