@@ -36,4 +36,29 @@
         SELECT order_id FROM orders WHERE order_no = #{orderNo}
     </select>
 
+    <!-- 현재 결제 상태 조회 -->
+    <select id="selectPaymentStatusByOrderNo" resultType="String">
+        SELECT payment_status
+        FROM orders
+        WHERE order_no = #{orderNo}
+    </select>
+
+    <!-- imp_uid 조회 -->
+    <select id="selectImpUidByOrderNo" resultType="String">
+        SELECT imp_uid
+        FROM orders
+        WHERE order_no = #{orderNo}
+    </select>
+
+    <!--
+        취소/거절 상태 업데이트.
+        payment_status + accept_status 동시 변경.
+    -->
+	<update id="updateCancelStatus">
+	    UPDATE orders
+	    SET payment_status = #{paymentStatus},
+	        accept_status  = #{paymentStatus}
+	    WHERE order_no = #{orderNo}
+	</update>
+
 </mapper>

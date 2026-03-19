@@ -16,11 +16,14 @@
 	    o.accept_status,
 	    o.delivery_status,
 	    o.created_at,
-	    b.company_name AS business_nickname
+	    b.company_name AS business_nickname,
+	    cr.room_id
 	FROM orders o
 	LEFT JOIN business b ON b.business_id = o.business_id
-	LEFT JOIN customer c ON c.customer_id = o.customer_id  
-	
+	LEFT JOIN customer c ON c.customer_id = o.customer_id
+	LEFT JOIN chat_room cr ON cr.bid_id       = o.bid_id
+	                       AND cr.customer_id  = o.customer_id
+	                       AND cr.business_id  = o.business_id
 	WHERE o.customer_id = #{customerId}
 	  AND o.payment_status = 'PAID'
 	  AND o.customer_deleted = 0
@@ -29,10 +32,7 @@
 	    AND (
 	        o.order_no LIKE CONCAT('%', #{search.keyword}, '%')
 	        OR b.company_name LIKE CONCAT('%', #{search.keyword}, '%')
-	
-	        <!-- ❗ 고객페이지라 의미는 없지만 구조 통일 위해 유지 -->
 	        OR c.nickname LIKE CONCAT('%', #{search.keyword}, '%')
-	
 	        OR EXISTS (
 	            SELECT 1
 	            FROM order_items oi
@@ -68,7 +68,6 @@
 		        o.order_no LIKE CONCAT('%', #{search.keyword}, '%')
 		        OR b.company_name LIKE CONCAT('%', #{search.keyword}, '%')
 		        OR c.nickname LIKE CONCAT('%', #{search.keyword}, '%')
-		
 		        OR EXISTS (
 		            SELECT 1
 		            FROM order_items oi
@@ -264,100 +263,102 @@
           AND cm.sender_type = 'BUSINESS'
     </select>
 
-	<select id="selectOrdersForAdmin" resultType="com.nextage.web.domain.OrderHistoryDTO">
-	SELECT
-	    o.order_id            AS orderId,
-	    o.order_no            AS orderNo,
-	    o.customer_id         AS customerId,
-	    o.business_id         AS businessId,
-	    o.bid_id              AS bidId,
-	    o.total_amount        AS totalAmount,
-	    o.payment_status      AS paymentStatus,
-	    o.accept_status       AS acceptStatus,
-	    o.delivery_status     AS deliveryStatus,
-	    o.created_at          AS createdAt,
-	
-	    c.nickname            AS customerNickname,
-	    b.company_name        AS businessNickname
-	
-	FROM orders o
-	LEFT JOIN business b ON b.business_id = o.business_id
-	LEFT JOIN customer c ON c.customer_id = o.customer_id
-	
-	WHERE o.payment_status = 'PAID'
-	  AND o.customer_deleted = 0
-	  AND o.bid_id IS NULL
-	
-	<if test="search != null and search.keyword != null and search.keyword != ''">
-	    AND (
-	        o.order_no LIKE CONCAT('%', #{search.keyword}, '%')
-	        OR c.nickname LIKE CONCAT('%', #{search.keyword}, '%')
-	        OR b.company_name LIKE CONCAT('%', #{search.keyword}, '%')
-	
-	        OR EXISTS (
-	            SELECT 1
-	            FROM order_items oi
-	            LEFT JOIN kit k ON k.kit_id = oi.kit_id
-	            LEFT JOIN bids bd ON bd.bid_id = o.bid_id
-	            LEFT JOIN request r ON r.request_id = bd.request_id
-	            WHERE oi.order_id = o.order_id
-	              AND (
-	                  k.name LIKE CONCAT('%', #{search.keyword}, '%')
-	                  OR r.title LIKE CONCAT('%', #{search.keyword}, '%')
-	              )
-	        )
-	    )
-	</if>
-	
-	<if test="search != null and search.startDate != null and search.startDate != ''">
-	    AND DATE(o.created_at) >= #{search.startDate}
-	</if>
-	
-	<if test="search != null and search.endDate != null and search.endDate != ''">
-	    AND DATE(o.created_at) &lt;= #{search.endDate}
-	</if>
-	
-	ORDER BY o.created_at DESC
-	LIMIT #{limit} OFFSET #{offset}
-	</select>
-	
-	<select id="countOrdersForAdmin" resultType="int">
-	SELECT COUNT(*)
-	FROM orders o
-	LEFT JOIN business b ON b.business_id = o.business_id
-	LEFT JOIN customer c ON c.customer_id = o.customer_id
-	
-	WHERE o.payment_status = 'PAID'
-	  AND o.customer_deleted = 0
-	  AND o.bid_id IS NULL
-	
-	<if test="search != null and search.keyword != null and search.keyword != ''">
-	    AND (
-	        o.order_no LIKE CONCAT('%', #{search.keyword}, '%')
-	        OR c.nickname LIKE CONCAT('%', #{search.keyword}, '%')
-	        OR b.company_name LIKE CONCAT('%', #{search.keyword}, '%')
-	
-	        OR EXISTS (
-	            SELECT 1
-	            FROM order_items oi
-	            LEFT JOIN kit k ON k.kit_id = oi.kit_id
-	            LEFT JOIN bids bd ON bd.bid_id = o.bid_id
-	            LEFT JOIN request r ON r.request_id = bd.request_id
-	            WHERE oi.order_id = o.order_id
-	              AND (
-	                  k.name LIKE CONCAT('%', #{search.keyword}, '%')
-	                  OR r.title LIKE CONCAT('%', #{search.keyword}, '%')
-	              )
-	        )
-	    )
-	</if>
-	
-	<if test="search != null and search.startDate != null and search.startDate != ''">
-	    AND DATE(o.created_at) >= #{search.startDate}
-	</if>
-	
-	<if test="search != null and search.endDate != null and search.endDate != ''">
-	    AND DATE(o.created_at) &lt;= #{search.endDate}
-	</if>
-	</select>
+    <select id="selectOrdersForAdmin" resultType="com.nextage.web.domain.OrderHistoryDTO">
+    SELECT
+        o.order_id            AS orderId,
+        o.order_no            AS orderNo,
+        o.customer_id         AS customerId,
+        o.business_id         AS businessId,
+        o.bid_id              AS bidId,
+        o.total_amount        AS totalAmount,
+        o.payment_status      AS paymentStatus,
+        o.accept_status       AS acceptStatus,
+        o.delivery_status     AS deliveryStatus,
+        o.created_at          AS createdAt,
+        c.nickname            AS customerNickname,
+        b.company_name        AS businessNickname,
+        cr.room_id            AS roomId
+    FROM orders o
+    LEFT JOIN business b ON b.business_id = o.business_id
+    LEFT JOIN customer c ON c.customer_id = o.customer_id
+    LEFT JOIN chat_room cr ON cr.bid_id      = o.bid_id
+                           AND cr.customer_id = o.customer_id
+                           AND cr.business_id = o.business_id
+    WHERE o.payment_status = 'PAID'
+      AND o.customer_deleted = 0
+      AND o.bid_id IS NULL
+      AND o.accept_status IN ('ACCEPTED', 'REJECTED')
+
+    <if test="search != null and search.keyword != null and search.keyword != ''">
+        AND (
+            o.order_no LIKE CONCAT('%', #{search.keyword}, '%')
+            OR c.nickname LIKE CONCAT('%', #{search.keyword}, '%')
+            OR b.company_name LIKE CONCAT('%', #{search.keyword}, '%')
+            OR EXISTS (
+                SELECT 1
+                FROM order_items oi
+                LEFT JOIN kit k ON k.kit_id = oi.kit_id
+                LEFT JOIN bids bd ON bd.bid_id = o.bid_id
+                LEFT JOIN request r ON r.request_id = bd.request_id
+                WHERE oi.order_id = o.order_id
+                  AND (
+                      k.name LIKE CONCAT('%', #{search.keyword}, '%')
+                      OR r.title LIKE CONCAT('%', #{search.keyword}, '%')
+                  )
+            )
+        )
+    </if>
+
+    <if test="search != null and search.startDate != null and search.startDate != ''">
+        AND DATE(o.created_at) >= #{search.startDate}
+    </if>
+
+    <if test="search != null and search.endDate != null and search.endDate != ''">
+        AND DATE(o.created_at) &lt;= #{search.endDate}
+    </if>
+
+    ORDER BY o.created_at DESC
+    LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="countOrdersForAdmin" resultType="int">
+    SELECT COUNT(*)
+    FROM orders o
+    LEFT JOIN business b ON b.business_id = o.business_id
+    LEFT JOIN customer c ON c.customer_id = o.customer_id
+
+    WHERE o.payment_status = 'PAID'
+      AND o.customer_deleted = 0
+      AND o.bid_id IS NULL
+      AND o.accept_status IN ('ACCEPTED', 'REJECTED')
+
+    <if test="search != null and search.keyword != null and search.keyword != ''">
+        AND (
+            o.order_no LIKE CONCAT('%', #{search.keyword}, '%')
+            OR c.nickname LIKE CONCAT('%', #{search.keyword}, '%')
+            OR b.company_name LIKE CONCAT('%', #{search.keyword}, '%')
+            OR EXISTS (
+                SELECT 1
+                FROM order_items oi
+                LEFT JOIN kit k ON k.kit_id = oi.kit_id
+                LEFT JOIN bids bd ON bd.bid_id = o.bid_id
+                LEFT JOIN request r ON r.request_id = bd.request_id
+                WHERE oi.order_id = o.order_id
+                  AND (
+                      k.name LIKE CONCAT('%', #{search.keyword}, '%')
+                      OR r.title LIKE CONCAT('%', #{search.keyword}, '%')
+                  )
+            )
+        )
+    </if>
+
+    <if test="search != null and search.startDate != null and search.startDate != ''">
+        AND DATE(o.created_at) >= #{search.startDate}
+    </if>
+
+    <if test="search != null and search.endDate != null and search.endDate != ''">
+        AND DATE(o.created_at) &lt;= #{search.endDate}
+    </if>
+    </select>
+
 </mapper>

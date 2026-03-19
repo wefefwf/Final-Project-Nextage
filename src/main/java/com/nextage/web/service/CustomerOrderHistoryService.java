@@ -22,6 +22,7 @@ public class CustomerOrderHistoryService {
     private final CustomerOrderHistoryMapper customerOrderHistoryMapper;
     private final CustomerReviewMapper       customerReviewMapper;
     private final BusinessOrderHistoryMapper businessOrderHistoryMapper;
+    private final CustomerPaymentService     paymentService;
     // ✅ BidService 제거 - Kit 구매만 다루므로 불필요
     private static final int PAGE_SIZE = 5;
 
@@ -105,9 +106,15 @@ public class CustomerOrderHistoryService {
 
     @Transactional
     public void rejectOrder(Long orderId) {
-        // ✅ Kit 구매만 다루므로 bidService 호출 불필요
         customerOrderHistoryMapper.updateAcceptStatus(orderId, "REJECTED");
         customerOrderHistoryMapper.updateDeliveryStatus(orderId, 9);
+
+        // ✅ order_no 조회 후 포트원 취소 API + payment_status 업데이트
+        OrderHistoryDTO order = customerOrderHistoryMapper.selectOrderDetail(orderId);
+        if (order != null && order.getOrderNo() != null) {
+            paymentService.cancelPayment(order.getOrderNo(), "관리자 거절");
+        }
+
         log.info("주문 취소 - orderId: {}", orderId);
     }
 

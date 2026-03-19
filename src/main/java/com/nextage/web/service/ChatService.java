@@ -56,4 +56,8 @@ public class ChatService {
     public void updateReadStatus(Long roomId, String userType) {
         chatMapper.updateReadStatus(roomId, userType);
     }
+    
+    public int getUnreadCount(Long roomId, String userType) {
+        return chatMapper.countUnread(roomId, userType);
+    }
 }

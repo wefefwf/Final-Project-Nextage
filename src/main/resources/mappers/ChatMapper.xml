@@ -123,4 +123,11 @@
           AND is_read = 0
     </update>
 
+	<select id="countUnread" resultType="int">
+	    SELECT COUNT(*)
+	    FROM chat_message
+	    WHERE room_id = #{roomId}
+	      AND is_read = 0
+	      AND sender_type != #{userType}
+	</select>
 </mapper>

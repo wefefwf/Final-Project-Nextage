@@ -111,6 +111,27 @@
         .opt-done     .delivery-option-badge { background: #f0f0f0; color: #888;    border: 1px solid #e0e0e0; }
         .btn-confirm { width: 100%; padding: 16px; font-size: 15px; font-weight: 800; color: #fff; background: linear-gradient(135deg, #2c2c2c, #555); border: none; border-radius: 14px; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 16px rgba(0,0,0,0.18); }
         .btn-confirm:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.25); }
+        .unread-badge {
+		    position: absolute;
+		    top: -6px;
+		    right: -6px;
+		    background: #ff4444;
+		    color: #fff;
+		    border-radius: 50%;
+		    width: 18px;
+		    height: 18px;
+		    font-size: 10px;
+		    font-weight: 700;
+		    display: none;
+		    align-items: center;
+		    justify-content: center;
+		    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+		    text-align: center;
+		    line-height: 18px;
+		}
+		.unread-badge.show {
+		    display: inline-flex;
+		}
 
         @keyframes slideUp {
             from { opacity: 0; transform: translateY(30px); }
@@ -247,9 +268,11 @@
         수락한 주문이 없습니다.
     </div>
 
+    <!-- ✅ data-room-id 추가 -->
     <div th:each="order : ${acceptedOrders}"
          th:class="${order.acceptStatus == 'REJECTED'} ? 'order-row rejected' : 'order-row'"
          th:data-order-id="${order.orderId}"
+         th:data-room-id="${order.roomId}"
          onclick="goOrderDetail(this)">
 
         <div class="order-thumb">
@@ -286,29 +309,26 @@
         <span class="accept-badge accept-rejected" th:if="${order.acceptStatus == 'REJECTED'}">거절됨</span>
 
         <div class="order-btns">
-	    <button class="btn btn-blue"
-	            th:if="${!isAdmin and order.acceptStatus != 'REJECTED'}"
-	            th:data-order-id="${order.orderId}"
-	            th:data-delivery-status="${order.deliveryStatus}"
-	            onclick="openDeliveryModal(event, this)">배송관리</button>
-	    <!-- ✅ wrapper로 감싸서 뱃지 추가 -->
-	    <div th:if="${order.roomId != null and order.acceptStatus != 'REJECTED'}"
-	         style="position:relative; display:inline-flex;">
-	        <a class="btn btn-green"
-	           th:href="@{/chat(roomId=${order.roomId})}"
-	           onclick="event.stopPropagation()">채팅하기</a>
-	        <span th:if="${order.unreadCount > 0}"
-	              th:text="${order.unreadCount > 99 ? '99+' : order.unreadCount}"
-	              style="position:absolute; top:-6px; right:-6px;
-	                     background:#ff4444; color:#fff; border-radius:50%;
-	                     width:18px; height:18px; font-size:10px; font-weight:700;
-	                     display:inline-flex; align-items:center; justify-content:center;
-	                     padding-top:1px;
-	                     box-shadow:0 2px 4px rgba(0,0,0,0.2);">
-	        </span>
-	    </div>
-	</div>
-	</div>
+            <button class="btn btn-blue"
+                    th:if="${!isAdmin and order.acceptStatus != 'REJECTED'}"
+                    th:data-order-id="${order.orderId}"
+                    th:data-delivery-status="${order.deliveryStatus}"
+                    onclick="openDeliveryModal(event, this)">배송관리</button>
+            <!-- ✅ data-room-id wrapper + unread-badge class 추가 -->
+            <div th:if="${order.roomId != null and order.acceptStatus != 'REJECTED'}"
+                 th:data-room-id="${order.roomId}"
+                 style="position:relative; display:inline-flex;">
+                <a class="btn btn-green"
+                   th:href="@{/chat(roomId=${order.roomId})}"
+                   onclick="event.stopPropagation()">채팅하기</a>
+                <!-- unreadCount > 0이면 초기 렌더링, 0이어도 span은 생성 (JS로 제어) -->
+                <span class="unread-badge"
+                      th:classappend="${order.unreadCount > 0} ? ' show'"
+					th:text="${order.unreadCount > 0} ? (${order.unreadCount > 99} ? '99+' : ${order.unreadCount}) : ''">
+				</span>
+            </div>
+        </div>
+    </div>
 
     <!-- 페이징 -->
     <div class="pagination" th:if="${totalPages > 1}">
@@ -368,7 +388,6 @@
     var _deliveryOrderId = null;
     var _selectedStatus  = null;
 
-    // 날짜 배열([2026,3,16,...]) 또는 문자열 모두 처리
     function parseDate(val) {
         if (!val) return null;
         if (Array.isArray(val)) {
@@ -457,7 +476,6 @@
             }
         };
 
-        // ✅ unread count 조회
         if (o.roomId) {
             fetch('/business/order/chat/unread/' + o.roomId)
             .then(function(r) { return r.json(); })

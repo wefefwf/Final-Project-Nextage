@@ -1,11 +1,13 @@
 package com.nextage.web.controller;
 
 import com.nextage.web.domain.PaymentDTO;
+import com.nextage.web.service.ChatService;
 import com.nextage.web.service.CustomerPaymentService;
 import com.nextage.web.userDetails.CustomerUserDetails;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -20,6 +22,7 @@ import java.util.Map;
 public class CustomerOrderController {
 
     private final CustomerPaymentService paymentService;
+    private final ChatService chatService;
 
     // 임시 테스트용 customer_id (로그인 연동 후 제거)
     //private static final Long TEMP_CUSTOMER_ID = 1L;
@@ -79,5 +82,21 @@ public class CustomerOrderController {
         model.addAttribute("totalAmount", totalAmount != null ? totalAmount : 0);
         model.addAttribute("redirectUrl", "/customer/order/history");
         return "views/shop/customer-payment-complete";
+    }
+    
+    @GetMapping("/chat/unread/{roomId}")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getUnreadCount(
+            @PathVariable("roomId") Long roomId,
+            Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated())
+            return ResponseEntity.status(403).body(Map.of("count", 0));
+
+        Object principal = authentication.getPrincipal();
+        String userType = (principal instanceof com.nextage.web.userDetails.CustomerUserDetails)
+                ? "CUSTOMER" : "BUSINESS";
+
+        int count = chatService.getUnreadCount(roomId, userType);
+        return ResponseEntity.ok(Map.of("count", count));
     }
 }

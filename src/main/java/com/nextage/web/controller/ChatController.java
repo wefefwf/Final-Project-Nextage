@@ -23,6 +23,9 @@ import com.nextage.web.service.ChatService;
 import com.nextage.web.userDetails.BusinessUserDetails;
 import com.nextage.web.userDetails.CustomerUserDetails;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Controller
 public class ChatController {
     private final ChatService chatService;
@@ -151,5 +154,27 @@ public class ChatController {
         if (existingRoom != null) return ResponseEntity.ok(existingRoom.getRoomId());
         chatService.createChatRoom(chatRoomDTO);
         return ResponseEntity.ok(chatRoomDTO.getRoomId());
+    }
+    
+    @GetMapping("/chat/unread/{roomId}")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getUnreadCount(
+            @PathVariable("roomId") Long roomId,
+            Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated())
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+
+        Object principal = authentication.getPrincipal();
+        String userType;
+        if (principal instanceof CustomerUserDetails) {
+            userType = "CUSTOMER";
+        } else if (principal instanceof BusinessUserDetails) {
+            userType = "BUSINESS";
+        } else {
+            userType = "BUSINESS";
+        }
+
+        int count = chatService.getUnreadCount(roomId, userType);
+        return ResponseEntity.ok(Map.of("count", count));
     }
 }

@@ -10,291 +10,126 @@
         * { box-sizing: border-box; }
         body { font-family: 'Pretendard', sans-serif; background: #fafafa; color: #333; }
 
-        .history-wrapper {
-            max-width: 900px;
-            margin: 40px auto;
-            padding: 0 20px 80px;
-        }
-
-        .page-title {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 32px; font-weight: 900;
-            color: #222; margin-bottom: 6px;
-        }
+        .history-wrapper { max-width: 900px; margin: 40px auto; padding: 0 20px 80px; }
+        .page-title { font-family: 'Montserrat', sans-serif; font-size: 32px; font-weight: 900; color: #222; margin-bottom: 6px; }
         .page-subtitle { font-size: 14px; color: #aaa; margin-bottom: 36px; }
-
-        .search-box {
-            background: #fff;
-            border: 1px solid #ebebeb;
-            border-radius: 16px;
-            padding: 20px 24px;
-            margin-bottom: 24px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-        }
-        .search-row {
-            display: flex; gap: 10px; align-items: center;
-            margin-bottom: 12px; flex-wrap: wrap;
-        }
+        .search-box { background: #fff; border: 1px solid #ebebeb; border-radius: 16px; padding: 20px 24px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+        .search-row { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; flex-wrap: wrap; }
         .search-row:last-child { margin-bottom: 0; }
-
-        .search-select {
-            padding: 10px 12px;
-            border: 1.5px solid #ebebeb; border-radius: 10px;
-            font-size: 13px; color: #555; background: #fff;
-            outline: none; cursor: pointer;
-        }
+        .search-select { padding: 10px 12px; border: 1.5px solid #ebebeb; border-radius: 10px; font-size: 13px; color: #555; background: #fff; outline: none; cursor: pointer; }
         .search-select:focus { border-color: #bd93f9; }
-
-        .search-input {
-            flex: 1; min-width: 160px;
-            padding: 10px 14px;
-            border: 1.5px solid #ebebeb; border-radius: 10px;
-            font-size: 13px; color: #333; outline: none;
-        }
+        .search-input { flex: 1; min-width: 160px; padding: 10px 14px; border: 1.5px solid #ebebeb; border-radius: 10px; font-size: 13px; color: #333; outline: none; }
         .search-input:focus { border-color: #bd93f9; }
-
-        .period-btn {
-            padding: 8px 16px;
-            border: 1.5px solid #ebebeb; border-radius: 20px;
-            background: #fff; color: #777;
-            font-size: 13px; font-weight: 600;
-            cursor: pointer; transition: all 0.2s;
-        }
+        .period-btn { padding: 8px 16px; border: 1.5px solid #ebebeb; border-radius: 20px; background: #fff; color: #777; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
         .period-btn:hover { border-color: #bd93f9; color: #bd93f9; }
-        .period-btn.active {
-            background: linear-gradient(135deg, #bd93f9, #a6c1ee);
-            color: #fff; border-color: transparent;
-        }
-
-        .date-input {
-            padding: 10px 12px;
-            border: 1.5px solid #ebebeb; border-radius: 10px;
-            font-size: 13px; color: #555; outline: none;
-        }
+        .period-btn.active { background: linear-gradient(135deg, #bd93f9, #a6c1ee); color: #fff; border-color: transparent; }
+        .date-input { padding: 10px 12px; border: 1.5px solid #ebebeb; border-radius: 10px; font-size: 13px; color: #555; outline: none; }
         .date-input:focus { border-color: #bd93f9; }
-
-        .btn-search {
-            padding: 10px 24px;
-            background: linear-gradient(135deg, #bd93f9, #a6c1ee);
-            color: #fff; border: none; border-radius: 10px;
-            font-size: 13px; font-weight: 700; cursor: pointer;
-            transition: all 0.2s;
-        }
+        .btn-search { padding: 10px 24px; background: linear-gradient(135deg, #bd93f9, #a6c1ee); color: #fff; border: none; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
         .btn-search:hover { transform: translateY(-1px); }
-
-        .btn-reset {
-            padding: 10px 18px;
-            border: 1.5px solid #ebebeb; border-radius: 10px;
-            background: #fff; color: #aaa;
-            font-size: 13px; text-decoration: none;
-            transition: all 0.2s;
-        }
+        .btn-reset { padding: 10px 18px; border: 1.5px solid #ebebeb; border-radius: 10px; background: #fff; color: #aaa; font-size: 13px; text-decoration: none; transition: all 0.2s; }
         .btn-reset:hover { border-color: #bd93f9; color: #bd93f9; }
-
         .order-card-wrapper { margin-bottom: 16px; }
-
-        /* ✅ div로 바뀌었으므로 cursor 명시 */
-        .order-card {
-            background: #fff;
-            border: 1px solid #ebebeb;
-            border-radius: 16px;
-            padding: 24px 28px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-            transition: all 0.3s;
-            cursor: pointer;
-            color: inherit;
-        }
-        .order-card:hover {
-            border-color: #d8c4f8;
-            box-shadow: 0 6px 20px rgba(189,147,249,0.12);
-            transform: translateY(-2px);
-        }
-
-        .order-card.rejected {
-            background: #f5f5f5;
-            opacity: 0.7;
-        }
-        .order-card.rejected:hover {
-            border-color: #e0e0e0;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-            transform: none;
-        }
-
-        .order-card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 16px;
-        }
-
-        .order-product-name {
-            font-size: 15px; font-weight: 700; color: #222; margin-bottom: 6px;
-        }
-        .order-no {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 13px; font-weight: 700; color: #bd93f9; margin-bottom: 4px;
-        }
+        .order-card { background: #fff; border: 1px solid #ebebeb; border-radius: 16px; padding: 24px 28px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); transition: all 0.3s; cursor: pointer; color: inherit; }
+        .order-card:hover { border-color: #d8c4f8; box-shadow: 0 6px 20px rgba(189,147,249,0.12); transform: translateY(-2px); }
+        .order-card.rejected { background: #f5f5f5; opacity: 0.7; }
+        .order-card.rejected:hover { border-color: #e0e0e0; box-shadow: 0 2px 8px rgba(0,0,0,0.04); transform: none; }
+        .order-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+        .order-product-name { font-size: 15px; font-weight: 700; color: #222; margin-bottom: 6px; }
+        .order-no { font-family: 'Montserrat', sans-serif; font-size: 13px; font-weight: 700; color: #bd93f9; margin-bottom: 4px; }
         .order-date { font-size: 12px; color: #bbb; }
-
-        .badge-group {
-            display: flex; flex-direction: column; align-items: flex-end; gap: 8px;
-        }
-
-        .order-status {
-            font-size: 16px; font-weight: 700;
-            color: #bd93f9; white-space: nowrap;
-            display: inline-block; margin-right: 10px;
-        }
-
-        .accept-badge {
-            font-size: 13px; font-weight: 700;
-            padding: 7px 18px; border-radius: 20px;
-            white-space: nowrap; display: inline-block;
-        }
+        .badge-group { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+        .order-status { font-size: 16px; font-weight: 700; color: #bd93f9; white-space: nowrap; display: inline-block; margin-right: 10px; }
+        .accept-badge { font-size: 13px; font-weight: 700; padding: 7px 18px; border-radius: 20px; white-space: nowrap; display: inline-block; }
         .accept-pending  { background: #fff8e1; color: #f59e0b; border: 1px solid #fde68a; }
         .accept-accepted { background: #eefbf3; color: #2ecc71; border: 1px solid #a7f3d0; }
         .accept-rejected { background: #fff5f5; color: #ff6b6b; border: 1px solid #ffc2c2; }
-
-        .delivery-badge {
-            font-size: 13px; font-weight: 700;
-            padding: 7px 18px; border-radius: 20px;
-            white-space: nowrap; display: inline-block;
-        }
+        .delivery-badge { font-size: 13px; font-weight: 700; padding: 7px 18px; border-radius: 20px; white-space: nowrap; display: inline-block; }
         .delivery-checking { background: #fef3e2; color: #e67e22; border: 1px solid #fad7a0; }
         .delivery-ready    { background: #eaf4fb; color: #2e86c1; border: 1px solid #aed6f1; }
         .delivery-ing      { background: #e8f0fe; color: #4285f4; border: 1px solid #c5d8fd; }
         .delivery-done     { background: #f0f0f0; color: #888;    border: 1px solid #e0e0e0; }
         .delivery-cancel   { background: #fff5f5; color: #ff6b6b; border: 1px solid #ffc2c2; }
-
-        .order-items-preview {
-            display: flex; gap: 10px;
-            margin-bottom: 16px; flex-wrap: wrap;
-        }
-
-        .preview-img {
-            width: 64px; height: 64px;
-            object-fit: cover; border-radius: 10px; border: 1px solid #eee;
-        }
-        .preview-placeholder {
-            width: 64px; height: 64px; border-radius: 10px;
-            background: linear-gradient(135deg, #f5f0ff, #ede9fe);
-        }
-        .preview-more {
-            width: 64px; height: 64px; border-radius: 10px;
-            background: #f5f5f5;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 13px; font-weight: 700; color: #aaa;
-        }
-
-        .order-card-footer {
-            display: flex; justify-content: space-between;
-            align-items: center;
-            border-top: 1px solid #f5f5f5; padding-top: 14px;
-        }
-
+        .order-items-preview { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+        .preview-img { width: 64px; height: 64px; object-fit: cover; border-radius: 10px; border: 1px solid #eee; }
+        .preview-placeholder { width: 64px; height: 64px; border-radius: 10px; background: linear-gradient(135deg, #f5f0ff, #ede9fe); }
+        .preview-more { width: 64px; height: 64px; border-radius: 10px; background: #f5f5f5; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #aaa; }
+        .order-card-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f5f5f5; padding-top: 14px; }
         .order-item-count { font-size: 13px; color: #999; }
-        .order-total {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 20px; font-weight: 900;
-            background: linear-gradient(to right, #a78bfa, #a6c1ee);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        }
+        .order-total { font-family: 'Montserrat', sans-serif; font-size: 20px; font-weight: 900; background: linear-gradient(to right, #a78bfa, #a6c1ee); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .detail-arrow { font-size: 13px; color: #bd93f9; font-weight: 600; }
-
         .empty-state { text-align: center; padding: 80px 0; color: #bbb; }
         .empty-text { font-size: 16px; font-weight: 500; margin-bottom: 20px; }
-        .btn-shop {
-            display: inline-block; padding: 14px 32px;
-            font-size: 14px; font-weight: 700; color: #fff;
-            background: linear-gradient(135deg, #bd93f9, #a6c1ee);
-            border-radius: 50px; text-decoration: none;
-            box-shadow: 0 4px 16px rgba(189,147,249,0.35); transition: all 0.3s;
-        }
+        .btn-shop { display: inline-block; padding: 14px 32px; font-size: 14px; font-weight: 700; color: #fff; background: linear-gradient(135deg, #bd93f9, #a6c1ee); border-radius: 50px; text-decoration: none; box-shadow: 0 4px 16px rgba(189,147,249,0.35); transition: all 0.3s; }
         .btn-shop:hover { transform: translateY(-2px); }
-
-        .pagination {
-            display: flex; justify-content: center;
-            align-items: center; gap: 6px;
-            margin-top: 36px;
-        }
-        .page-btn {
-            width: 38px; height: 38px;
-            display: flex; align-items: center; justify-content: center;
-            border-radius: 50%; font-size: 14px; font-weight: 600;
-            text-decoration: none; color: #aaa;
-            border: 1.5px solid #eee; background: #fff;
-            transition: all 0.2s;
-        }
+        .pagination { display: flex; justify-content: center; align-items: center; gap: 6px; margin-top: 36px; }
+        .page-btn { width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 14px; font-weight: 600; text-decoration: none; color: #aaa; border: 1.5px solid #eee; background: #fff; transition: all 0.2s; }
         .page-btn:hover { border-color: #bd93f9; color: #bd93f9; }
-        .page-btn.active {
-            background: linear-gradient(135deg, #bd93f9, #a6c1ee);
-            color: #fff; border-color: transparent;
-            box-shadow: 0 2px 10px rgba(189,147,249,0.35);
-        }
+        .page-btn.active { background: linear-gradient(135deg, #bd93f9, #a6c1ee); color: #fff; border-color: transparent; box-shadow: 0 2px 10px rgba(189,147,249,0.35); }
         .page-btn.disabled { opacity: 0.35; pointer-events: none; }
-
-        /* ✅ business 페이지와 동일한 btn 스타일 */
-        .btn {
-            padding: 8px 16px; font-size: 12px; font-weight: 700;
-            border-radius: 20px; cursor: pointer; border: none;
-            transition: all 0.2s; white-space: nowrap; text-decoration: none;
-            display: inline-flex; align-items: center; gap: 4px;
-        }
-        .btn-green {
-            color: #fff;
-            background: linear-gradient(135deg, #6dca8a, #a8e6cf);
-            box-shadow: 0 2px 8px rgba(109,202,138,0.3);
-        }
+        .btn { padding: 8px 16px; font-size: 12px; font-weight: 700; border-radius: 20px; cursor: pointer; border: none; transition: all 0.2s; white-space: nowrap; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; }
+        .btn-green { color: #fff; background: linear-gradient(135deg, #6dca8a, #a8e6cf); box-shadow: 0 2px 8px rgba(109,202,138,0.3); }
         .btn-green:hover { transform: translateY(-1px); color: #fff; }
+        .unread-badge {
+    		position: absolute;
+		    top: -6px;
+		    right: -6px;
+		    background: #ff4444;
+		    color: #fff;
+		    border-radius: 50%;
+		    width: 18px;
+		    height: 18px;
+		    font-size: 10px;
+		    font-weight: 700;
+		    display: none;
+		    align-items: center;
+		    justify-content: center;
+		    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+		    text-align: center;
+		    line-height: 18px;
+		}
+		.unread-badge.show {
+		    display: inline-flex;
+		}
     </style>
 </head>
 <body>
 <th:block layout:fragment="content">
     <div class="history-wrapper">
-		<div style="font-family:'Montserrat',sans-serif; font-size:28px; font-weight:700; color:#555; margin-bottom:6px;">
-		</div>
+        <div style="font-family:'Montserrat',sans-serif; font-size:28px; font-weight:700; color:#555; margin-bottom:6px;"></div>
         <h2 class="page-title">구매내역</h2>
         <p class="page-subtitle">결제가 완료된 구매 내역을 확인하세요.</p>
 
-		<div class="search-box">
-		    <form th:action="@{/customer/order/history}" method="get">
-		
-		        <!-- ✅ 통합 검색 하나로 -->
-		        <div class="search-row">
-		            <input type="text" name="keyword" class="search-input"
-		                   th:value="${search.keyword}"
-		                   placeholder="상품명, 판매자명, 주문번호로 검색">
-		            <button type="submit" class="btn-search">검색</button>
-		        </div>
-		
-		        <div class="search-row">
-		            <span style="font-size:13px; color:#aaa; font-weight:600;">빠른 선택</span>
-		            <button type="submit" name="period" value="1w" class="period-btn"
-		                    th:classappend="${search.period == '1w'} ? ' active'">1주일</button>
-		            <button type="submit" name="period" value="1m" class="period-btn"
-		                    th:classappend="${search.period == '1m'} ? ' active'">1개월</button>
-		            <button type="submit" name="period" value="3m" class="period-btn"
-		                    th:classappend="${search.period == '3m'} ? ' active'">3개월</button>
-		        </div>
-		
-		        <div class="search-row">
-		            <span style="font-size:13px; color:#aaa; font-weight:600;">직접 입력</span>
-		            <input type="date" name="startDate" class="date-input" th:value="${search.startDate}">
-		            <span style="color:#aaa;">~</span>
-		            <input type="date" name="endDate" class="date-input" th:value="${search.endDate}">
-		            <button type="submit" class="btn-search">검색</button>
-		            <a href="/customer/order/history" class="btn-reset">초기화</a>
-		        </div>
-		
-		    </form>
-		</div>
+        <div class="search-box">
+            <form th:action="@{/customer/order/history}" method="get">
+                <div class="search-row">
+                    <input type="text" name="keyword" class="search-input"
+                           th:value="${search.keyword}"
+                           placeholder="상품명, 판매자명, 주문번호로 검색">
+                    <button type="submit" class="btn-search">검색</button>
+                </div>
+                <div class="search-row">
+                    <span style="font-size:13px; color:#aaa; font-weight:600;">빠른 선택</span>
+                    <button type="submit" name="period" value="1w" class="period-btn" th:classappend="${search.period == '1w'} ? ' active'">1주일</button>
+                    <button type="submit" name="period" value="1m" class="period-btn" th:classappend="${search.period == '1m'} ? ' active'">1개월</button>
+                    <button type="submit" name="period" value="3m" class="period-btn" th:classappend="${search.period == '3m'} ? ' active'">3개월</button>
+                </div>
+                <div class="search-row">
+                    <span style="font-size:13px; color:#aaa; font-weight:600;">직접 입력</span>
+                    <input type="date" name="startDate" class="date-input" th:value="${search.startDate}">
+                    <span style="color:#aaa;">~</span>
+                    <input type="date" name="endDate" class="date-input" th:value="${search.endDate}">
+                    <button type="submit" class="btn-search">검색</button>
+                    <a href="/customer/order/history" class="btn-reset">초기화</a>
+                </div>
+            </form>
+        </div>
 
         <div class="empty-state" th:if="${#lists.isEmpty(orders)}">
             <div class="empty-text">구매 내역이 없어요.</div>
             <a href="/customer/shop" class="btn-shop">쇼핑하러 가기</a>
         </div>
 
-        <!-- ✅ 주문 목록: 외부를 div로 변경, onclick으로 상세 이동 -->
         <div th:each="order : ${orders}" class="order-card-wrapper">
             <div th:class="${order.acceptStatus == 'REJECTED' or order.deliveryStatus == 9} ? 'order-card rejected' : 'order-card'"
                  th:data-href="@{/customer/order/detail/{orderId}(orderId=${order.orderId})}"
@@ -312,11 +147,11 @@
                         </div>
                         <div class="order-no" th:text="${order.orderNo}">ORDER_...</div>
                         <div class="order-date">
-						    <span th:text="${#temporals.format(order.createdAt, 'yyyy-MM-dd HH:mm')}"></span>
-						    <span th:if="${order.businessNickname != null}"
-						          style="margin-left:6px; color:#bd93f9; font-weight:600;"
-						          th:text="'· ' + ${order.businessNickname}"></span>
-						</div>
+                            <span th:text="${#temporals.format(order.createdAt, 'yyyy-MM-dd HH:mm')}"></span>
+                            <span th:if="${order.businessNickname != null}"
+                                  style="margin-left:6px; color:#bd93f9; font-weight:600;"
+                                  th:text="'· ' + ${order.businessNickname}"></span>
+                        </div>
                     </div>
                     <div class="badge-group">
                         <span class="order-status">결제완료</span>
@@ -326,41 +161,32 @@
                         <span class="delivery-badge delivery-done"     th:if="${order.deliveryStatus == 4}">배송완료</span>
                         <span class="delivery-badge delivery-cancel"   th:if="${order.deliveryStatus == 9}">취소</span>
                         <th:block th:if="${order.bidId != null}">
-						    <span class="accept-badge accept-pending"
-						          th:if="${order.acceptStatus == 'PENDING'}">검토중</span>
-						    <span class="accept-badge accept-accepted"
-						          th:if="${order.acceptStatus == 'ACCEPTED'}">수락됨</span>
-						    <span class="accept-badge accept-rejected"
-						          th:if="${order.acceptStatus == 'REJECTED'}">거절됨</span>
-						    <!-- ✅ 채팅하기 버튼 + unread 뱃지 -->
-						    <div th:if="${order.acceptStatus != 'REJECTED'}"
-						         style="position:relative; display:inline-flex;">
-						        <a th:href="@{/customer/order/chat/enter(orderId=${order.orderId})}"
-						           onclick="event.stopPropagation()"
-						           class="btn btn-green">
-						            채팅하기
-						        </a>
-						        <span th:if="${order.unreadCount > 0}"
-								      th:text="${order.unreadCount > 99 ? '99+' : order.unreadCount}"
-								      style="position:absolute; top:-6px; right:-6px;
-								             background:#ff4444; color:#fff; border-radius:50%;
-								             width:18px; height:18px; font-size:11px; font-weight:700;
-								             display:inline-flex; align-items:center; justify-content:center;
-								             line-height:1; padding-top:1px;
-								             box-shadow:0 2px 4px rgba(0,0,0,0.2);">
+                            <span class="accept-badge accept-pending"  th:if="${order.acceptStatus == 'PENDING'}">검토중</span>
+                            <span class="accept-badge accept-accepted" th:if="${order.acceptStatus == 'ACCEPTED'}">수락됨</span>
+                            <span class="accept-badge accept-rejected" th:if="${order.acceptStatus == 'REJECTED'}">거절됨</span>
+                            <!-- ✅ data-room-id 추가 -->
+                            <div th:if="${order.acceptStatus != 'REJECTED'}"
+                                 th:data-room-id="${order.roomId}"
+                                 style="position:relative; display:inline-flex;">
+                                <a th:href="@{/customer/order/chat/enter(orderId=${order.orderId})}"
+                                   onclick="event.stopPropagation()"
+                                   class="btn btn-green">
+                                    채팅하기
+                                </a>
+                                <!-- ✅ unread-badge class 추가, roomId 없어도 span 유지 -->
+                                <span class="unread-badge"
+								      th:classappend="${order.unreadCount > 0} ? ' show'"
+								      th:text="${order.unreadCount > 0} ? (${order.unreadCount > 99} ? '99+' : ${order.unreadCount}) : ''">
 								</span>
-						    </div>
-						</th:block>
+                            </div>
+                        </th:block>
                     </div>
                 </div>
 
                 <div class="order-items-preview">
                     <th:block th:each="item, iter : ${order.items}" th:if="${iter.index < 4}">
                         <div class="preview-placeholder" th:if="${item.imageUrl == null}"></div>
-                        <img class="preview-img"
-                             th:if="${item.imageUrl != null}"
-                             th:src="${item.imageUrl}"
-                             th:alt="${item.productName}">
+                        <img class="preview-img" th:if="${item.imageUrl != null}" th:src="${item.imageUrl}" th:alt="${item.productName}">
                     </th:block>
                     <div class="preview-more"
                          th:if="${#lists.size(order.items) > 4}"
@@ -368,11 +194,9 @@
                 </div>
 
                 <div class="order-card-footer">
-                    <span class="order-item-count"
-                          th:text="${#lists.size(order.items)} + '개 상품'">1개 상품</span>
+                    <span class="order-item-count" th:text="${#lists.size(order.items)} + '개 상품'">1개 상품</span>
                     <div style="display:flex; align-items:center; gap:12px;">
-                        <span class="order-total"
-                              th:text="${#numbers.formatInteger(order.totalAmount, 3, 'COMMA') + '원'}">0원</span>
+                        <span class="order-total" th:text="${#numbers.formatInteger(order.totalAmount, 3, 'COMMA') + '원'}">0원</span>
                         <span class="detail-arrow">상세 보러가기 &rarr;</span>
                     </div>
                 </div>
@@ -381,35 +205,15 @@
         </div>
 
         <div class="pagination" th:if="${totalPages > 1}">
-            <a class="page-btn"
-               th:classappend="${currentPage == 1} ? 'disabled'"
-               th:href="@{/customer/order/history(page=${currentPage - 1},
-                        searchType=${search.searchType},
-                        keyword=${search.keyword},
-                        startDate=${search.startDate},
-                        endDate=${search.endDate},
-                        period=${search.period})}">&lsaquo;</a>
-
+            <a class="page-btn" th:classappend="${currentPage == 1} ? 'disabled'"
+               th:href="@{/customer/order/history(page=${currentPage - 1},searchType=${search.searchType},keyword=${search.keyword},startDate=${search.startDate},endDate=${search.endDate},period=${search.period})}">&lsaquo;</a>
             <th:block th:each="i : ${#numbers.sequence(1, totalPages)}">
-                <a class="page-btn"
-                   th:classappend="${i == currentPage} ? 'active'"
-                   th:href="@{/customer/order/history(page=${i},
-                            searchType=${search.searchType},
-                            keyword=${search.keyword},
-                            startDate=${search.startDate},
-                            endDate=${search.endDate},
-                            period=${search.period})}"
+                <a class="page-btn" th:classappend="${i == currentPage} ? 'active'"
+                   th:href="@{/customer/order/history(page=${i},searchType=${search.searchType},keyword=${search.keyword},startDate=${search.startDate},endDate=${search.endDate},period=${search.period})}"
                    th:text="${i}">1</a>
             </th:block>
-
-            <a class="page-btn"
-               th:classappend="${currentPage == totalPages} ? 'disabled'"
-               th:href="@{/customer/order/history(page=${currentPage + 1},
-                        searchType=${search.searchType},
-                        keyword=${search.keyword},
-                        startDate=${search.startDate},
-                        endDate=${search.endDate},
-                        period=${search.period})}">&rsaquo;</a>
+            <a class="page-btn" th:classappend="${currentPage == totalPages} ? 'disabled'"
+               th:href="@{/customer/order/history(page=${currentPage + 1},searchType=${search.searchType},keyword=${search.keyword},startDate=${search.startDate},endDate=${search.endDate},period=${search.period})}">&rsaquo;</a>
         </div>
 
     </div>

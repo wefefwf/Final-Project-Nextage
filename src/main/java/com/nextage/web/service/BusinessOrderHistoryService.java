@@ -22,6 +22,7 @@ public class BusinessOrderHistoryService {
     private final CustomerRequestMapper requestMapper;
     private final BusinessSettlementMapper settlementMapper;
     private final BidService bidService;
+    private final CustomerPaymentService customerPaymentService;
 
     @Transactional(readOnly = true)
     public List<OrderHistoryDTO> getPendingOrders(Long businessId, String role) {
@@ -102,12 +103,16 @@ public class BusinessOrderHistoryService {
     public void rejectOrder(Long orderId) {
         mapper.updateAcceptStatus(orderId, "REJECTED");
         mapper.updateDeliveryStatus(orderId, 9);
-        mapper.updatePaymentStatus(orderId, "CANCELLED"); // ✅ 결제 상태 취소로 변경
+        mapper.updatePaymentStatus(orderId, "CANCELLED");
         log.info("주문 거절 - orderId: {}", orderId);
 
+        // ✅ 아임포트 실제 환불 처리 추가
         OrderHistoryDTO order = mapper.selectOrderDetail(orderId);
+        String orderNo = order.getOrderNo(); // OrderHistoryDTO에 orderNo 필드 필요
+        customerPaymentService.cancelPayment(order.getOrderNo(), "비즈니스 거절로 인한 취소");
+
         if (order.getBidId() != null) {
-            bidService.rejectByBusiness(order.getBidId()); // ✅ request OPEN + 댓글 상태 변경
+            bidService.rejectByBusiness(order.getBidId());
         }
     }
 

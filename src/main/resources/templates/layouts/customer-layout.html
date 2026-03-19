@@ -44,9 +44,9 @@
 </head>
 <body>
     <div class="container-fluid px-5">
-        <div th:replace="~{fragments/customer-header::header}"></div>	
+        <div th:replace="~{fragments/customer-header::header}"></div>
         <main class="mt-4"><div layout:fragment="content"></div></main>
-        <div th:replace="~{fragments/customer-footer::footer}"></div>	
+        <div th:replace="~{fragments/customer-footer::footer}"></div>
     </div>
 
     <div th:if="${#authorization.expression('isAuthenticated()')}">
@@ -149,9 +149,32 @@
         function updateGlobalBadge() {
             const badge = document.getElementById('globalChatBadge');
             if(!badge) return;
+            if(userData && (userData.userType === 'CADMIN' || userData.userType === 'BADMIN')) return; // ✅ 어드민은 뱃지 표시 안 함
             fetch('/chat/global-info').then(res => res.json()).then(data => {
                 badge.innerText = data.unreadCount;
                 badge.style.display = data.unreadCount > 0 ? 'flex' : 'none';
+            });
+        }
+
+        // ✅ 신규: 주문/구매내역 페이지 실시간 unread 뱃지 업데이트
+        function updateOrderPageBadge(roomId) {
+            if (!roomId) return;
+
+            // ── 구매내역 페이지: data-order-id 카드에서 orderId로 roomId 매핑 ──
+            // 채팅하기 버튼의 href에 orderId가 있으므로 roomId를 data로 저장해둔 wrapper를 찾음
+            document.querySelectorAll('[data-room-id="' + roomId + '"]').forEach(function(wrap) {
+            	fetch('/customer/order/chat/unread/' + roomId)
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    var badge = wrap.querySelector('.unread-badge');
+                    if (!badge) return;
+                    if (data.count > 0) {
+                        badge.textContent = data.count > 99 ? '99+' : data.count;
+                        badge.style.display = 'inline-flex';
+                    } else {
+                        badge.style.display = 'none';
+                    }
+                });
             });
         }
 
@@ -264,6 +287,8 @@
                         const m = JSON.parse(msg.body);
                         updateGlobalBadge();
                         if (document.getElementById('miniChatDrawer').style.display === 'flex' && !currentMiniRoomId) loadMiniRooms();
+                        // ✅ 주문/구매내역 페이지 뱃지 실시간 업데이트
+                        updateOrderPageBadge(m.roomId);
                     });
                 });
             }).catch(() => { if(chatBtn) chatBtn.style.display = 'none'; });

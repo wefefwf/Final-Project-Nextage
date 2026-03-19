@@ -25,4 +25,6 @@ public interface ChatMapper {
     void insertChatRoom(ChatRoomDTO chatRoomDTO);
 
     void updateReadStatus(@Param("roomId") Long roomId, @Param("userType") String userType);
+    
+    int countUnread(@Param("roomId") Long roomId, @Param("userType") String userType);
 }
