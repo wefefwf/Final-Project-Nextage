@@ -18,6 +18,11 @@
         .mini-header { padding: 18px 20px; border-bottom: 1px solid #efeff4; display: flex; justify-content: space-between; align-items: center; background: #fff; }
         .mini-header h6 { margin: 0; font-weight: 800; font-size: 14px; color: #1c1c1e; letter-spacing: -0.5px; }
         .mini-body { flex: 1; overflow-y: auto; background: #f4f4f7; position: relative; }
+        .launcher-menu { display: flex; flex-direction: column; padding: 20px; gap: 15px; }
+        .launcher-btn { background: #fff; border: 1px solid #d1d1d6; padding: 20px; border-radius: 12px; cursor: pointer; text-align: left; transition: 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .launcher-btn:hover { background: #efeff4; transform: translateY(-2px); }
+        .launcher-btn-title { font-weight: 800; font-size: 15px; color: #1c1c1e; margin-bottom: 5px; }
+        .launcher-btn-desc { font-size: 12px; color: #8e8e93; }
         .mini-room-item { padding: 15px 20px; border-bottom: 1px solid #efeff4; cursor: pointer; background: #fff; }
         .mini-room-item:hover { background: #f8f8fa; }
         .mini-chat-content { display: none; flex-direction: column; height: 100%; position: absolute; top: 0; left: 0; width: 100%; background: #f4f4f7; z-index: 10; }
@@ -53,12 +58,24 @@
             <div class="mini-header">
                 <div class="d-flex align-items-center">
                     <span class="mini-back-btn" id="miniBackBtn" style="display:none;">&larr;</span>
-                    <h6 id="miniHeaderTitle">BUSINESS MESSAGES</h6>
+                    <h6 id="miniHeaderTitle">고객 지원 센터</h6>
                 </div>
                 <span style="cursor:pointer; color:#8e8e93; font-size:14px;" onclick="toggleMiniChat()">✕</span>
             </div>
             <div class="mini-body" id="miniBody">
-                <div id="miniRoomList"></div>
+                <div id="launcherMenu" class="launcher-menu">
+                    <div class="launcher-btn" onclick="openTransactionChat()">
+                        <div class="launcher-btn-title">BUSINESS MESSAGES</div>
+                        <div class="launcher-btn-desc">고객 및 클라이언트와의 대화 내역</div>
+                    </div>
+                    <div class="launcher-btn" onclick="openAIChat()">
+                        <div class="launcher-btn-title">AI 지원 어시스턴트</div>
+                        <div class="launcher-btn-desc">시스템 이용 안내 및 규정 확인</div>
+                    </div>
+                </div>
+
+                <div id="miniRoomList" style="display:none;"></div>
+
                 <div class="mini-chat-content" id="miniChatView">
                     <div class="mini-msg-area" id="miniMsgArea"></div>
                     <div id="miniPreviewContainer"><img id="miniPreviewImg" src=""><button id="miniClearImgBtn" onclick="clearMiniPreview()">✕</button></div>
@@ -68,6 +85,16 @@
                             <span class="mini-photo-btn" onclick="document.getElementById('miniFileInput').click()">+</span>
                             <input type="text" id="miniInput" placeholder="답변 입력...">
                             <span class="mini-send-btn" onclick="sendMiniMsg()">전송</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mini-chat-content" id="aiChatView">
+                    <div class="mini-msg-area" id="aiMsgArea"></div>
+                    <div class="mini-footer">
+                        <div class="mini-input-wrap">
+                            <input type="text" id="aiInput" placeholder="AI에게 질문하기...">
+                            <span class="mini-send-btn" onclick="sendAiMsg()">전송</span>
                         </div>
                     </div>
                 </div>
@@ -107,18 +134,43 @@
             if(!drawer) return;
             const isVisible = drawer.style.display === 'flex';
             drawer.style.display = isVisible ? 'none' : 'flex';
-            if (!isVisible) loadMiniRooms();
+            if (!isVisible) {
+                document.getElementById('launcherMenu').style.display = 'flex';
+                document.getElementById('miniRoomList').style.display = 'none';
+                document.getElementById('miniChatView').style.display = 'none';
+                document.getElementById('aiChatView').style.display = 'none';
+                document.getElementById('miniBackBtn').style.display = 'none';
+                document.getElementById('miniHeaderTitle').innerText = '고객 지원 센터';
+                if(currentMiniSub) { currentMiniSub.unsubscribe(); currentMiniSub = null; }
+                currentMiniRoomId = null;
+                clearMiniPreview();
+            }
         }
 
-        function loadMiniRooms() {
-            if(currentMiniSub) { currentMiniSub.unsubscribe(); currentMiniSub = null; }
-            currentMiniRoomId = null;
-            clearMiniPreview();
-            const backBtn = document.getElementById('miniBackBtn');
-            if(backBtn) backBtn.style.display = 'none';
-            const chatView = document.getElementById('miniChatView');
-            if(chatView) chatView.style.display = 'none';
+        function goBack() {
+            if (document.getElementById('miniChatView').style.display === 'flex') {
+                document.getElementById('miniChatView').style.display = 'none';
+                document.getElementById('miniRoomList').style.display = 'block';
+                document.getElementById('miniHeaderTitle').innerText = 'BUSINESS MESSAGES';
+                if(currentMiniSub) { currentMiniSub.unsubscribe(); currentMiniSub = null; }
+                currentMiniRoomId = null;
+            } else if (document.getElementById('miniRoomList').style.display === 'block' || document.getElementById('aiChatView').style.display === 'flex') {
+                document.getElementById('miniRoomList').style.display = 'none';
+                document.getElementById('aiChatView').style.display = 'none';
+                document.getElementById('launcherMenu').style.display = 'flex';
+                document.getElementById('miniBackBtn').style.display = 'none';
+                document.getElementById('miniHeaderTitle').innerText = '고객 지원 센터';
+            }
+        }
+
+        function openTransactionChat() {
+            document.getElementById('launcherMenu').style.display = 'none';
+            document.getElementById('miniChatView').style.display = 'none';
+            document.getElementById('aiChatView').style.display = 'none';
+            document.getElementById('miniRoomList').style.display = 'block';
+            document.getElementById('miniBackBtn').style.display = 'block';
             document.getElementById('miniHeaderTitle').innerText = 'BUSINESS MESSAGES';
+            
             fetch('/chat/mini/rooms').then(res => res.json()).then(rooms => {
                 const list = document.getElementById('miniRoomList');
                 if(!list) return;
@@ -127,7 +179,6 @@
                 rooms.forEach(r => {
                     const item = document.createElement('div');
                     item.className = 'mini-room-item';
-                    // ✅ BADMIN은 미니채팅 목록에서도 unread 뱃지 표시 안 함
                     const badgeHtml = (r.unreadCount > 0 && userData && userData.userType !== 'BADMIN')
                         ? `<span class="badge bg-danger rounded-pill" id="mini-unread-${r.roomId}">${r.unreadCount}</span>`
                         : '';
@@ -139,9 +190,72 @@
             });
         }
 
+        function openAIChat() {
+            document.getElementById('launcherMenu').style.display = 'none';
+            document.getElementById('miniRoomList').style.display = 'none';
+            document.getElementById('miniChatView').style.display = 'none';
+            document.getElementById('aiChatView').style.display = 'flex';
+            document.getElementById('miniBackBtn').style.display = 'block';
+            document.getElementById('miniHeaderTitle').innerText = 'AI 지원 어시스턴트';
+            loadAiChatHistory();
+        }
+
+        function loadAiChatHistory() {
+            const area = document.getElementById('aiMsgArea');
+            area.innerHTML = '';
+            const history = JSON.parse(localStorage.getItem('ai_chat_history_business')) || [];
+            if(history.length === 0) {
+                appendAiMsg('BOT', '시스템 어시스턴트입니다. 무엇을 도와드릴까요?');
+            } else {
+                history.forEach(m => appendAiMsg(m.role, m.content));
+            }
+            area.scrollTop = area.scrollHeight;
+        }
+
+        function appendAiMsg(role, content) {
+            const area = document.getElementById('aiMsgArea');
+            if(!area) return;
+            const isUser = role === 'USER';
+            const row = document.createElement('div');
+            row.className = `mini-msg-row ${isUser ? 'right' : 'left'}`;
+            const bubbleClass = isUser ? 'mini-msg-right' : 'mini-msg-left';
+            row.innerHTML = `<div class="mini-msg-bubble ${bubbleClass}"><span>${content}</span></div>`;
+            area.appendChild(row);
+            area.scrollTop = area.scrollHeight;
+        }
+
+        function saveAiChatHistory(role, content) {
+            const history = JSON.parse(localStorage.getItem('ai_chat_history_business')) || [];
+            history.push({ role, content });
+            localStorage.setItem('ai_chat_history_business', JSON.stringify(history));
+        }
+
+        function sendAiMsg() {
+            const input = document.getElementById('aiInput');
+            const text = input.value.trim();
+            if (!text || !userData) return;
+
+            appendAiMsg('USER', text);
+            saveAiChatHistory('USER', text);
+            input.value = '';
+
+            fetch('/api/cs/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    message: text,
+                    userType: userData.userType 
+                })
+            }).then(res => res.json()).then(data => {
+                appendAiMsg('BOT', data.reply);
+                saveAiChatHistory('BOT', data.reply);
+            }).catch(err => {
+                appendAiMsg('BOT', '시스템 연결 대기중입니다. 백엔드 구성이 완료되면 정상 응답합니다.');
+            });
+        }
+
         function markAsRead(roomId) {
             if(!roomId || !userData) return;
-            // ✅ BADMIN은 읽음 처리 안 함 → 실제 판매자 안읽음 유지
             if(userData.userType === 'BADMIN') return;
             fetch(`/chat/read/${roomId}?userType=${userData.userType}`, { method: 'POST' }).then(() => {
                 const badge = document.getElementById('mini-unread-' + roomId);
@@ -153,7 +267,6 @@
         function updateGlobalBadge() {
             const badge = document.getElementById('globalChatBadge');
             if(!badge) return;
-            // ✅ BADMIN이면 뱃지 강제 숨김, fetch 자체를 안 함
             if(userData && userData.userType === 'BADMIN') {
                 badge.style.display = 'none';
                 return;
@@ -164,7 +277,6 @@
             });
         }
 
-        // ✅ 주문 페이지 실시간 unread 뱃지 업데이트 (BUSINESS 전용)
         function updateOrderPageBadge(roomId) {
             if (!roomId) return;
             var rows = document.querySelectorAll('[data-room-id="' + roomId + '"]');
@@ -204,11 +316,10 @@
         function openMiniChat(roomId, name) {
             if(currentMiniSub) { currentMiniSub.unsubscribe(); }
             currentMiniRoomId = roomId;
-            const backBtn = document.getElementById('miniBackBtn');
-            if(backBtn) backBtn.style.display = 'block';
+            document.getElementById('miniRoomList').style.display = 'none';
             document.getElementById('miniChatView').style.display = 'flex';
             document.getElementById('miniHeaderTitle').innerText = name;
-            markAsRead(roomId); // ✅ BADMIN이면 내부에서 return되므로 안전
+            markAsRead(roomId); 
             currentMiniSub = miniStomp.subscribe('/sub/chat/room/' + roomId, function(msg) {
                 const received = JSON.parse(msg.body);
                 appendMiniMsg(received);
@@ -285,26 +396,25 @@
             const chatBtn = document.getElementById('globalChatBtn');
             if (!chatBtn || window.location.pathname.includes('/chat')) { if(chatBtn) chatBtn.style.display = 'none'; return; }
             const backBtn = document.getElementById('miniBackBtn');
-            if(backBtn) backBtn.onclick = loadMiniRooms;
+            if(backBtn) backBtn.onclick = goBack;
             const miniInput = document.getElementById('miniInput');
             if(miniInput) miniInput.onkeypress = (e) => { if(e.key === 'Enter') sendMiniMsg(); };
+            const aiInput = document.getElementById('aiInput');
+            if(aiInput) aiInput.onkeypress = (e) => { if(e.key === 'Enter') sendAiMsg(); };
             fetch('/chat/global-info').then(res => {
                 if(!res.ok) throw new Error();
                 return res.json();
             }).then(data => {
                 userData = data;
-                // ✅ userData 세팅 직후 호출 → BADMIN이면 즉시 숨김
                 updateGlobalBadge();
                 const socket = new SockJS('/ws-chat');
                 miniStomp = Stomp.over(socket);
                 miniStomp.debug = null;
                 miniStomp.connect({}, function() {
-                    // ✅ BADMIN은 STOMP 구독 자체를 안 함 → 알림 수신 차단
                     if (data.userType === 'BADMIN') return;
                     miniStomp.subscribe('/sub/chat/user/' + data.userType + '/' + data.myId, function(msg) {
                         const m = JSON.parse(msg.body);
                         updateGlobalBadge();
-                        if (document.getElementById('miniChatDrawer').style.display === 'flex' && !currentMiniRoomId) loadMiniRooms();
                         updateOrderPageBadge(m.roomId);
                     });
                 });

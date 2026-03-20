@@ -18,6 +18,11 @@
         .mini-header { padding: 18px 20px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; background: #fff; }
         .mini-header h6 { margin: 0; font-weight: 800; font-size: 15px; color: #1d1d1f; }
         .mini-body { flex: 1; overflow-y: auto; background: #fff; position: relative; }
+        .launcher-menu { display: flex; flex-direction: column; padding: 20px; gap: 15px; }
+        .launcher-btn { background: #fff; border: 1px solid #d1d1d6; padding: 20px; border-radius: 12px; cursor: pointer; text-align: left; transition: 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .launcher-btn:hover { background: #f4f4f7; transform: translateY(-2px); }
+        .launcher-btn-title { font-weight: 800; font-size: 15px; color: #1c1c1e; margin-bottom: 5px; }
+        .launcher-btn-desc { font-size: 12px; color: #8e8e93; }
         .mini-room-item { padding: 15px 20px; border-bottom: 1px solid #f9f9f9; cursor: pointer; transition: 0.2s; }
         .mini-room-item:hover { background: #f5f5f7; }
         .mini-chat-content { display: none; flex-direction: column; height: 100%; position: absolute; top: 0; left: 0; width: 100%; background: #fff; z-index: 10; }
@@ -54,12 +59,24 @@
             <div class="mini-header">
                 <div class="d-flex align-items-center">
                     <span class="mini-back-btn" id="miniBackBtn" style="display:none;">&larr;</span>
-                    <h6 id="miniHeaderTitle">메시지</h6>
+                    <h6 id="miniHeaderTitle">고객 지원</h6>
                 </div>
                 <span style="cursor:pointer; color:#8e8e93; font-size:14px;" onclick="toggleMiniChat()">✕</span>
             </div>
             <div class="mini-body" id="miniBody">
-                <div id="miniRoomList"></div>
+                <div id="launcherMenu" class="launcher-menu">
+                    <div class="launcher-btn" onclick="openTransactionChat()">
+                        <div class="launcher-btn-title">1:1 거래 채팅</div>
+                        <div class="launcher-btn-desc">파트너와 진행 중인 거래 대화 내역</div>
+                    </div>
+                    <div class="launcher-btn" onclick="openAIChat()">
+                        <div class="launcher-btn-title">AI 고객센터</div>
+                        <div class="launcher-btn-desc">24시간 빠른 시스템 문제 해결</div>
+                    </div>
+                </div>
+
+                <div id="miniRoomList" style="display:none;"></div>
+
                 <div class="mini-chat-content" id="miniChatView">
                     <div class="mini-msg-area" id="miniMsgArea"></div>
                     <div id="miniPreviewContainer"><img id="miniPreviewImg" src=""><button id="miniClearImgBtn" onclick="clearMiniPreview()">✕</button></div>
@@ -69,6 +86,16 @@
                             <span class="mini-photo-btn" onclick="document.getElementById('miniFileInput').click()">⊕</span>
                             <input type="text" id="miniInput" placeholder="메시지 입력...">
                             <span class="mini-send-btn" onclick="sendMiniMsg()">보내기</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mini-chat-content" id="aiChatView">
+                    <div class="mini-msg-area" id="aiMsgArea"></div>
+                    <div class="mini-footer">
+                        <div class="mini-input-wrap">
+                            <input type="text" id="aiInput" placeholder="AI에게 질문하기...">
+                            <span class="mini-send-btn" onclick="sendAiMsg()">전송</span>
                         </div>
                     </div>
                 </div>
@@ -108,18 +135,43 @@
             if(!drawer) return;
             const isVisible = drawer.style.display === 'flex';
             drawer.style.display = isVisible ? 'none' : 'flex';
-            if (!isVisible) loadMiniRooms();
+            if (!isVisible) {
+                document.getElementById('launcherMenu').style.display = 'flex';
+                document.getElementById('miniRoomList').style.display = 'none';
+                document.getElementById('miniChatView').style.display = 'none';
+                document.getElementById('aiChatView').style.display = 'none';
+                document.getElementById('miniBackBtn').style.display = 'none';
+                document.getElementById('miniHeaderTitle').innerText = '고객 지원';
+                if(currentMiniSub) { currentMiniSub.unsubscribe(); currentMiniSub = null; }
+                currentMiniRoomId = null;
+                clearMiniPreview();
+            }
         }
 
-        function loadMiniRooms() {
-            if(currentMiniSub) { currentMiniSub.unsubscribe(); currentMiniSub = null; }
-            currentMiniRoomId = null;
-            clearMiniPreview();
-            const backBtn = document.getElementById('miniBackBtn');
-            if(backBtn) backBtn.style.display = 'none';
-            const chatView = document.getElementById('miniChatView');
-            if(chatView) chatView.style.display = 'none';
-            document.getElementById('miniHeaderTitle').innerText = '메시지';
+        function goBack() {
+            if (document.getElementById('miniChatView').style.display === 'flex') {
+                document.getElementById('miniChatView').style.display = 'none';
+                document.getElementById('miniRoomList').style.display = 'block';
+                document.getElementById('miniHeaderTitle').innerText = '1:1 거래 채팅';
+                if(currentMiniSub) { currentMiniSub.unsubscribe(); currentMiniSub = null; }
+                currentMiniRoomId = null;
+            } else if (document.getElementById('miniRoomList').style.display === 'block' || document.getElementById('aiChatView').style.display === 'flex') {
+                document.getElementById('miniRoomList').style.display = 'none';
+                document.getElementById('aiChatView').style.display = 'none';
+                document.getElementById('launcherMenu').style.display = 'flex';
+                document.getElementById('miniBackBtn').style.display = 'none';
+                document.getElementById('miniHeaderTitle').innerText = '고객 지원';
+            }
+        }
+
+        function openTransactionChat() {
+            document.getElementById('launcherMenu').style.display = 'none';
+            document.getElementById('miniChatView').style.display = 'none';
+            document.getElementById('aiChatView').style.display = 'none';
+            document.getElementById('miniRoomList').style.display = 'block';
+            document.getElementById('miniBackBtn').style.display = 'block';
+            document.getElementById('miniHeaderTitle').innerText = '1:1 거래 채팅';
+            
             fetch('/chat/mini/rooms').then(res => res.json()).then(rooms => {
                 const list = document.getElementById('miniRoomList');
                 if(!list) return;
@@ -137,6 +189,70 @@
             });
         }
 
+        function openAIChat() {
+            document.getElementById('launcherMenu').style.display = 'none';
+            document.getElementById('miniRoomList').style.display = 'none';
+            document.getElementById('miniChatView').style.display = 'none';
+            document.getElementById('aiChatView').style.display = 'flex';
+            document.getElementById('miniBackBtn').style.display = 'block';
+            document.getElementById('miniHeaderTitle').innerText = 'AI 고객센터';
+            loadAiChatHistory();
+        }
+
+        function loadAiChatHistory() {
+            const area = document.getElementById('aiMsgArea');
+            area.innerHTML = '';
+            const history = JSON.parse(localStorage.getItem('ai_chat_history_customer')) || [];
+            if(history.length === 0) {
+                appendAiMsg('BOT', '안녕하세요! 무엇을 도와드릴까요?');
+            } else {
+                history.forEach(m => appendAiMsg(m.role, m.content));
+            }
+            area.scrollTop = area.scrollHeight;
+        }
+
+        function appendAiMsg(role, content) {
+            const area = document.getElementById('aiMsgArea');
+            if(!area) return;
+            const isUser = role === 'USER';
+            const row = document.createElement('div');
+            row.className = `mini-msg-row ${isUser ? 'right' : 'left'}`;
+            const bubbleClass = isUser ? 'mini-msg-right' : 'mini-msg-left';
+            row.innerHTML = `<div class="mini-msg-bubble ${bubbleClass}"><span>${content}</span></div>`;
+            area.appendChild(row);
+            area.scrollTop = area.scrollHeight;
+        }
+
+        function saveAiChatHistory(role, content) {
+            const history = JSON.parse(localStorage.getItem('ai_chat_history_customer')) || [];
+            history.push({ role, content });
+            localStorage.setItem('ai_chat_history_customer', JSON.stringify(history));
+        }
+
+        function sendAiMsg() {
+            const input = document.getElementById('aiInput');
+            const text = input.value.trim();
+            if (!text || !userData) return;
+
+            appendAiMsg('USER', text);
+            saveAiChatHistory('USER', text);
+            input.value = '';
+
+            fetch('/api/cs/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    message: text,
+                    userType: userData.userType 
+                })
+            }).then(res => res.json()).then(data => {
+                appendAiMsg('BOT', data.reply);
+                saveAiChatHistory('BOT', data.reply);
+            }).catch(err => {
+                appendAiMsg('BOT', '시스템 연결 대기중입니다. 백엔드 구성이 완료되면 정상 응답합니다.');
+            });
+        }
+
         function markAsRead(roomId) {
             if(!roomId || !userData) return;
             fetch(`/chat/read/${roomId}?userType=${userData.userType}`, { method: 'POST' }).then(() => {
@@ -149,19 +265,15 @@
         function updateGlobalBadge() {
             const badge = document.getElementById('globalChatBadge');
             if(!badge) return;
-            if(userData && (userData.userType === 'CADMIN' || userData.userType === 'BADMIN')) return; // ✅ 어드민은 뱃지 표시 안 함
+            if(userData && (userData.userType === 'CADMIN' || userData.userType === 'BADMIN')) return; 
             fetch('/chat/global-info').then(res => res.json()).then(data => {
                 badge.innerText = data.unreadCount;
                 badge.style.display = data.unreadCount > 0 ? 'flex' : 'none';
             });
         }
 
-        // ✅ 신규: 주문/구매내역 페이지 실시간 unread 뱃지 업데이트
         function updateOrderPageBadge(roomId) {
             if (!roomId) return;
-
-            // ── 구매내역 페이지: data-order-id 카드에서 orderId로 roomId 매핑 ──
-            // 채팅하기 버튼의 href에 orderId가 있으므로 roomId를 data로 저장해둔 wrapper를 찾음
             document.querySelectorAll('[data-room-id="' + roomId + '"]').forEach(function(wrap) {
             	fetch('/customer/order/chat/unread/' + roomId)
                 .then(function(r) { return r.json(); })
@@ -181,8 +293,7 @@
         function openMiniChat(roomId, name) {
             if(currentMiniSub) { currentMiniSub.unsubscribe(); }
             currentMiniRoomId = roomId;
-            const backBtn = document.getElementById('miniBackBtn');
-            if(backBtn) backBtn.style.display = 'block';
+            document.getElementById('miniRoomList').style.display = 'none';
             document.getElementById('miniChatView').style.display = 'flex';
             document.getElementById('miniHeaderTitle').innerText = name;
             markAsRead(roomId);
@@ -270,9 +381,11 @@
             const chatBtn = document.getElementById('globalChatBtn');
             if (!chatBtn || window.location.pathname.includes('/chat')) { if(chatBtn) chatBtn.style.display = 'none'; return; }
             const backBtn = document.getElementById('miniBackBtn');
-            if(backBtn) backBtn.onclick = loadMiniRooms;
+            if(backBtn) backBtn.onclick = goBack;
             const miniInput = document.getElementById('miniInput');
             if(miniInput) miniInput.onkeypress = (e) => { if(e.key === 'Enter') sendMiniMsg(); };
+            const aiInput = document.getElementById('aiInput');
+            if(aiInput) aiInput.onkeypress = (e) => { if(e.key === 'Enter') sendAiMsg(); };
             fetch('/chat/global-info').then(res => {
                 if(!res.ok) throw new Error();
                 return res.json();
@@ -286,8 +399,6 @@
                     miniStomp.subscribe('/sub/chat/user/' + data.userType + '/' + data.myId, function(msg) {
                         const m = JSON.parse(msg.body);
                         updateGlobalBadge();
-                        if (document.getElementById('miniChatDrawer').style.display === 'flex' && !currentMiniRoomId) loadMiniRooms();
-                        // ✅ 주문/구매내역 페이지 뱃지 실시간 업데이트
                         updateOrderPageBadge(m.roomId);
                     });
                 });
