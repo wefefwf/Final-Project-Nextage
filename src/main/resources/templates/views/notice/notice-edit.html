@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{|layouts/${userType}-layout|}">
+<head><title>공지 수정</title></head>
+<body>
+<div layout:fragment="content">
+    <div class="container my-5" style="max-width:700px">
+        <h4 class="fw-bold mb-4">공지 수정</h4>
+
+        <!-- 수정 폼 -->
+        <form th:action="@{/notice/edit/{id}(id=${notice.noticeId})}" method="post">
+            <div class="mb-3">
+                <label class="form-label">제목</label>
+                <input type="text" class="form-control" name="title"
+                       th:value="${notice.title}" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">대상</label>
+                <select class="form-select" name="target">
+                    <option value="ALL"      th:selected="${notice.target == 'ALL'}">전체</option>
+                    <option value="CUSTOMER" th:selected="${notice.target == 'CUSTOMER'}">고객</option>
+                    <option value="BUSINESS" th:selected="${notice.target == 'BUSINESS'}">기업</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">내용</label>
+                <textarea class="form-control" name="content" rows="6"
+                          th:text="${notice.content}" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-warning fw-bold w-100">수정하기</button>
+        </form>
+
+            <a th:href="@{/notice}" class="btn btn-outline-secondary">목록으로</a>
+
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+     layout:decorate="~{|layouts/${userType}-layout|}">
+<head>
+    <title>공지 상세</title>
+</head>
+<body>
+
+<div layout:fragment="content">
+    <div class="container my-5" style="max-width:750px">
+
+        <!-- 1. 제목 + 타겟 뱃지 -->
+        <div class="d-flex align-items-center gap-2 mb-2">
+            <!-- 2. CUER 오타 수정 (CUSER로 가정) -->
+            <span class="badge"
+                  th:classappend="${notice.target == 'ALL'} ? 'bg-secondary' :
+                                  (${notice.target == 'CUSTOMER'} ? 'bg-primary' : 'bg-success')"
+                  th:text="${notice.target}">ALL</span>
+            <h4 class="fw-bold mb-0" th:text="${notice.title}">제목이 들어갑니다</h4>
+        </div>
+
+        <!-- 2. 작성일 -->
+        <div class="text-muted small mb-3"
+             th:text="${#temporals.format(notice.createdAt, 'yyyy-MM-dd HH:mm')}">
+            2024-01-01 12:00
+        </div>
+
+        <hr>
+
+        <!-- 3. 본문 (에디터 태그 렌더링을 위한 utext) -->
+        <div class="notice-content mt-4 mb-5"
+             style="min-height:200px; line-height:1.8;"
+             th:utext="${notice.content}">
+            본문 내용이 들어갑니다.
+        </div>
+
+        <hr>
+
+        <!-- 4. 하단 버튼 영역 -->
+        <div class="d-flex justify-content-between mt-3">
+            
+            <!-- 3. 목록 URL을 공통 컨트롤러 주소로 변경 -->
+            <a th:href="@{/notice}" class="btn btn-outline-secondary">목록으로</a>
+
+            <!-- 4. 기업 관리자(BADMIN)와 고객 관리자(CADMIN) 모두 버튼이 보이도록 변경 -->
+            <div sec:authorize="hasAnyRole('CADMIN', 'BADMIN')" class="d-flex gap-2">
+                
+                <!-- 수정 버튼 -->
+                <a th:href="@{/notice/edit/{id}(id=${notice.noticeId})}" sec:authorize="hasAnyRole('CADMIN','BADMIN')"
+                   class="btn btn-warning">수정</a>
+                   
+                <!-- 삭제 버튼 (안전한 POST 방식) -->
+                <form th:action="@{/notice/delete/{id}(id=${notice.noticeId})}" method="post">
+                    <button type="submit" class="btn btn-danger" sec:authorize="hasAnyRole('CADMIN','BADMIN')"
+                            onclick="return confirm('정말 삭제하시겠습니까? 삭제 후 복구할 수 없습니다.')">삭제</button>
+                </form>
+                
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{|layouts/${userType}-layout|}">
+ 
+<head>
+    <title>Notice</title>
+    <link rel="stylesheet" th:href="@{/css/mypage/notice.css}">
+</head>
+<body>
+<div layout:fragment="content">
+
+    <div class="container my-5">
+        <h2 class="fw-bold mb-1">Notice</h2>
+
+        <!-- 인사말 (HTML 고정) -->
+        
+
+        <!-- 검색 + 글쓰기 -->
+        <div class="d-flex justify-content-between mb-3">
+    <div class="d-flex gap-2">
+        <select class="form-select" id="searchTarget" style="width:110px">
+            <option value="ALL"    th:selected="${selectedTarget == 'ALL'}">ALL</option>
+            <option value="CUER"   th:selected="${selectedTarget == 'CUSTOMER'}">CUSTOMER</option>
+            <option value="BUER"   th:selected="${selectedTarget == 'BUSINESS'}">BUSINESS</option>
+        </select>
+        <input type="text" class="form-control" id="searchKeyword"
+               th:value="${keyword}" placeholder="검색어를 입력해주세요">
+        <button class="btn btn-dark" onclick="searchNotice()">검색</button>
+    </div>
+
+            <!-- 관리자만 글쓰기 버튼 표시 -->
+            
+            
+        </div>
+        <a sec:authorize="hasAnyRole('CADMIN','BADMIN')"
+               href="/notice/write"
+               class="btn btn-warning fw-bold">글 쓰기</a>
+
+        <!-- 공지 목록 -->
+        <div class="notice-greeting p-3 mb-4 bg-light border rounded">
+            안녕하세요! 저희 서비스를 이용해주셔서 감사합니다. 😊
+        </div>
+        <table class="table table-hover text-center" style="border-top: 2px solid #333;">
+			    <thead class="table-light">
+			        <tr>
+			            <th width="15%">대상</th>
+			            <th width="60%">제목</th>
+			            <th width="25%">작성일</th>
+			        </tr>
+			    </thead>
+			    <tbody>
+			        <tr th:each="notice : ${noticeList}">
+			
+			            <!-- 대상: ALL / CUSTOMER / BUSINESS 등 원문 값 표시 -->
+			            <td th:text="${notice.target}">전체</td>
+			
+			            <!-- 제목: 상세 페이지로 이동 -->
+			            <td class="text-start">
+			                <a th:href="@{/notice/detail/{id}(id=${notice.noticeId})}"
+			                   th:text="${notice.title}">제목</a>
+			            </td>
+			
+			            <!-- 작성일 -->
+			            <td th:text="${#temporals.format(notice.createdAt, 'yyyy-MM-dd')}">
+			                2026-03-20
+			            </td>
+			
+			        </tr>
+			
+			        <!-- 데이터 없을 때 -->
+			        <tr th:if="${#lists.isEmpty(noticeList)}">
+			            <td colspan="3" class="py-4 text-muted">등록된 공지사항이 없습니다.</td>
+			        </tr>
+			    </tbody>
+			</table>
+
+        <!-- 페이지네이션 -->
+        <div class="d-flex justify-content-center mt-4">
+            <nav>
+                <ul class="pagination">
+                    <li class="page-item"><a class="page-link" href="#">이전</a></li>
+                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">다음</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+</div>
+
+<th:block layout:fragment="script">
+	<script>
+        function searchNotice() {
+            const target  = document.getElementById('searchTarget').value;
+            const keyword = document.getElementById('searchKeyword').value;
+            location.href = '/customer/notice?target=' + target + '&keyword=' + encodeURIComponent(keyword);
+        }
+    </script>
+</th:block>
+</body>
+</html>
