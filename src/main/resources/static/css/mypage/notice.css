@@ -50,7 +50,6 @@
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
-/* 🌟 검색바 및 입력창 (클릭 시 핑크색/그림자 삭제, 단순 검정 테두리) */
 .search-wrapper { display: flex; gap: 10px; flex: 1; max-width: 400px; }
 .search-input {
     flex: 1;
@@ -65,10 +64,10 @@
 }
 .search-input:focus {
     background: #fff;
-    border-color: #1d1d1f; /* 검정색 테두리만 생성 */
+    border-color: #1d1d1f; 
 }
 
-/* 공지사항 카드 아이템 */
+
 .notice-item {
     display: flex;
     flex-direction: column;
@@ -99,7 +98,7 @@
 .notice-date { font-size: 0.85rem; color: #a1a1a6; }
 .notice-title { font-size: 1.2rem; font-weight: 700; color: #1d1d1f; line-height: 1.4; }
 
-/* 🌟 공통 액션 버튼 (목록, 수정, 취소 등) */
+
 .action-btn {
     display: inline-flex;
     align-items: center;
@@ -133,19 +132,19 @@
 }
 .action-btn.danger:hover { background: #f8d7da; }
 
-/* 🌟 작성/수정 폼 하단 버튼 그룹 (저장/취소 5:5 비율 배치) */
+
 .form-actions {
     display: flex;
     gap: 15px;
     margin-top: 40px;
 }
 .form-actions .action-btn {
-    flex: 1; /* 양쪽 버튼 크기를 정확히 5:5로 맞춤 */
+    flex: 1; 
     padding: 14px 20px;
     font-size: 1rem;
 }
 
-/* 상세페이지 전용 */
+
 .detail-card {
     background: #fff;
     border-radius: 24px;
