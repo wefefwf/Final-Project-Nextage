@@ -14,7 +14,7 @@
         <div class="detail-card">
             <div class="item-top mb-3">
                 <span class="target-badge" 
-                      th:classappend="${notice.target == 'ALL' ? 'target-all' : (notice.target == 'CUSTOMER' ? 'target-customer' : 'target-business')}"
+                      th:classappend="${notice.target == 'ALL' ? 'target-all' : (notice.target == 'CUSTOMER' ? 'target-customer-' + userType : 'target-business-' + userType)}"
                       th:text="${notice.target}">ALL</span>
                 <span class="notice-date" th:text="${#temporals.format(notice.createdAt, 'yyyy.MM.dd HH:mm')}">2024.01.01</span>
             </div>

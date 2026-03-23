@@ -65,7 +65,7 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
             <a th:each="notice : ${noticeList}" th:href="@{/notice/detail/{id}(id=${notice.noticeId})}" class="notice-item">
         	<div class="item-top">
                     <span class="target-badge" 
-                          th:classappend="${notice.target == 'ALL' ? 'target-all' : (notice.target == 'CUSTOMER' ? 'target-customer' : 'target-business')}"
+                          th:classappend="${notice.target == 'ALL' ? 'target-all' : (notice.target == 'CUSTOMER' ? 'target-customer-' + userType : 'target-business-' + userType)}"
                           th:text="${notice.target}">ALL</span>
                     <span class="notice-date" th:text="${#temporals.format(notice.createdAt, 'yyyy-MM-dd')}">2024-03-20</span>
                 </div>
