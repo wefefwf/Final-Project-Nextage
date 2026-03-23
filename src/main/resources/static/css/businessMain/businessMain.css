@@ -689,8 +689,8 @@ h3 { margin-bottom: 20px; font-size: 20px; font-family: sans-serif; }
     border-radius: 4px;
     letter-spacing: -0.3px;
 }
-.badge-all { background: #f5f5f7; color: #86868b; }
-.badge-biz { background: #f1f8e9; color: #689f38; }
+.badge-all {background: #86868b; color: #f5f5f7; }
+.badge-biz {  background: #333; color: #f1f8e9; }
 
 .mini-title {
     font-size: 0.9rem;
