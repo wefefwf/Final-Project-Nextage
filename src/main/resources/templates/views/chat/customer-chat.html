@@ -17,7 +17,7 @@
         .msg-row.right { flex-direction: row-reverse; }
         .msg-row.left { flex-direction: row; }
         .msg-bubble { max-width: 70%; padding: 10px 15px; border-radius: 15px; font-size: 14px; position: relative; word-break: break-all; }
-        .msg-right { background: #0d6efd; color: #fff; border-bottom-right-radius: 2px; }
+        .msg-right { background: linear-gradient(135deg, #6e8efb, #a777e3); color: #fff; border-bottom-right-radius: 2px; border: none; }      
         .msg-left { background: #fff; border: 1px solid #ddd; color: #333; border-bottom-left-radius: 2px; }
         .msg-time { font-size: 11px; color: #999; margin: 0 8px; white-space: nowrap; }
         .photo-btn { background: none; border: none; padding: 0 10px; cursor: pointer; color: #6c757d; font-size: 1.5rem; }
@@ -151,12 +151,12 @@
             });
         }
 
+
         function markAsRead(roomId) {
             if(!roomId) return;
-            fetch(`/chat/read/${roomId}?userType=${userType}`, { method: 'POST' }).then(() => {
-                const badge = document.getElementById('unread-count-' + roomId);
-                if(badge) badge.style.display = 'none';
-            });
+            const badge = document.getElementById('unread-count-' + roomId);
+            if(badge) badge.style.display = 'none'; 
+            fetch(`/chat/read/${roomId}?userType=${userType}`, { method: 'POST' }); 
         }
 
         function connect() {
@@ -278,8 +278,21 @@
             document.querySelectorAll('.room-time-text').forEach(el => {
                 el.innerText = formatDisplayDate(el.getAttribute('data-time'));
             });
+
+
+            document.querySelectorAll('.chat-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const badge = this.querySelector('.badge.bg-danger');
+                    if(badge) badge.style.display = 'none';
+                });
+            });
+
             connect();
             if(currentRoomId) {
+
+                const currentBadge = document.getElementById('unread-count-' + currentRoomId);
+                if(currentBadge) currentBadge.style.display = 'none';
+
                 markAsRead(currentRoomId);
                 if(initialMessages) { 
                     initialMessages.forEach(m => appendMessageToScreen(m, true)); 
