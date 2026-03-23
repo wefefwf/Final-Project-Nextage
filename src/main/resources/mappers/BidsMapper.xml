@@ -51,13 +51,16 @@
 
 	<!-- 업체(페이지): 내가 작성한 제안 목록 조회 -->
 	<select id="selectBidsByBusinessId" parameterType="long"
-		resultType="com.nextage.web.domain.BidDTO">
-		SELECT *
-		FROM bids
-		WHERE business_id = #{businessId}
-		AND
-		status != 'HIDDEN'
-		ORDER BY created_at DESC
+	    resultType="com.nextage.web.domain.BidDTO">
+	    SELECT
+	        b.*,
+	        r.title AS requestTitle,
+	        r.status AS requestStatus
+	    FROM bids b
+	    LEFT JOIN request r ON r.request_id = b.request_id
+	    WHERE b.business_id = #{businessId}
+	    AND b.status != 'HIDDEN'
+	    ORDER BY b.created_at DESC
 	</select>
 
 	<select id="selectBidById" parameterType="long"

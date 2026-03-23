@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -178,6 +179,38 @@ public class ApiBidsController {
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result);
 	    }
 	}
+	
+	
+	/**
+     * 업체 본인의 제안 목록 조회
+     */
+    @GetMapping("/business/{businessId}")
+    public List<BidDTO> getBidsByBusiness(@PathVariable("businessId") Long businessId) {
+        return bidService.getBidsByBusinessId(businessId);
+    }
+ 
+    /**
+     * 업체 본인이 자신의 제안 삭제 (소프트 딜리트: HIDDEN)
+     */
+    @DeleteMapping("/{bidId}")
+    public ResponseEntity<Map<String, Object>> deleteBid(@PathVariable("bidId") Long bidId) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            bidService.updateBidStatus(bidId, "HIDDEN");
+            result.put("success", true);
+            result.put("message", "제안이 삭제되었습니다.");
+            return ResponseEntity.ok(result);
+        } catch (IllegalArgumentException e) {
+            result.put("success", false);
+            result.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(result);
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("message", "삭제 중 오류가 발생했습니다.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result);
+        }
+    }
+	
 	
 
 }

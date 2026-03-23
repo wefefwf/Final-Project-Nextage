@@ -24,5 +24,8 @@ public class BidDTO {
 	
 	private String businessLoginId;
 	private String companyName;
+	
+	private String requestTitle;
+	private String requestStatus;
 
 }
