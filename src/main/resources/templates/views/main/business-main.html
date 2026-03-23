@@ -144,7 +144,7 @@
 					        
 					   
 					        <a th:each="notice : ${businessNotices}" 
-					           th:href="@{/notice/detail/{id}(id=${notice.noticeId})}" 
+					           th:href="@{/business/notice/detail/{id}(id=${notice.noticeId})}" 
 					           class="mini-notice-item">
 					         
 					            <div class="mini-item-left">
@@ -165,7 +165,7 @@
 					    </div>
 					</div>
                     <div class="link-wrapper">
-                        <a th:href="@{/notice}" class="view-all">전체 보러가기 →</a>
+                        <a th:href="@{/business/notice}" class="view-all">전체 보러가기 →</a>
                     </div>
                 </div>
             </div>

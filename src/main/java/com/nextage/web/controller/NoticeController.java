@@ -33,12 +33,30 @@ public class NoticeController {
       model.addAttribute("keyword", keyword);
       return "views/notice/notice";
    }
+   
+   @GetMapping("/business/notice")
+   public String businessNoticeList(@RequestParam(name = "target", required = false, defaultValue = "") String target,
+                                    @RequestParam(name = "keyword", required = false, defaultValue = "") String keyword,
+                                    Authentication authentication, Model model) {
+       model.addAttribute("userType", "business");
+       model.addAttribute("noticeList", noticeService.getSearchList(target, keyword));
+       model.addAttribute("selectedTarget", target);
+       model.addAttribute("keyword", keyword);
+       return "views/notice/notice";
+       }
 
    @GetMapping({"/notice/detail/{noticeId}"})
    public String customerNoticeDetail(Authentication authentication, @PathVariable("noticeId") Long noticeId, Model model) {
       model.addAttribute("userType", this.getUserType(authentication));
       model.addAttribute("notice", this.noticeService.getNoticeById(noticeId));
       return "views/notice/notice-detail";
+   }
+   
+   @GetMapping("/business/notice/detail/{noticeId}")
+   public String businessNoticeDetail(Authentication authentication, @PathVariable("noticeId") Long noticeId, Model model) {
+	   model.addAttribute("userType", this.getUserType(authentication));
+	      model.addAttribute("notice", this.noticeService.getNoticeById(noticeId));
+       return "views/notice/notice-detail";
    }
 
    @PreAuthorize("hasAnyRole('CADMIN', 'BADMIN')")
