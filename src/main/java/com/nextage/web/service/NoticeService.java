@@ -1,41 +1,49 @@
 package com.nextage.web.service;
 
-import java.util.List;
-
-import org.springframework.stereotype.Service;
-
 import com.nextage.web.domain.NoticeDTO;
 import com.nextage.web.mapper.NoticeMapper;
-
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+import lombok.Generated;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
 public class NoticeService {
+   private final NoticeMapper noticeMapper;
 
-    private final NoticeMapper noticeMapper;
+   public List<NoticeDTO> getVisibleNotices(String role) {
+      return this.noticeMapper.findAllVisible(role);
+   }
 
-    public List<NoticeDTO> getVisibleNotices(String role) {
-        return noticeMapper.findAllVisible(role);
-    }
+   public List<NoticeDTO> getAllNotices() {
+      return this.noticeMapper.findAll();
+   }
 
-    public List<NoticeDTO> getAllNotices() {
-        return noticeMapper.findAll();
-    }
+   public NoticeDTO getNoticeById(Long noticeId) {
+      return this.noticeMapper.findById(noticeId);
+   }
 
-    public NoticeDTO getNoticeById(Long noticeId) {
-        return noticeMapper.findById(noticeId);
-    }
+   public void write(NoticeDTO notice) {
+      this.noticeMapper.insert(notice);
+   }
 
-    public void write(NoticeDTO notice) {
-        noticeMapper.insert(notice);
-    }
+   public void edit(NoticeDTO notice) {
+      this.noticeMapper.update(notice);
+   }
 
-    public void edit(NoticeDTO notice) {
-        noticeMapper.update(notice);
-    }
+   public void remove(Long noticeId) {
+      this.noticeMapper.delete(noticeId);
+   }
 
-    public void remove(Long noticeId) {
-        noticeMapper.delete(noticeId);
-    }
+   @Transactional(
+      readOnly = true
+   )
+   public List<NoticeDTO> getSearchList(String target, String keyword) {
+      return this.noticeMapper.getSearchList(target, keyword);
+   }
+
+   @Generated
+   public NoticeService(NoticeMapper noticeMapper) {
+      this.noticeMapper = noticeMapper;
+   }
 }

@@ -39,5 +39,28 @@
     <delete id="delete" parameterType="Long">
         DELETE FROM notice WHERE notice_id = #{noticeId}
     </delete>
+    
+        <select id="getSearchList" resultType="com.nextage.web.domain.NoticeDTO">
+        SELECT
+        notice_id   AS noticeId,
+        title,
+        content,
+        target,
+        created_at  AS createdAt,
+        updated_at  AS updatedAt
+    FROM notice
+    <where>
+        <if test="target != null and target != ''">
+            AND target = #{target}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            AND (
+                title   LIKE CONCAT('%', #{keyword}, '%')
+             OR content LIKE CONCAT('%', #{keyword}, '%')
+            )
+        </if>
+    </where>
+    ORDER BY created_at DESC
+    </select>
 
 </mapper>

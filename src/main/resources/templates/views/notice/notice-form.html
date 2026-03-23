@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{|layouts/${userType}-layout|}">
+<head><title>공지 작성</title>
+    <link rel="stylesheet" th:href="@{/css/mypage/notice.css}">
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="notice-board-container" style="max-width: 700px;">
+        <div class="detail-card" style="padding: 40px;">
+            <h2 class="brand-title" style="font-size: 1.8rem; margin-bottom: 30px;">Edit Notice</h2>
+            
+            <form th:action="${notice.noticeId == null} ? @{/notice/write} : @{/notice/edit/{id}(id=${notice.noticeId})}" method="post">
+                <div class="mb-4">
+                    <label class="group-label" style="font-size: 0.8rem; font-weight:700; color:#86868b; margin-bottom:8px; display:block;">Title</label>
+                    <input type="text" class="search-input w-100" name="title" th:value="${notice.title}" required placeholder="제목을 입력하세요">
+                </div>
+                
+                <div class="mb-4">
+                    <label class="group-label" style="font-size: 0.8rem; font-weight:700; color:#86868b; margin-bottom:8px; display:block;">Target</label>
+                    <select class="search-input w-100" name="target">
+                        <option value="ALL" th:selected="${notice.target == 'ALL'}">전체 (ALL)</option>
+                        <option value="CUSTOMER" th:selected="${notice.target == 'CUSTOMER'}">고객 (CUSTOMER)</option>
+                        <option value="BUSINESS" th:selected="${notice.target == 'BUSINESS'}">기업 (BUSINESS)</option>
+                    </select>
+                </div>
+
+                <div class="mb-4">
+                    <label class="group-label" style="font-size: 0.8rem; font-weight:700; color:#86868b; margin-bottom:8px; display:block;">Content</label>
+                    <textarea class="search-input w-100" name="content" rows="10" th:text="${notice.content}" required placeholder="내용을 입력하세요"></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <a th:href="@{/notice}" class="action-btn text-center">취소</a>
+                    <button type="submit" class="action-btn primary text-center">저장하기</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

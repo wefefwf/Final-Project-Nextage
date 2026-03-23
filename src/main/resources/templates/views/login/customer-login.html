@@ -91,7 +91,9 @@
 <body class="d-flex vh-100 justify-content-center align-items-center">
 
     <div class="login-wrapper text-center">
-        <img th:src="@{/images/logo.png}" alt="Nextage Logo" class="logo-image">
+        <a th:href="@{/customer/main}">
+            <img th:src="@{/images/logo.png}" alt="Nextage Logo" class="logo-image">
+        </a>
 
         <div th:if="${param.error}" class="alert alert-danger py-2" style="font-size: 0.9rem; border-radius: 8px;" role="alert">
             아이디 또는 비밀번호가 틀렸습니다.

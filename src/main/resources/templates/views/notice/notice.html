@@ -9,95 +9,89 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
     <link rel="stylesheet" th:href="@{/css/mypage/notice.css}">
 </head>
 <body>
-<div layout:fragment="content">
+	<div layout:fragment="content">
+	    <div class="notice-board-container">
+	    
+<div class="board-title-area text-center mb-5">
+    <h2 class="brand-title">Notice</h2>
+    <p class="text-muted mb-0">새로운 소식과 안내사항을 확인하세요.</p>
+</div>
 
-    <div class="container my-5">
-        <h2 class="fw-bold mb-1">Notice</h2>
+<!-- 검색 헤더 (좌, 중, 우 3분할 레이아웃) -->
+<div class="board-header d-flex align-items-center justify-content-between mb-4">
+    
+    <!-- 1. 좌측 빈 공간 (검색창을 완벽하게 중앙에 두기 위한 밸런스 용도) -->
+    <div style="flex: 1;"></div>
 
-        <!-- 인사말 (HTML 고정) -->
+    <!-- 2. 중앙 검색 영역 -->
+    <div class="search-wrapper d-flex gap-2 justify-content-center" style="flex: 2; max-width: 650px;">
         
-
-        <!-- 검색 + 글쓰기 -->
-        <div class="d-flex justify-content-between mb-3">
-    <div class="d-flex gap-2">
-        <select class="form-select" id="searchTarget" style="width:110px">
-            <option value="ALL"    th:selected="${selectedTarget == 'ALL'}">ALL</option>
-            <option value="CUER"   th:selected="${selectedTarget == 'CUSTOMER'}">CUSTOMER</option>
-            <option value="BUER"   th:selected="${selectedTarget == 'BUSINESS'}">BUSINESS</option>
-        </select>
-        <input type="text" class="form-control" id="searchKeyword"
-               th:value="${keyword}" placeholder="검색어를 입력해주세요">
-        <button class="btn btn-dark" onclick="searchNotice()">검색</button>
+        <!-- Select 박스에도 search-input 클래스를 주어 디자인 통일 -->
+        <select class="search-input" id="searchTarget"  style="width: 110px; flex: none; cursor: pointer; appearance: none; text-align: center; text-align-last: center; padding: 12px 10px;">
+		    
+		    <option value="" th:selected="${selectedTarget == '' or selectedTarget == null}">-- 전체 --</option>
+		    <option value="ALL" th:selected="${selectedTarget == 'ALL'}">ALL</option>
+		    <option value="CUSTOMER" th:selected="${selectedTarget == 'CUSTOMER'}">CUSTOMER</option>
+		    <option value="BUSINESS" th:selected="${selectedTarget == 'BUSINESS'}">BUSINESS</option>
+		    
+		</select>
+		        
+        <input type="text" class="search-input" id="searchKeyword" th:value="${keyword}" 
+           style="flex: 1;" placeholder="제목이나 내용을 검색하세요" onkeyup="if(window.event.keyCode==13){searchNotice()}">
+           
+ 
+    <button class="action-btn primary" onclick="searchNotice()" 
+            style="white-space: nowrap; min-width: 80px; flex: none;">검색</button>
     </div>
 
-            <!-- 관리자만 글쓰기 버튼 표시 -->
-            
-            
-        </div>
-        <a sec:authorize="hasAnyRole('CADMIN','BADMIN')"
-               href="/notice/write"
-               class="btn btn-warning fw-bold">글 쓰기</a>
-
-        <!-- 공지 목록 -->
-        <div class="notice-greeting p-3 mb-4 bg-light border rounded">
-            안녕하세요! 저희 서비스를 이용해주셔서 감사합니다. 😊
-        </div>
-        <table class="table table-hover text-center" style="border-top: 2px solid #333;">
-			    <thead class="table-light">
-			        <tr>
-			            <th width="15%">대상</th>
-			            <th width="60%">제목</th>
-			            <th width="25%">작성일</th>
-			        </tr>
-			    </thead>
-			    <tbody>
-			        <tr th:each="notice : ${noticeList}">
-			
-			            <!-- 대상: ALL / CUSTOMER / BUSINESS 등 원문 값 표시 -->
-			            <td th:text="${notice.target}">전체</td>
-			
-			            <!-- 제목: 상세 페이지로 이동 -->
-			            <td class="text-start">
-			                <a th:href="@{/notice/detail/{id}(id=${notice.noticeId})}"
-			                   th:text="${notice.title}">제목</a>
-			            </td>
-			
-			            <!-- 작성일 -->
-			            <td th:text="${#temporals.format(notice.createdAt, 'yyyy-MM-dd')}">
-			                2026-03-20
-			            </td>
-			
-			        </tr>
-			
-			        <!-- 데이터 없을 때 -->
-			        <tr th:if="${#lists.isEmpty(noticeList)}">
-			            <td colspan="3" class="py-4 text-muted">등록된 공지사항이 없습니다.</td>
-			        </tr>
-			    </tbody>
-			</table>
-
-        <!-- 페이지네이션 -->
-        <div class="d-flex justify-content-center mt-4">
-            <nav>
-                <ul class="pagination">
-                    <li class="page-item"><a class="page-link" href="#">이전</a></li>
-                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                    <li class="page-item"><a class="page-link" href="#">다음</a></li>
-                </ul>
-            </nav>
-        </div>
+    <!-- 3. 우측 '새 공지 작성' (여백에 자연스럽게 숨기기) -->
+    <div style="flex: 1; text-align: right;">
+        <a sec:authorize="hasAnyRole('CADMIN','BADMIN')" href="/notice/write" 
+           style="color: #a1a1a6; font-size: 0.9rem; font-weight: 600; text-decoration: underline; transition: color 0.2s;">
+            + 새 공지 작성
+        </a>
     </div>
 
 </div>
 
-<th:block layout:fragment="script">
-	<script>
-        function searchNotice() {
-            const target  = document.getElementById('searchTarget').value;
-            const keyword = document.getElementById('searchKeyword').value;
-            location.href = '/customer/notice?target=' + target + '&keyword=' + encodeURIComponent(keyword);
-        }
-    </script>
-</th:block>
+	    
+
+
+
+
+      
+        <!-- 카드형 리스트 -->
+        <div class="notice-list">
+            <a th:each="notice : ${noticeList}" th:href="@{/notice/detail/{id}(id=${notice.noticeId})}" class="notice-item">
+        	<div class="item-top">
+                    <span class="target-badge" 
+                          th:classappend="${notice.target == 'ALL' ? 'target-all' : (notice.target == 'CUSTOMER' ? 'target-customer' : 'target-business')}"
+                          th:text="${notice.target}">ALL</span>
+                    <span class="notice-date" th:text="${#temporals.format(notice.createdAt, 'yyyy-MM-dd')}">2024-03-20</span>
+                </div>
+                <div class="notice-title" th:text="${notice.title}">공지사항 제목이 표시됩니다.</div>
+            </a>
+
+            <!-- 데이터가 없을 때 -->
+            <div th:if="${#lists.isEmpty(noticeList)}" class="empty-msg" style="text-align:center; padding: 100px 0; color:#86868b;">
+                등록된 공지사항이 없습니다.
+            </div>
+        </div>
+
+    
+    </div>
+
+
+<script>
+    function searchNotice() {
+        const target = document.getElementById('searchTarget').value;
+        const keyword = document.getElementById('searchKeyword').value;
+        
+
+        location.href = `/notice?target=${target}&keyword=${encodeURIComponent(keyword)}`;
+    }
+</script>
+</div>
+
 </body>
 </html>

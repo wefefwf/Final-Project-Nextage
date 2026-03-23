@@ -65,7 +65,9 @@
 
     <div class="login-wrapper text-center">
 
-        <img th:src="@{/images/logo2.png}" alt="Nextage Logo" class="logo-image">
+        <a th:href="@{/business/main}">
+            <img th:src="@{/images/logo2.png}" alt="Nextage Logo" class="logo-image">
+        </a>
 
 
         <div th:if="${param.error}" class="alert alert-danger py-2" style="font-size: 0.9rem;" role="alert">

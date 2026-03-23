@@ -1,129 +1,154 @@
-/* 전체 배경 & 기본 */
-body {
-    background-color: #f8f9fa;
-    font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+/* Nextage 공지사항 메인 컨테이너 */
+.notice-board-container {
+    max-width: 1000px;
+    margin: 50px auto;
+    padding: 20px;
+    font-family: 'Pretendard', -apple-system, sans-serif;
 }
 
-/* 제목 */
-h2 {
-    font-weight: 700;
-    letter-spacing: -0.5px;
+/* 상단 타이틀 섹션 */
+.board-title-area { margin-bottom: 40px; }
+.brand-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #1d1d1f;
+    letter-spacing: -1px;
 }
 
-/* 인사말 박스 */
-.notice-greeting {
-    background: linear-gradient(135deg, #fdfdfd, #f1f3f5);
+/* 검색 및 필터 헤더 */
+.board-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+/* 필터 버튼 그룹 */
+.filter-group {
+    display: flex;
+    background: #f5f5f7;
+    padding: 5px;
+    border-radius: 15px;
+    gap: 2px;
+}
+.filter-btn {
+    padding: 8px 20px;
     border-radius: 12px;
-    font-size: 0.95rem;
-    color: #555;
-}
-
-/* 검색 영역 */
-.form-select,
-.form-control {
-    border-radius: 10px;
-    border: 1px solid #ddd;
-    transition: all 0.2s ease;
-}
-
-.form-select:focus,
-.form-control:focus {
-    border-color: #333;
-    box-shadow: 0 0 0 0.15rem rgba(0,0,0,0.1);
-}
-
-/* 검색 버튼 */
-.btn-dark {
-    border-radius: 10px;
-    padding: 6px 14px;
-    font-weight: 500;
-    transition: all 0.2s ease;
-}
-
-.btn-dark:hover {
-    background-color: #222;
-}
-
-/* 글쓰기 버튼 */
-.btn-warning {
-    border-radius: 10px;
-    padding: 6px 16px;
-    font-weight: 600;
-    transition: all 0.2s ease;
-}
-
-.btn-warning:hover {
-    background-color: #ffca2c;
-}
-
-/* 테이블 */
-.table {
-    border-radius: 12px;
-    overflow: hidden;
-    background-color: white;
-}
-
-.table thead {
-    background-color: #f1f3f5;
-}
-
-.table th {
+    border: none;
+    background: transparent;
+    color: #86868b;
     font-weight: 600;
     font-size: 0.9rem;
-    color: #555;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+.filter-btn.active {
+    background: #fff;
+    color: #1d1d1f;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
-.table td {
-    vertical-align: middle;
+/* 🌟 검색바 및 입력창 (클릭 시 핑크색/그림자 삭제, 단순 검정 테두리) */
+.search-wrapper { display: flex; gap: 10px; flex: 1; max-width: 400px; }
+.search-input {
+    flex: 1;
+    padding: 12px 18px;
+    border-radius: 12px;
+    border: 1px solid #e5e5e7;
+    background: #f5f5f7;
+    outline: none;
     font-size: 0.95rem;
+    color: #1d1d1f;
+    transition: border-color 0.2s;
+}
+.search-input:focus {
+    background: #fff;
+    border-color: #1d1d1f; /* 검정색 테두리만 생성 */
 }
 
-/* hover 효과 */
-.table-hover tbody tr {
-    transition: all 0.15s ease;
+/* 공지사항 카드 아이템 */
+.notice-item {
+    display: flex;
+    flex-direction: column;
+    padding: 25px 30px;
+    background: #fff;
+    border-radius: 20px;
+    margin-bottom: 15px;
+    border: 1px solid #f5f5f7;
+    text-decoration: none !important;
+    transition: border-color 0.2s;
+}
+.notice-item:hover {
+    border-color: #1d1d1f; 
 }
 
-.table-hover tbody tr:hover {
-    background-color: #f8f9fa;
+.item-top { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.target-badge {
+    font-size: 0.7rem; padding: 4px 12px; border-radius: 6px;
+    font-weight: 700; text-transform: uppercase;
+}
+.target-all { background: #86868b; color: #f5f5f7; }
+.target-customer { background: #ff79c6; color: #f5f5f7; }
+.target-business { background: #333; color: #f1f8e9; }
+
+.notice-date { font-size: 0.85rem; color: #a1a1a6; }
+.notice-title { font-size: 1.2rem; font-weight: 700; color: #1d1d1f; line-height: 1.4; }
+
+/* 🌟 공통 액션 버튼 (목록, 수정, 취소 등) */
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 24px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    text-decoration: none !important;
+    border: 1px solid #e5e5e7;
+    background: #fff;
+    color: #1d1d1f;
+    transition: background 0.2s;
+}
+.action-btn:hover { background: #f5f5f7; color: #1d1d1f; }
+
+/* 검정색 메인 버튼 (새 글 작성, 저장하기, 검색 등) */
+.action-btn.primary {
+    background: #1d1d1f;
+    color: #fff !important;
+    border-color: #1d1d1f;
+}
+.action-btn.primary:hover { background: #333; }
+
+/* 빨간색 삭제 버튼 */
+.action-btn.danger {
+    color: #dc3545;
+    border-color: #f8d7da;
+    background: #fff;
+}
+.action-btn.danger:hover { background: #f8d7da; }
+
+/* 🌟 작성/수정 폼 하단 버튼 그룹 (저장/취소 5:5 비율 배치) */
+.form-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 40px;
+}
+.form-actions .action-btn {
+    flex: 1; /* 양쪽 버튼 크기를 정확히 5:5로 맞춤 */
+    padding: 14px 20px;
+    font-size: 1rem;
 }
 
-/* 제목 링크 */
-.table a {
-    transition: all 0.2s ease;
+/* 상세페이지 전용 */
+.detail-card {
+    background: #fff;
+    border-radius: 24px;
+    padding: 50px;
+    border: 1px solid #e5e5e7;
 }
-
-.table a:hover {
-    color: #0d6efd;
-    text-decoration: underline;
-}
-
-/* 페이지네이션 */
-.pagination .page-link {
-    border-radius: 8px;
-    margin: 0 3px;
-    color: #333;
-    border: 1px solid #ddd;
-    transition: all 0.2s ease;
-}
-
-.pagination .page-link:hover {
-    background-color: #f1f3f5;
-}
-
-.pagination .active .page-link {
-    background-color: #333;
-    border-color: #333;
-    color: white;
-}
-
-/* 카드 느낌 컨테이너 */
-.container {
-    background-color: transparent;
-}
-
-.container > div {
-    background: white;
-    padding: 25px;
-    border-radius: 16px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+.detail-content {
+    font-size: 1.1rem; line-height: 1.8; color: #3e3e42; margin-top: 30px;
 }
