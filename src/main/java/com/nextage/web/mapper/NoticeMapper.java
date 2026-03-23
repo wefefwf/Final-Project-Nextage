@@ -10,6 +10,8 @@ public interface NoticeMapper {
    List<NoticeDTO> findAllVisible(String var1);
 
    List<NoticeDTO> findAll();
+   
+   List<NoticeDTO> findBusinessNotices();
 
    List<NoticeDTO> getSearchList(@Param("target") String var1, @Param("keyword") String var2);
 

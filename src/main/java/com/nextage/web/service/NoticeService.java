@@ -18,6 +18,11 @@ public class NoticeService {
    public List<NoticeDTO> getAllNotices() {
       return this.noticeMapper.findAll();
    }
+   
+   public List<NoticeDTO> getFindBusinessNotices() {
+	      return this.noticeMapper.findBusinessNotices();
+	   }
+
 
    public NoticeDTO getNoticeById(Long noticeId) {
       return this.noticeMapper.findById(noticeId);

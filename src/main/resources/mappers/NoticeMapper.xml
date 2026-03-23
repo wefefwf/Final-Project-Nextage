@@ -62,5 +62,13 @@
     </where>
     ORDER BY created_at DESC
     </select>
+    
+    <select id="findBusinessNotices" resultType="NoticeDTO">
+	    SELECT * 
+	    FROM notice 
+	    WHERE target IN ('ALL', 'BUSINESS')
+	    ORDER BY created_at DESC
+	    LIMIT 4
+	</select>
 
 </mapper>

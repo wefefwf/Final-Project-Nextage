@@ -139,9 +139,33 @@
 
                 <div class="notice-zone">
                     <h3>Notice</h3>
-                    <div class="box-gray notice-box"></div>
+                    <div class="box-gray notice-box p-0">
+					    <div class="mini-notice-list">
+					        
+					   
+					        <a th:each="notice : ${businessNotices}" 
+					           th:href="@{/notice/detail/{id}(id=${notice.noticeId})}" 
+					           class="mini-notice-item">
+					         
+					            <div class="mini-item-left">
+					                <span class="mini-badge" 
+					                      th:classappend="${notice.target == 'ALL'} ? 'badge-all' : 'badge-biz'"
+					                      th:text="${notice.target}">ALL</span>
+					                <span class="mini-title" th:text="${notice.title}">공지사항 제목입니다.</span>
+					            </div>
+					            
+					            <div class="mini-date" th:text="${#temporals.format(notice.createdAt, 'MM.dd')}">12.25</div>
+					        </a>
+					
+					        <!-- 공지사항이 아예 없을 경우 빈 상태 표시 -->
+					        <div th:if="${#lists.isEmpty(businessNotices)}" class="mini-empty-msg">
+					            등록된 공지사항이 없습니다.
+					        </div>
+					        
+					    </div>
+					</div>
                     <div class="link-wrapper">
-                        <a href="#" class="view-all">전체 보러가기 →</a>
+                        <a th:href="@{/notice}" class="view-all">전체 보러가기 →</a>
                     </div>
                 </div>
             </div>
