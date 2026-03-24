@@ -96,10 +96,6 @@
             transition: opacity 0.2s;
         }
         .item-img:hover { opacity: 0.85; }
-        .item-placeholder {
-            width: 72px; height: 72px; border-radius: 12px;
-            background: linear-gradient(135deg, #f0f2ff, #e8eeff); flex-shrink: 0;
-        }
         .item-info { flex: 1; min-width: 0; }
         .item-name {
             font-size: 15px; font-weight: 700; color: #222; margin-bottom: 5px;
@@ -295,23 +291,20 @@
         <div class="info-card">
             <div class="info-card-title">주문 상품</div>
 
-            <!-- ✅ th:each 안에 링크 포함 -->
+            <!-- ✅ 이미지 없을 경우 기본 이미지 적용 -->
             <div th:each="item : ${order.items}" class="order-item-row">
 
-                <!-- 이미지에 링크 -->
                 <a th:href="${order.bidId != null}
                            ? '/business/request/detail/' + ${order.requestId}
                            : '/customer/shop/detail?id=' + ${item.kitId}"
                    style="text-decoration:none; flex-shrink:0; display:block;">
-                    <div class="item-placeholder" th:if="${item.imageUrl == null}"></div>
                     <img class="item-img"
-                         th:if="${item.imageUrl != null}"
-                         th:src="${item.imageUrl}"
+                         th:src="${item.imageUrl != null ? item.imageUrl : '/image/default-profile.png'}"
+                         onerror="this.src='/image/default-profile.png'"
                          th:alt="${item.productName}">
                 </a>
 
                 <div class="item-info">
-                    <!-- 상품명에 링크 -->
                     <a th:href="${order.bidId != null}
                                ? '/business/request/detail/' + ${order.requestId}
                                : '/customer/shop/detail?id=' + ${item.kitId}"

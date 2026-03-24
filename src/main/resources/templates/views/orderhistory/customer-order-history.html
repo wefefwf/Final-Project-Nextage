@@ -51,8 +51,8 @@
         .delivery-done     { background: #f0f0f0; color: #888;    border: 1px solid #e0e0e0; }
         .delivery-cancel   { background: #fff5f5; color: #ff6b6b; border: 1px solid #ffc2c2; }
         .order-items-preview { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+        /* ✅ preview-placeholder 제거 — 기본 이미지로 대체 */
         .preview-img { width: 64px; height: 64px; object-fit: cover; border-radius: 10px; border: 1px solid #eee; }
-        .preview-placeholder { width: 64px; height: 64px; border-radius: 10px; background: linear-gradient(135deg, #f5f0ff, #ede9fe); }
         .preview-more { width: 64px; height: 64px; border-radius: 10px; background: #f5f5f5; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #aaa; }
         .order-card-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f5f5f5; padding-top: 14px; }
         .order-item-count { font-size: 13px; color: #999; }
@@ -71,26 +71,26 @@
         .btn-green { color: #fff; background: linear-gradient(135deg, #6dca8a, #a8e6cf); box-shadow: 0 2px 8px rgba(109,202,138,0.3); }
         .btn-green:hover { transform: translateY(-1px); color: #fff; }
         .unread-badge {
-    		position: absolute;
-		    top: -6px;
-		    right: -6px;
-		    background: #ff4444;
-		    color: #fff;
-		    border-radius: 50%;
-		    width: 18px;
-		    height: 18px;
-		    font-size: 10px;
-		    font-weight: 700;
-		    display: none;
-		    align-items: center;
-		    justify-content: center;
-		    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-		    text-align: center;
-		    line-height: 18px;
-		}
-		.unread-badge.show {
-		    display: inline-flex;
-		}
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: #ff4444;
+            color: #fff;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 10px;
+            font-weight: 700;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            text-align: center;
+            line-height: 18px;
+        }
+        .unread-badge.show {
+            display: inline-flex;
+        }
     </style>
 </head>
 <body>
@@ -164,7 +164,6 @@
                             <span class="accept-badge accept-pending"  th:if="${order.acceptStatus == 'PENDING'}">검토중</span>
                             <span class="accept-badge accept-accepted" th:if="${order.acceptStatus == 'ACCEPTED'}">수락됨</span>
                             <span class="accept-badge accept-rejected" th:if="${order.acceptStatus == 'REJECTED'}">거절됨</span>
-                            <!-- ✅ data-room-id 추가 -->
                             <div th:if="${order.acceptStatus != 'REJECTED'}"
                                  th:data-room-id="${order.roomId}"
                                  style="position:relative; display:inline-flex;">
@@ -173,20 +172,22 @@
                                    class="btn btn-green">
                                     채팅하기
                                 </a>
-                                <!-- ✅ unread-badge class 추가, roomId 없어도 span 유지 -->
                                 <span class="unread-badge"
-								      th:classappend="${order.unreadCount > 0} ? ' show'"
-								      th:text="${order.unreadCount > 0} ? (${order.unreadCount > 99} ? '99+' : ${order.unreadCount}) : ''">
-								</span>
+                                      th:classappend="${order.unreadCount > 0} ? ' show'"
+                                      th:text="${order.unreadCount > 0} ? (${order.unreadCount > 99} ? '99+' : ${order.unreadCount}) : ''">
+                                </span>
                             </div>
                         </th:block>
                     </div>
                 </div>
 
+                <!-- ✅ 이미지 없을 경우 기본 이미지 적용 -->
                 <div class="order-items-preview">
                     <th:block th:each="item, iter : ${order.items}" th:if="${iter.index < 4}">
-                        <div class="preview-placeholder" th:if="${item.imageUrl == null}"></div>
-                        <img class="preview-img" th:if="${item.imageUrl != null}" th:src="${item.imageUrl}" th:alt="${item.productName}">
+                        <img class="preview-img"
+                             th:src="${item.imageUrl != null ? item.imageUrl : '/image/default-profile.png'}"
+                             onerror="this.src='/image/default-profile.png'"
+                             th:alt="${item.productName}">
                     </th:block>
                     <div class="preview-more"
                          th:if="${#lists.size(order.items) > 4}"

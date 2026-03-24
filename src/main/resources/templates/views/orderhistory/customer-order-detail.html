@@ -96,10 +96,6 @@
             width: 72px; height: 72px; object-fit: cover;
             border-radius: 12px; border: 1px solid #eee; flex-shrink: 0;
         }
-        .item-placeholder {
-            width: 72px; height: 72px; border-radius: 12px;
-            background: linear-gradient(135deg, #f5f0ff, #ede9fe); flex-shrink: 0;
-        }
         .item-info { flex: 1; min-width: 0; }
         .item-name {
             font-size: 15px; font-weight: 700; color: #222; margin-bottom: 5px;
@@ -263,50 +259,49 @@
             <div class="info-card-title">주문 상품</div>
 
             <div th:each="item : ${order.items}" class="order-item-row">
-			
-			    <!-- ✅ 이미지에 링크 -->
-			    <a th:href="${order.bidId != null}
-				           ? '/customer/request/detail/' + ${order.requestId}
-				           : '/customer/shop/detail?id=' + ${item.kitId}"
-				   style="text-decoration:none; flex-shrink:0; display:block;">
-				    <div class="item-placeholder" th:if="${item.imageUrl == null}"></div>
-				    <img class="item-img"
-				         th:if="${item.imageUrl != null}"
-				         th:src="${item.imageUrl}"
-				         th:alt="${item.productName}">
-				</a>
-				
-				<div class="item-info">
-				    <a th:href="${order.bidId != null}
-				               ? '/customer/request/detail/' + ${order.requestId}
-				               : '/customer/shop/detail?id=' + ${item.kitId}"
-				       style="text-decoration:none; color:inherit;">
-				        <div class="item-name" th:text="${item.productName}"
-				             style="cursor:pointer;"
-				             onmouseover="this.style.color='#bd93f9'"
-				             onmouseout="this.style.color='#222'">상품명</div>
-				    </a>
-				    <div class="item-qty" th:text="${item.quantity} + '개'">1개</div>
-				</div>
-			
-			    <div class="item-price"
-			         th:text="${#numbers.formatInteger(item.price * item.quantity, 3, 'COMMA') + '원'}">
-			    </div>
-			
-			    <!-- 후기 버튼 -->
-			    <th:block th:if="${order.bidId != null and order.deliveryStatus == 4}">
-			        <button class="btn-reviewed"
-			                th:if="${item.reviewed}"
-			                th:onclick="|location.href='/business/portfolio/' + ${order.businessId} + '?reviewId=' + ${item.reviewId}|">
-			            후기 보기
-			        </button>
-			        <button class="btn-review"
-			                th:if="${!item.reviewed}"
-			                th:onclick="|location.href='/customer/review/write?orderItemId=' + ${item.orderItemId}|">
-			            후기 작성
-			        </button>
-			    </th:block>
-			</div>
+
+                <!-- ✅ 이미지에 링크 + 기본 이미지 적용 -->
+                <a th:href="${order.bidId != null}
+                           ? '/customer/request/detail/' + ${order.requestId}
+                           : '/customer/shop/detail?id=' + ${item.kitId}"
+                   style="text-decoration:none; flex-shrink:0; display:block;">
+                    <img class="item-img"
+                         th:src="${item.imageUrl != null ? item.imageUrl : '/image/default-profile.png'}"
+                         onerror="this.src='/image/default-profile.png'"
+                         th:alt="${item.productName}">
+                </a>
+
+                <div class="item-info">
+                    <a th:href="${order.bidId != null}
+                               ? '/customer/request/detail/' + ${order.requestId}
+                               : '/customer/shop/detail?id=' + ${item.kitId}"
+                       style="text-decoration:none; color:inherit;">
+                        <div class="item-name" th:text="${item.productName}"
+                             style="cursor:pointer;"
+                             onmouseover="this.style.color='#bd93f9'"
+                             onmouseout="this.style.color='#222'">상품명</div>
+                    </a>
+                    <div class="item-qty" th:text="${item.quantity} + '개'">1개</div>
+                </div>
+
+                <div class="item-price"
+                     th:text="${#numbers.formatInteger(item.price * item.quantity, 3, 'COMMA') + '원'}">
+                </div>
+
+                <!-- 후기 버튼 -->
+                <th:block th:if="${order.bidId != null and order.deliveryStatus == 4}">
+                    <button class="btn-reviewed"
+                            th:if="${item.reviewed}"
+                            th:onclick="|location.href='/business/portfolio/' + ${order.businessId} + '?reviewId=' + ${item.reviewId}|">
+                        후기 보기
+                    </button>
+                    <button class="btn-review"
+                            th:if="${!item.reviewed}"
+                            th:onclick="|location.href='/customer/review/write?orderItemId=' + ${item.orderItemId}|">
+                        후기 작성
+                    </button>
+                </th:block>
+            </div>
 
             <div class="total-row">
                 <span class="total-label">총 결제 금액</span>

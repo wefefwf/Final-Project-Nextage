@@ -197,11 +197,11 @@
                      class="pending-item"
                      th:data-order-id="${order.orderId}"
                      th:onclick="|selectOrder([[${order.orderId}]])|">
+                    <!-- ✅ 이미지 없을 경우 기본 이미지 적용 -->
                     <div class="pending-thumb">
-                        <img th:if="${order.items != null and !#lists.isEmpty(order.items) and order.items[0].imageUrl != null}"
-                             th:src="${order.items[0].imageUrl}" alt="">
-                        <div class="pending-thumb-placeholder"
-                             th:if="${order.items == null or #lists.isEmpty(order.items) or order.items[0].imageUrl == null}"></div>
+                        <img th:src="${order.items != null and !#lists.isEmpty(order.items) and order.items[0].imageUrl != null
+                                       ? order.items[0].imageUrl : '/image/default-profile.png'}"
+                             onerror="this.src='/image/default-profile.png'" alt="">
                     </div>
                     <div class="pending-info">
                         <div class="pending-name" th:text="${order.customerNickname} + ' 님의 주문'"></div>
@@ -275,9 +275,11 @@
          th:data-room-id="${order.roomId}"
          onclick="goOrderDetail(this)">
 
+        <!-- ✅ 이미지 없을 경우 기본 이미지 적용 -->
         <div class="order-thumb">
-            <img th:if="${order.items != null and !#lists.isEmpty(order.items) and order.items[0].imageUrl != null}"
-                 th:src="${order.items[0].imageUrl}" alt="">
+            <img th:src="${order.items != null and !#lists.isEmpty(order.items) and order.items[0].imageUrl != null
+                           ? order.items[0].imageUrl : '/image/default-profile.png'}"
+                 onerror="this.src='/image/default-profile.png'" alt="">
         </div>
 
         <div class="order-info">
@@ -432,10 +434,12 @@
         var items = o.items || [];
         var first = items[0] || {};
 
+        // ✅ 상세 패널 이미지: imageUrl 없으면 기본 이미지 사용
         var imgEl = document.getElementById('detailImg');
-        imgEl.innerHTML = first.imageUrl
-            ? '<img src="' + first.imageUrl + '" style="width:100%;height:100%;object-fit:cover;" alt="">'
-            : '';
+        var imgSrc = first.imageUrl || '/image/default-profile.png';
+        imgEl.innerHTML = '<img src="' + imgSrc + '"'
+            + ' onerror="this.src=\'/image/default-profile.png\'"'
+            + ' style="width:100%;height:100%;object-fit:cover;" alt="">';
 
         document.getElementById('dOrderNo').textContent  = o.orderNo          || '-';
         document.getElementById('dCustomer').textContent = o.customerNickname || '-';
