@@ -68,7 +68,7 @@
 	    FROM notice 
 	    WHERE target IN ('ALL', 'BUSINESS')
 	    ORDER BY created_at DESC
-	    LIMIT 4
+	    LIMIT 3
 	</select>
 
 </mapper>
