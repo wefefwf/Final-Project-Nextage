@@ -100,19 +100,28 @@ $(document).ready(function() {
 
 // 3. 상태 변경
 function toggleStatus() {
-
     const nextStatus = (selectedStatus === 'ACTIVE') ? 'HIDDEN' : 'ACTIVE';
-
-    if(!confirm(`상태를 ${nextStatus === 'HIDDEN' ? '비공개' : '공개'}로 변경하시겠습니까?`)) return;
 
     $.ajax({
         url: '/business/portfolio/updateStatus',
         type: 'POST',
         data: { reviewId: selectedReviewId, status: nextStatus },
-        success: function(){
-            alert('변경되었습니다.');
-            location.reload();
-        },
+		success: function(){
+		    // reload 없이 그냥 화면만 업데이트
+		    selectedStatus = nextStatus;
+		    
+		    const btn = document.getElementById('btnToggleStatus');
+		    btn.innerText = (nextStatus === 'ACTIVE') ? '비공개로 전환' : '공개로 전환';
+		    
+		    // 카드도 업데이트
+		    const card = $(`.work-card[data-id="${selectedReviewId}"]`);
+		    card.attr('data-status', nextStatus);
+		    if(nextStatus === 'HIDDEN'){
+		        card.addClass('is-hidden');
+		    } else {
+		        card.removeClass('is-hidden');
+		    }
+		},
         error: function(){
             alert('오류 발생');
         }
