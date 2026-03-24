@@ -383,16 +383,31 @@
             markAsRead(roomId);
             currentMiniSub = miniStomp.subscribe('/sub/chat/room/' + roomId, function(msg) {
                 const received = JSON.parse(msg.body);
-                appendMiniMsg(received.senderType === userData.userType ? 'USER' : 'BOT', received.content);
+                appendMiniMsg(received);
                 if(received.senderType !== userData.userType) markAsRead(roomId);
             });
             fetch('/chat/mini/messages?roomId=' + roomId).then(res => res.json()).then(msgs => {
                 const area = document.getElementById('miniMsgArea');
                 if(!area) return;
                 area.innerHTML = '';
-                if(msgs) msgs.forEach(m => appendMiniMsg(m.senderType === userData.userType ? 'USER' : 'BOT', m.content));
+                if(msgs) msgs.forEach(m => appendMiniMsg(m));
                 area.scrollTop = area.scrollHeight;
             });
+        }
+
+        function appendMiniMsg(m) {
+            const area = document.getElementById('miniMsgArea');
+            if(!area || !userData) return;
+            const dateObj = m.sendAt ? new Date(m.sendAt) : new Date();
+            const isMy = m.senderId === userData.myId && m.senderType === userData.userType;
+            const row = document.createElement('div');
+            row.className = `mini-msg-row ${isMy ? 'right' : 'left'}`;
+            let contentHtml = `<div class="mini-msg-bubble ${isMy ? 'mini-msg-right' : 'mini-msg-left'} ${m.messageType === 'IMAGE' ? 'msg-image-only' : ''}">`;
+            if(m.messageType === 'IMAGE') { contentHtml += `<img src="${m.content}" style="max-width:100%; border-radius:8px;">`; }
+            else { contentHtml += `<span>${m.content}</span>`; }
+            row.innerHTML = contentHtml + `</div><span class="mini-msg-time">${String(dateObj.getHours()).padStart(2, '0')}:${String(dateObj.getMinutes()).padStart(2, '0')}</span>`;
+            area.appendChild(row);
+            area.scrollTop = area.scrollHeight;
         }
 
         function sendMiniMsg() {
