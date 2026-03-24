@@ -84,10 +84,12 @@
 
                 <!-- ✅ 관리자 삭제 버튼 -->
                 <button th:if="${isAdmin}"
-				        th:onclick="|event.stopPropagation(); adminDelete(${request.requestId})|"
-				        style="margin-left:10px; padding:6px 14px; background:#ff3b30; color:#fff; border:none; border-radius:8px; font-weight:700; cursor:pointer;">
-				    삭제
-				</button>
+						        th:data-id="${request.requestId}"
+						        th:data-status="${request.status}"
+						        onclick="event.stopPropagation(); adminDelete(this)"
+						        style="margin-left:10px; padding:6px 14px; background:#ff3b30; color:#fff; border:none; border-radius:8px; font-weight:700; cursor:pointer;">
+						    삭제
+						</button>
             </div>
         </div>
     </div>
@@ -133,14 +135,35 @@
     document.getElementById('sortSelect').addEventListener('change', applyFilterAndSort);
 
     // ✅ 관리자 삭제 함수
-    function adminDelete(requestId) {
-        if (!confirm('정말 삭제하시겠어요?')) return;
-        fetch('/customer/request/' + requestId, { method: 'DELETE' })
-            .then(r => {
-                if (r.ok) location.reload();
-                else alert('삭제 실패');
-            });
+    // ✅ 인자를 (requestId, status) 대신 (btn) 하나로 받습니다.
+function adminDelete(btn) {
+    // 1. 버튼(this)에 심어둔 data 속성값들을 꺼내옵니다.
+    const requestId = btn.getAttribute('data-id');
+    const status = btn.getAttribute('data-status');
+
+    // 2. 상태 체크 (안전하게 대문자로 변환해서 비교)
+    if (!status || status.toUpperCase() !== 'OPEN') {
+        alert('진행 중이거나 완료된 의뢰는 삭제할 수 없습니다. (의뢰중 상태만 가능)');
+        return; 
     }
+
+    // 3. OPEN 상태일 때만 삭제 확인창 띄우기
+    if (!confirm('정말 삭제하시겠어요?')) return;
+
+    // 4. 실제 삭제 요청
+    fetch('/customer/request/' + requestId, { method: 'DELETE' })
+        .then(r => {
+            if (r.ok) {
+                location.reload();
+            } else {
+                alert('삭제 실패');
+            }
+        })
+        .catch(err => {
+            console.error("삭제 중 오류 발생:", err);
+            alert('서버 통신 중 오류가 발생했습니다.');
+        });
+}
     </script>
 </th:block>
 </body>
