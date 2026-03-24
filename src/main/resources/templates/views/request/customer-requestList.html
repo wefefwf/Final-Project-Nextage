@@ -143,7 +143,7 @@ function adminDelete(btn) {
 
     // 2. 상태 체크 (안전하게 대문자로 변환해서 비교)
     if (!status || status.toUpperCase() !== 'OPEN') {
-        alert('진행 중이거나 완료된 의뢰는 삭제할 수 없습니다. (의뢰중 상태만 가능)');
+        alert('진행 중이거나 완료된 의뢰는 삭제할 수 없습니다.');
         return; 
     }
 
