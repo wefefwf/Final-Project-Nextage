@@ -25,7 +25,7 @@
 	                       AND cr.customer_id  = o.customer_id
 	                       AND cr.business_id  = o.business_id
 	WHERE o.customer_id = #{customerId}
-	  AND o.payment_status = 'PAID'
+	  AND o.payment_status IN ('PAID', 'CANCELLED')
 	  AND o.customer_deleted = 0
 	
 	<if test="search != null and search.keyword != null and search.keyword != ''">
@@ -60,7 +60,7 @@
 		LEFT JOIN customer c ON c.customer_id = o.customer_id 
 		
 		WHERE o.customer_id = #{customerId}
-		  AND o.payment_status = 'PAID'
+		  AND o.payment_status IN ('PAID', 'CANCELLED')
 		  AND o.customer_deleted = 0
 		
 		<if test="search != null and search.keyword != null and search.keyword != ''">
@@ -95,9 +95,9 @@
         FROM orders o
         JOIN customer c ON c.customer_id = o.customer_id
         LEFT JOIN business b ON b.business_id = o.business_id
-        WHERE o.payment_status = 'PAID'
+        WHERE o.payment_status IN ('PAID', 'CANCELLED')
           AND o.bid_id IS NULL
-          AND o.accept_status IN ('ACCEPTED', 'REJECTED')
+          AND o.accept_status IN ('ACCEPTED', 'REJECTED', 'CANCELLED')
         <if test="search != null and search.searchType == 'loginId' and search.keyword != null and search.keyword != ''">
             AND c.login_id LIKE CONCAT('%', #{search.keyword}, '%')
         </if>
@@ -125,9 +125,9 @@
         SELECT COUNT(*)
         FROM orders o
         JOIN customer c ON c.customer_id = o.customer_id
-        WHERE o.payment_status = 'PAID'
+        WHERE o.payment_status IN ('PAID', 'CANCELLED')
           AND o.bid_id IS NULL
-          AND o.accept_status IN ('ACCEPTED', 'REJECTED')
+          AND o.accept_status IN ('ACCEPTED', 'REJECTED', 'CANCELLED')
         <if test="search != null and search.searchType == 'loginId' and search.keyword != null and search.keyword != ''">
             AND c.login_id LIKE CONCAT('%', #{search.keyword}, '%')
         </if>
@@ -284,10 +284,10 @@
     LEFT JOIN chat_room cr ON cr.bid_id      = o.bid_id
                            AND cr.customer_id = o.customer_id
                            AND cr.business_id = o.business_id
-    WHERE o.payment_status = 'PAID'
+    WHERE o.payment_status IN ('PAID', 'CANCELLED')
       AND o.customer_deleted = 0
       AND o.bid_id IS NULL
-      AND o.accept_status IN ('ACCEPTED', 'REJECTED')
+      AND o.accept_status IN ('ACCEPTED', 'REJECTED', 'CANCELLED')
 
     <if test="search != null and search.keyword != null and search.keyword != ''">
         AND (
@@ -327,10 +327,10 @@
     LEFT JOIN business b ON b.business_id = o.business_id
     LEFT JOIN customer c ON c.customer_id = o.customer_id
 
-    WHERE o.payment_status = 'PAID'
+    WHERE o.payment_status IN ('PAID', 'CANCELLED')
       AND o.customer_deleted = 0
       AND o.bid_id IS NULL
-      AND o.accept_status IN ('ACCEPTED', 'REJECTED')
+      AND o.accept_status IN ('ACCEPTED', 'REJECTED', 'CANCELLED')
 
     <if test="search != null and search.keyword != null and search.keyword != ''">
         AND (
