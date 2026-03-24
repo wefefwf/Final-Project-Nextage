@@ -90,6 +90,7 @@ public class ChatController {
             String receiverType = "CUSTOMER".equals(message.getSenderType()) ? "BUSINESS" : "CUSTOMER";
             Long receiverId = "CUSTOMER".equals(message.getSenderType()) ? room.getBusinessId() : room.getCustomerId();
             messagingTemplate.convertAndSend("/sub/chat/user/" + receiverType + "/" + receiverId, message);
+            messagingTemplate.convertAndSend("/sub/chat/user/BADMIN/0", message);
         }
     }
 

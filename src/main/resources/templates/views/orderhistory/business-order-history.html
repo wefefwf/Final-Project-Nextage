@@ -260,7 +260,7 @@
     <!-- 하단: 수락한 주문 목록 -->
     <div class="section-header">
         <span class="section-title">Order List</span>
-        <span class="section-sub">수락한 결제내역</span>
+        <span class="section-sub">수락/거절한 결제내역</span>
     </div>
 
     <div th:if="${#lists.isEmpty(acceptedOrders)}"
@@ -596,6 +596,79 @@
         if (!_selected || !_selected.requestId) return;
         location.href = '/business/request/detail/' + _selected.requestId;
     }
+    
+ // ====== 실시간 unread 뱃지 업데이트 (BADMIN & BUSINESS 공통) ======
+    (function() {
+        var isAdmin = /*[[${isAdmin}]]*/ false;
+
+        // SockJS / STOMP 라이브러리가 business-layout에 이미 include되어 있다고 가정
+        // 없다면 layout에 추가 필요
+        var socket = new SockJS('/ws');
+        var stompClient = Stomp.over(socket);
+        stompClient.debug = null; // 콘솔 노이즈 제거
+
+        stompClient.connect({}, function() {
+
+            if (isAdmin) {
+                // BADMIN: 모든 채팅방 메시지를 /sub/chat/user/BADMIN/0 으로 수신
+                stompClient.subscribe('/sub/chat/user/BADMIN/0', function(frame) {
+                    var msg = JSON.parse(frame.body);
+                    updateUnreadBadgeRealtime(msg.roomId);
+                });
+            } else {
+                // 일반 BUSINESS: 자신의 채널 구독 (myId는 이미 서버에서 렌더링됨)
+                var myId = /*[[${myId}]]*/ null;
+                if (myId) {
+                    stompClient.subscribe('/sub/chat/user/BUSINESS/' + myId, function(frame) {
+                        var msg = JSON.parse(frame.body);
+                        updateUnreadBadgeRealtime(msg.roomId);
+                    });
+                }
+            }
+        }, function(err) {
+            console.warn('WebSocket 연결 실패:', err);
+        });
+
+        // roomId에 해당하는 뱃지를 API로 최신값 조회 후 갱신
+        function updateUnreadBadgeRealtime(roomId) {
+            if (!roomId) return;
+
+            // 1) Order List 하단 행의 뱃지 갱신
+            var wrapper = document.querySelector('[data-room-id="' + roomId + '"]');
+            if (wrapper) {
+                fetch('/chat/unread/' + roomId)
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    var badge = wrapper.querySelector('.unread-badge');
+                    if (!badge) return;
+                    if (data.count > 0) {
+                        badge.textContent = data.count > 99 ? '99+' : data.count;
+                        badge.classList.add('show');
+                        badge.style.display = 'inline-flex';
+                    } else {
+                        badge.classList.remove('show');
+                        badge.style.display = 'none';
+                    }
+                });
+            }
+
+            // 2) 상단 detail 패널의 뱃지도 현재 선택된 주문이면 갱신
+            if (_selected && _selected.roomId == roomId) {
+                fetch('/chat/unread/' + roomId)
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    var unreadBadge = document.getElementById('dUnreadBadge');
+                    if (!unreadBadge) return;
+                    if (data.count > 0) {
+                        unreadBadge.textContent = data.count > 99 ? '99+' : data.count;
+                        unreadBadge.style.display = 'inline-flex';
+                    } else {
+                        unreadBadge.style.display = 'none';
+                    }
+                });
+            }
+        }
+    })();
 /*]]>*/
 </script>
 

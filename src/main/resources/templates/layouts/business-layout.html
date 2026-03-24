@@ -500,7 +500,14 @@
                 miniStomp = Stomp.over(socket);
                 miniStomp.debug = null;
                 miniStomp.connect({}, function() {
-                    if (data.userType === 'BADMIN') return;
+                    if (data.userType === 'BADMIN') {
+                        // BADMIN 전용 채널 구독
+                        miniStomp.subscribe('/sub/chat/user/BADMIN/0', function(msg) {
+                            const m = JSON.parse(msg.body);
+                            updateOrderPageBadge(m.roomId);
+                        });
+                        return;
+                    }
                     miniStomp.subscribe('/sub/chat/user/' + data.userType + '/' + data.myId, function(msg) {
                         const m = JSON.parse(msg.body);
                         updateGlobalBadge();
